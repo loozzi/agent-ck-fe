@@ -27,8 +27,8 @@ export const userRoutesConfig: RouteBrowser[] = [
     exact: true
   },
   {
-    name: 'Planning',
-    route: 'planning',
+    name: 'Subscription',
+    route: 'subscription',
     element: <Planning />,
     exact: true
   },
