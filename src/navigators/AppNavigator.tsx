@@ -9,8 +9,8 @@ const AppNavigator = () => {
     <BrowserRouter>
       <Routes>
         {/* Public routes */}
-        <Route path='/login' element={<UserAuth />} />
-        <Route path='/register' element={<UserAuth />} />
+        <Route path='/signin' element={<UserAuth />} />
+        <Route path='/signup' element={<UserAuth isSignUp />} />
         <Route path='/unauthorized' element={<div>Unauthorized Access</div>} />
 
         {/* Protected user routes */}
