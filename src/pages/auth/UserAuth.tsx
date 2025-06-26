@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -6,10 +7,6 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { TrendingUp, Shield, Eye, EyeOff, Mail, Lock, User } from 'lucide-react'
-
-interface UserAuthProps {
-  isSignUp?: boolean
-}
 
 interface FormData {
   email: string
@@ -23,8 +20,15 @@ interface FormErrors {
   fullName?: string
 }
 
-const UserAuth = ({ isSignUp = false }: UserAuthProps) => {
-  const [isSignIn, setIsSignIn] = useState<boolean>(!isSignUp)
+const UserAuth = () => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  
+  // Determine sign in/up state based on current URL
+  const [isSignIn, setIsSignIn] = useState<boolean>(() => {
+    return location.pathname === '/signin'
+  })
+  
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -33,6 +37,11 @@ const UserAuth = ({ isSignUp = false }: UserAuthProps) => {
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  // Update state when URL changes
+  useEffect(() => {
+    setIsSignIn(location.pathname === '/signin')
+  }, [location.pathname])
 
   // Reset form when switching between sign in/up
   useEffect(() => {
@@ -97,6 +106,14 @@ const UserAuth = ({ isSignUp = false }: UserAuthProps) => {
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }))
+    }
+  }
+
+  const handleToggleAuthMode = () => {
+    if (isSignIn) {
+      navigate('/signup')
+    } else {
+      navigate('/signin')
     }
   }
 
@@ -251,7 +268,7 @@ const UserAuth = ({ isSignUp = false }: UserAuthProps) => {
                 type='button'
                 variant='link'
                 className='text-blue-600 hover:text-blue-700 font-medium p-0'
-                onClick={() => setIsSignIn(!isSignIn)}
+                onClick={handleToggleAuthMode}
               >
                 {isSignIn ? 'Đăng ký ngay' : 'Đăng nhập ngay'}
               </Button>
