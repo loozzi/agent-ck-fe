@@ -11,7 +11,7 @@ const persistConfig = {
   key: 'root',
   storage: storage,
   blacklist: [], // reducers that you don't want to persist
-  whiteList: [] // reducers that you want to persist
+  whiteList: ['auth'] // reducers that you want to persist
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

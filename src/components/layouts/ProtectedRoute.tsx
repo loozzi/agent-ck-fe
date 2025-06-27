@@ -1,3 +1,4 @@
+import { useAppSelector } from '@/app/hook'
 import { Navigate, useLocation } from 'react-router-dom'
 
 interface ProtectedRouteProps {
@@ -8,20 +9,19 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children, requiredRoles = [] }: ProtectedRouteProps) => {
   const location = useLocation()
 
-  // TODO: Implement authentication check
-  const isAuthenticated = true
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
 
   // TODO: Implement role check
-  const userRoles = ['user'] // This should come from your auth context/store
+  const userRole = useAppSelector((state) => state.auth.user?.role || '')
 
   if (!isAuthenticated) {
     // Redirect to login with return url
-    return <Navigate to='/login' state={{ from: location }} replace />
+    return <Navigate to='/signin' state={{ from: location }} replace />
   }
 
   // Check if user has required roles
   if (requiredRoles.length > 0) {
-    const hasRequiredRole = requiredRoles.some((role) => userRoles.includes(role))
+    const hasRequiredRole = requiredRoles.some((role) => role === userRole)
     if (!hasRequiredRole) {
       return <Navigate to='/unauthorized' replace />
     }

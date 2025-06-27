@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import React, { useState, useEffect } from 'react'
 import { MdChevronLeft, MdChevronRight, MdLogout } from 'react-icons/md'
 import SidebarMenuItem from './SidebarItem'
+import { useNavigate } from 'react-router'
 
 export interface SidebarItem {
   id: string
@@ -33,6 +34,8 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ items, user, className, onMobileMenuToggle, isMobileMenuOpen }) => {
   const [collapsed, setCollapsed] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+
+  const navigate = useNavigate()
 
   // Detect mobile screen size
   useEffect(() => {
@@ -64,9 +67,7 @@ const Sidebar: React.FC<SidebarProps> = ({ items, user, className, onMobileMenuT
   const otherItems = items.filter((item) => !['profile', 'settings'].includes(item.id))
 
   const handleLogout = () => {
-    // Xử lý đăng xuất ở đây
-    console.log('Logout clicked')
-    // Có thể gọi API logout hoặc xóa thông tin người dụng trong state
+    navigate('/signout')
   }
   return (
     <>
