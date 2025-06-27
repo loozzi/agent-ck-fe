@@ -62,6 +62,7 @@ const UserLayout = () => {
       href: '/setting'
     }
   ]
+
   const sampleUser = {
     name: user?.full_name || 'User Name',
     role: user?.role || 'Viewer',
@@ -70,12 +71,14 @@ const UserLayout = () => {
 
   return (
     <SidebarProvider>
+      {/* Mobile Header - fixed trên mobile */}
       <MobileHeader
         onMenuClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         title='CodingLab'
         isMenuOpen={isMobileMenuOpen}
       />
 
+      {/* Sidebar - sẽ tự động fixed trên cả desktop và mobile */}
       <Sidebar
         items={sidebarItems}
         user={sampleUser}
@@ -83,8 +86,11 @@ const UserLayout = () => {
         isMobileMenuOpen={isMobileMenuOpen}
       />
 
-      <main className='flex-1 md:ml-0 p-4 md:mt-0 mt-16'>
-        <UserNavigator />
+      {/* Main Content - với margin cho sidebar trên desktop */}
+      <main className='flex-1 overflow-auto md:ml-64 ml-0 mt-16 md:mt-0'>
+        <div className='p-4 h-full'>
+          <UserNavigator />
+        </div>
       </main>
     </SidebarProvider>
   )

@@ -81,8 +81,10 @@ const Sidebar: React.FC<SidebarProps> = ({ items, user, className, onMobileMenuT
         <div
           className={cn(
             'flex flex-col bg-slate-900 text-white transition-all duration-300 h-screen',
-            // Desktop styles
-            !isMobile && (collapsed ? 'w-16' : 'w-64'), // Mobile styles
+            // Desktop styles - fixed position
+            !isMobile && 'fixed left-0 top-0 z-30',
+            !isMobile && (collapsed ? 'w-16' : 'w-64'),
+            // Mobile styles
             isMobile && 'fixed inset-y-0 left-0 z-40 w-64 transform transition-transform',
             isMobile && (isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'),
             className

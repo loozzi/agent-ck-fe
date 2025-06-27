@@ -5,7 +5,12 @@ interface SidebarProviderProps {
 }
 
 const SidebarProvider = ({ children }: SidebarProviderProps) => {
-  return <div className='flex h-full w-full'>{children}</div>
+  return (
+    <div className='flex h-screen w-full overflow-hidden bg-background'>
+      {/* Sidebar sẽ được fixed và content sẽ có margin để tránh overlap */}
+      {children}
+    </div>
+  )
 }
 
 export default SidebarProvider
