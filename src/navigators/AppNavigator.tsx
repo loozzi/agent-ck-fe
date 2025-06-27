@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import UserAuth from '@/pages/auth/UserAuth'
 import SignOut from '@/pages/auth/SignOut'
 import Unauthorized from '@/pages/auth/Unauthorized'
+import Home from '@/pages/Home'
 
 const AppNavigator = () => {
   return (
@@ -15,7 +16,9 @@ const AppNavigator = () => {
         <Route path='/signup' element={<UserAuth />} />
         <Route path='/unauthorized' element={<Unauthorized />} />
         <Route path='/signout' element={<SignOut />} />
+        <Route path='/' element={<Home />} />
 
+        {/* Redirect root to user dashboard */}
         {/* Protected user routes */}
         <Route
           path='/*'

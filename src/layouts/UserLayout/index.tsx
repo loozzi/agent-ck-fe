@@ -15,7 +15,7 @@ const UserLayout = () => {
       id: 'dashboard',
       title: 'Bảng điều khiển',
       icon: <FaHome className='w-4 h-4' />,
-      href: '/'
+      href: '/dashboard'
     },
     {
       id: 'history',
