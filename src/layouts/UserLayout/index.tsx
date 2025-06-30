@@ -6,6 +6,7 @@ import UserNavigator from '@/navigators/user.routes'
 import { useState } from 'react'
 import { FaBookOpen, FaChartLine, FaHome, FaWallet } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
+import { MdOutlineMonitorHeart } from 'react-icons/md'
 const UserLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false)
   const user = useAppSelector((state) => state.auth.user)
@@ -16,6 +17,12 @@ const UserLayout = () => {
       title: 'Bảng điều khiển',
       icon: <FaHome className='w-4 h-4' />,
       href: '/dashboard'
+    },
+    {
+      id: 'portfolio',
+      title: 'Danh mục đầu tư',
+      icon: <MdOutlineMonitorHeart className='w-4 h-4' />,
+      href: '/portfolio'
     },
     {
       id: 'history',

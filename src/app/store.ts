@@ -1,12 +1,16 @@
 import authReducer from '@/slices/auth.slice'
 import mbtiReducer from '@/slices/mbti.slice'
+import portfolioReducer from '@/slices/portfolio.slice'
+import surveyReducer from '@/slices/survey.slice'
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { persistReducer, persistStore } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  mbti: mbtiReducer
+  mbti: mbtiReducer,
+  portfolio: portfolioReducer,
+  survey: surveyReducer
 })
 
 const persistConfig = {

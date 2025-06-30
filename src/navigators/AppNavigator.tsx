@@ -7,6 +7,7 @@ import SignOut from '@/pages/auth/SignOut'
 import Unauthorized from '@/pages/auth/Unauthorized'
 import Home from '@/pages/Home'
 import MBTI from '@/pages/user/MBTI'
+import Survey from '@/pages/user/Survey'
 
 const AppNavigator = () => {
   return (
@@ -19,6 +20,7 @@ const AppNavigator = () => {
         <Route path='/signout' element={<SignOut />} />
         <Route path='/' element={<Home />} />
         <Route path='/mbti' element={<MBTI />} />
+        <Route path='/survey' element={<Survey />} />
 
         {/* Redirect root to user dashboard */}
         {/* Protected user routes */}

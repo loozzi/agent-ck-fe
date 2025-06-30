@@ -32,22 +32,26 @@ apiInstance.interceptors.response.use(
     // Handle successful responses
     return response
   },
-  // TODO: handle refresh token logic
   (error) => {
-    if (error.status === 401 || error.response.data.detail === 'Invalid token') {
+    if (error.status === 403 || error.response.data.onboarding_required) window.location.href = '/survey'
+    if (error.status === 401 || error.response.data.detail === 'Token không hợp lệ') {
       const refreshToken = store.getState().auth.refreshToken
       if (refreshToken) {
         return apiInstance
           .post('/auth/token/refresh', { refresh_token: refreshToken })
           .then((response) => {
-            store.dispatch(authActions.updateToken(response.data))
-            // Retry the original request with the new token
-            error.config.headers['Authorization'] = `Bearer ${response.data.access_token}`
+            const { access_token, refresh_token } = response.data
+            store.dispatch(authActions.updateToken({ accessToken: access_token, refreshToken: refresh_token }))
+            error.config.headers['Authorization'] = `Bearer ${access_token}`
             return apiInstance.request(error.config)
           })
           .catch((refreshError) => {
+            console.error('Refresh token failed:', refreshError)
+            store.dispatch(authActions.signOut())
             return Promise.reject(refreshError)
           })
+      } else {
+        store.dispatch(authActions.signOut())
       }
     }
     return error

@@ -17,7 +17,6 @@ interface AuthState {
 export const signInAction = createAsyncThunk('auth/signIn', async (payload: SignInPayload, { rejectWithValue }) => {
   try {
     const response = await authService.signIn(payload)
-    console.log('SignIn Response:', response)
     if (response.status === 200) {
       toast.success('Đăng nhập thành công')
       const { access_token, refresh_token, token_type } = response.data
@@ -86,6 +85,7 @@ const userSlice = createSlice({
       state.token = null
       state.refreshToken = null
       state.signUpSuccess = false
+      state.loading = false
     },
     updateToken: (state, action) => {
       state.token = action.payload.accessToken
