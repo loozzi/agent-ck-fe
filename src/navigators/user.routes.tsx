@@ -2,6 +2,7 @@ import UserDashboard from '@/pages/user/Dashboard'
 import Learning from '@/pages/user/Learning'
 import Payment from '@/pages/user/Payment'
 import Planning from '@/pages/user/Planning'
+import Portfolio from '@/pages/user/Portfolio'
 import Setting from '@/pages/user/Setting'
 import TransactionHistory from '@/pages/user/TransactionHistory'
 import type { RouteBrowser } from '@/types/routes'
@@ -12,6 +13,12 @@ export const userRoutesConfig: RouteBrowser[] = [
     name: 'Dashboard',
     route: '',
     element: <UserDashboard />,
+    exact: true
+  },
+  {
+    name: 'Portfolio',
+    route: 'portfolio',
+    element: <Portfolio />,
     exact: true
   },
   {
@@ -27,8 +34,8 @@ export const userRoutesConfig: RouteBrowser[] = [
     exact: true
   },
   {
-    name: 'Planning',
-    route: 'planning',
+    name: 'Subscription',
+    route: 'subscription',
     element: <Planning />,
     exact: true
   },

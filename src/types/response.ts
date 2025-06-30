@@ -1,0 +1,54 @@
+export interface SignInResponse {
+  access_token: string
+  refresh_token: string
+  token_type: string
+
+  [key: string]: any
+}
+
+export interface SignUpResponse {
+  id: string
+  email: string
+  full_name: string
+  status: string
+  role: string
+  zalo_id?: any
+
+  [key: string]: any
+}
+
+export type UserRole = 'admin' | 'user' | 'viewer'
+
+export interface UserResponse {
+  id: string
+  email: string
+  full_name: string
+  status: string
+  role: UserRole
+  zalo_id: any
+
+  [key: string]: any
+}
+
+export interface PaginatedResponse {
+  total: number
+  limit: number
+  offset: number
+}
+
+export interface StockResponse {
+  ticker: string
+  name: string
+  exchange: string
+  sectors: any
+  time: string
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+}
+
+export interface ListStockResponse extends PaginatedResponse {
+  stocks: StockResponse[]
+}
