@@ -34,7 +34,12 @@ apiInstance.interceptors.response.use(
   },
   (error) => {
     if (error.status === 403 || error.response.data.onboarding_required) window.location.href = '/survey'
-    if (error.status === 401 || error.response.data.detail === 'Token không hợp lệ') {
+    if (error.status === 401 && error.response.data.detail === 'Refresh token đã hết hạn hoặc không hợp lệ') {
+      store.dispatch(authActions.signOut())
+      window.location.href = '/auth/login'
+      return Promise.reject(new Error('Refresh token expired or invalid'))
+    }
+    if (error.status === 401 && error.response.data.detail === 'Token không hợp lệ') {
       const refreshToken = store.getState().auth.refreshToken
       if (refreshToken) {
         return apiInstance

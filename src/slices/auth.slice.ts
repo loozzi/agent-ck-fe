@@ -88,8 +88,9 @@ const userSlice = createSlice({
       state.loading = false
     },
     updateToken: (state, action) => {
-      state.token = action.payload.accessToken
-      state.refreshToken = action.payload.refreshToken
+      const { accessToken, refreshToken } = action.payload
+      state.token = accessToken
+      state.refreshToken = refreshToken
     }
   },
   extraReducers: (builder) => {
