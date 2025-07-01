@@ -124,6 +124,7 @@ const UserLayout = () => {
         onMobileMenuToggle={setIsMobileMenuOpen}
         isMobileMenuOpen={isMobileMenuOpen}
         onCollapsedChange={handleSidebarToggle}
+        role='user'
       />
 
       {/* Main Content - với margin động theo trạng thái sidebar */}
