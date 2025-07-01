@@ -29,9 +29,17 @@ interface SidebarProps {
   className?: string
   onMobileMenuToggle?: (isOpen: boolean) => void
   isMobileMenuOpen?: boolean
+  onCollapsedChange?: (collapsed: boolean) => void
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ items, user, className, onMobileMenuToggle, isMobileMenuOpen }) => {
+const Sidebar: React.FC<SidebarProps> = ({
+  items,
+  user,
+  className,
+  onMobileMenuToggle,
+  isMobileMenuOpen,
+  onCollapsedChange
+}) => {
   const [collapsed, setCollapsed] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
@@ -52,7 +60,9 @@ const Sidebar: React.FC<SidebarProps> = ({ items, user, className, onMobileMenuT
     if (isMobile) {
       onMobileMenuToggle?.(!isMobileMenuOpen)
     } else {
-      setCollapsed(!collapsed)
+      const newCollapsed = !collapsed
+      setCollapsed(newCollapsed)
+      onCollapsedChange?.(newCollapsed)
     }
   }
 
@@ -61,6 +71,12 @@ const Sidebar: React.FC<SidebarProps> = ({ items, user, className, onMobileMenuT
       onMobileMenuToggle?.(false)
     }
   }
+
+  useEffect(() => {
+    if (!isMobile) {
+      setCollapsed(false)
+    }
+  }, [isMobile])
 
   // Nhóm items theo category
   const accountItems = items.filter((item) => ['profile', 'settings'].includes(item.id))
@@ -84,8 +100,8 @@ const Sidebar: React.FC<SidebarProps> = ({ items, user, className, onMobileMenuT
             // Desktop styles - fixed position
             !isMobile && 'fixed left-0 top-0 z-30',
             !isMobile && (collapsed ? 'w-16' : 'w-64'),
-            // Mobile styles
-            isMobile && 'fixed inset-y-0 left-0 z-40 w-64 transform transition-transform',
+            // Mobile styles - completely hidden when closed
+            isMobile && 'fixed inset-y-0 left-0 z-40 w-64',
             isMobile && (isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'),
             className
           )}

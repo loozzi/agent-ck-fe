@@ -23,7 +23,7 @@ const TransactionCard = ({ transaction }: TransactionCardProps) => {
 
   return (
     <Card
-      className={`border-l-4 ${isBuy ? 'border-l-green-500 bg-green-50 dark:bg-green-950/20' : 'border-l-red-500 bg-red-50 dark:bg-red-950/20'}`}
+      className={`border-l-4 ${isBuy ? 'border-l-blue-500 bg-blue-50 dark:bg-blue-950/20' : 'border-l-red-500 bg-red-50 dark:bg-red-950/20'}`}
     >
       <CardHeader className='pb-3'>
         <div className='flex items-center justify-between'>

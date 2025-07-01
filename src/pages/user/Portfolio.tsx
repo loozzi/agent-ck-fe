@@ -1,10 +1,12 @@
 import { useAppDispatch, useAppSelector } from '@/app/hook'
 import { Button } from '@/components/ui/button'
 import { fetchTransactions, fetchWallet } from '@/slices/portfolio.slice'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import WalletCard from '@/components/common/WalletCard'
 import TransactionCard from '@/components/common/TransactionCard'
 import AddTransactionDialog from '@/components/common/AddTransactionDialog'
+import StockDetailsDialog from '@/components/common/StockDetailsDialog'
+import DeleteConfirmationDialog from '@/components/common/DeleteConfirmationDialog'
 import { RefreshCw, Wallet, Receipt } from 'lucide-react'
 
 const Portfolio = () => {
@@ -15,9 +17,52 @@ const Portfolio = () => {
   const loading = useAppSelector((state) => state.portfolio.loading)
   const error = useAppSelector((state) => state.portfolio.error)
 
+  const [selectedStock, setSelectedStock] = useState<any>(null)
+  const [showStockDetails, setShowStockDetails] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [stockToDelete, setStockToDelete] = useState<any>(null)
+
   const handleTransactionSuccess = () => {
     dispatch(fetchWallet())
     dispatch(fetchTransactions())
+  }
+
+  const handleViewStock = (item: any) => {
+    setSelectedStock(item)
+    setShowStockDetails(true)
+  }
+
+  const handleEditStock = (item: any) => {
+    // TODO: Implement edit stock functionality
+    console.log('Edit stock:', item)
+    // You can implement a separate edit dialog here
+  }
+
+  const handleBuyStock = (ticker: string) => {
+    // TODO: Open buy transaction dialog with pre-filled ticker
+    console.log('Buy more stock:', ticker)
+    // This could open AddTransactionDialog with ticker pre-filled and action set to 'buy'
+  }
+
+  const handleSellStock = (ticker: string) => {
+    // TODO: Open sell transaction dialog with pre-filled ticker
+    console.log('Sell stock:', ticker)
+    // This could open AddTransactionDialog with ticker pre-filled and action set to 'sell'
+  }
+
+  const handleDeleteStock = (item: any) => {
+    setStockToDelete(item)
+    setShowDeleteDialog(true)
+  }
+
+  const confirmDeleteStock = () => {
+    if (stockToDelete) {
+      // TODO: Call API to delete stock from portfolio
+      console.log('Deleting stock:', stockToDelete.ticker)
+      // dispatch(deleteStockFromPortfolio(stockToDelete.id))
+      setShowDeleteDialog(false)
+      setStockToDelete(null)
+    }
   }
 
   useEffect(() => {
@@ -44,7 +89,7 @@ const Portfolio = () => {
             dispatch(fetchTransactions())
           }}
           disabled={loading}
-          className='flex items-center gap-2'
+          className='flex items-center gap-2 cursor-pointer'
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           {loading ? 'Đang tải...' : 'Làm mới'}
@@ -68,7 +113,15 @@ const Portfolio = () => {
         {wallet && wallet.length > 0 ? (
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
             {wallet.map((item) => (
-              <WalletCard key={item.id} item={item} />
+              <WalletCard
+                key={item.id}
+                item={item}
+                onView={handleViewStock}
+                onEdit={handleEditStock}
+                onBuy={handleBuyStock}
+                onSell={handleSellStock}
+                onDelete={handleDeleteStock}
+              />
             ))}
           </div>
         ) : (
@@ -98,6 +151,17 @@ const Portfolio = () => {
           </div>
         )}
       </div>
+
+      {/* Stock Details Dialog */}
+      <StockDetailsDialog item={selectedStock} open={showStockDetails} onOpenChange={setShowStockDetails} />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={confirmDeleteStock}
+        ticker={stockToDelete?.ticker || ''}
+      />
     </div>
   )
 }

@@ -1,0 +1,127 @@
+/* Alternative Button Layouts for WalletCard */
+
+/* Option 1: Current Implementation - 4 columns grid */
+.wallet-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.375rem;
+}
+
+@media (min-width: 640px) {
+  .wallet-actions-grid {
+    gap: 0.5rem;
+  }
+}
+
+/* Option 2: 2x2 Grid Layout */
+.wallet-actions-2x2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+/* Option 3: Horizontal Row with dividers */
+.wallet-actions-row {
+  display: flex;
+  border: 1px solid rgb(229 231 235);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.wallet-actions-row > button {
+  flex: 1;
+  border: none;
+  border-radius: 0;
+}
+
+.wallet-actions-row > button:not(:last-child) {
+  border-right: 1px solid rgb(229 231 235);
+}
+
+/* Option 4: Floating Action Buttons */
+.wallet-actions-floating {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.wallet-actions-floating button {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Option 5: Dropdown Menu Style */
+.wallet-actions-dropdown {
+  position: relative;
+}
+
+.wallet-actions-menu {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid rgb(229 231 235);
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  z-index: 10;
+  min-width: 8rem;
+}
+
+/* Current button styling improvements */
+.action-button {
+  @apply cursor-pointer transition-all duration-200 flex flex-col items-center gap-1 rounded-md;
+  height: 2.75rem;
+  padding: 0.375rem;
+}
+
+@media (min-width: 640px) {
+  .action-button {
+    height: 3rem;
+    padding: 0.5rem;
+  }
+}
+
+.action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Color variants */
+.action-button-view {
+  @apply text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800;
+}
+
+.action-button-view:hover {
+  @apply bg-blue-50 dark:bg-blue-950/30 border-blue-300 dark:border-blue-600;
+}
+
+.action-button-edit {
+  @apply text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700;
+}
+
+.action-button-edit:hover {
+  @apply bg-gray-50 dark:bg-gray-800/50 border-gray-300 dark:border-gray-600;
+}
+
+.action-button-buy {
+  @apply text-green-600 dark:text-green-400 border-green-200 dark:border-green-800;
+}
+
+.action-button-buy:hover {
+  @apply bg-green-50 dark:bg-green-950/30 border-green-300 dark:border-green-600;
+}
+
+.action-button-sell {
+  @apply text-red-600 dark:text-red-400 border-red-200 dark:border-red-800;
+}
+
+.action-button-sell:hover {
+  @apply bg-red-50 dark:bg-red-950/30 border-red-300 dark:border-red-600;
+}

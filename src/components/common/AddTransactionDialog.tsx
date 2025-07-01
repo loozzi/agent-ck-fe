@@ -74,7 +74,7 @@ const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant='outline' className='flex items-center gap-2'>
+        <Button variant='outline' className='flex items-center gap-2 cursor-pointer'>
           <Plus className='w-4 h-4' />
           Thêm giao dịch
         </Button>
@@ -196,10 +196,10 @@ const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
             </div>
           </div>
           <DialogFooter>
-            <Button type='button' variant='outline' onClick={() => setOpen(false)}>
+            <Button type='button' variant='outline' onClick={() => setOpen(false)} className='cursor-pointer'>
               Hủy
             </Button>
-            <Button type='submit' disabled={formik.isSubmitting || !formik.isValid}>
+            <Button type='submit' disabled={formik.isSubmitting || !formik.isValid} className='cursor-pointer'>
               {formik.isSubmitting ? 'Đang xử lý...' : 'Thêm giao dịch'}
             </Button>
           </DialogFooter>
