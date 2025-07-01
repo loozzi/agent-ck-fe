@@ -1,7 +1,9 @@
 import authService from '@/services/auth.service'
+import subscriptionService from '@/services/subscription.service'
 import userService from '@/services/user.service'
 import type { SignInPayload, SignUpPayload } from '@/types/payload'
 import type { UserResponse } from '@/types/response'
+import type { UserSubscription } from '@/types/subscription'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
 
@@ -12,6 +14,7 @@ interface AuthState {
   refreshToken?: string | null
   loading: boolean
   signUpSuccess?: boolean
+  subscription?: UserSubscription
 }
 
 export const signInAction = createAsyncThunk('auth/signIn', async (payload: SignInPayload, { rejectWithValue }) => {
@@ -64,6 +67,21 @@ export const signUpAction = createAsyncThunk('auth/signUp', async (payload: Sign
   } catch (error) {
     toast.error('Đã xảy ra lỗi khi đăng ký')
     return rejectWithValue(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi đăng ký')
+  }
+})
+
+export const getSubscriptionStatus = createAsyncThunk('auth/getSubscriptionStatus', async (_, { rejectWithValue }) => {
+  try {
+    const response = await subscriptionService.getStatus()
+    if (response.status === 200) {
+      return response.data
+    } else {
+      console.error('Get Subscription Status Error:', response)
+      return rejectWithValue('Không thể lấy trạng thái đăng ký')
+    }
+  } catch (error) {
+    console.error('Get Subscription Status Error:', error)
+    return rejectWithValue(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi lấy trạng thái đăng ký')
   }
 })
 
@@ -129,6 +147,24 @@ const userSlice = createSlice({
         state.loading = false
         state.isAuthenticated = false
         state.user = null
+      })
+      .addCase(getSubscriptionStatus.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(getSubscriptionStatus.fulfilled, (state, action) => {
+        state.subscription = {
+          status: action.payload.status,
+          subscription_type: action.payload.subscription_type,
+          start_date: action.payload.start_date,
+          end_date: action.payload.end_date,
+          is_active: action.payload.is_active,
+          created_at: action.payload.created_at
+        }
+        state.loading = false
+      })
+      .addCase(getSubscriptionStatus.rejected, (state, action) => {
+        state.loading = false
+        state.subscription = undefined
       })
       .addDefaultCase((state) => {
         // Handle any other actions that don't match

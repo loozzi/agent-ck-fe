@@ -20,7 +20,14 @@ const AppNavigator = () => {
         <Route path='/signout' element={<SignOut />} />
         <Route path='/' element={<Home />} />
         <Route path='/mbti' element={<MBTI />} />
-        <Route path='/survey' element={<Survey />} />
+        <Route
+          path='/survey'
+          element={
+            <ProtectedRoute requiredRoles={['user']}>
+              <Survey />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Redirect root to user dashboard */}
         {/* Protected user routes */}

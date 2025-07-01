@@ -11,7 +11,7 @@ import { Route, Routes } from 'react-router'
 export const userRoutesConfig: RouteBrowser[] = [
   {
     name: 'Dashboard',
-    route: '',
+    route: 'dashboard',
     element: <UserDashboard />,
     exact: true
   },
