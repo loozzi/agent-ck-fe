@@ -23,7 +23,7 @@ export interface AddTransactionPayload {
   action: string
   quantity: number
   price: number
-  tracsaction_time: string
+  transaction_time: string
   note: string
   [key: string]: any
 }

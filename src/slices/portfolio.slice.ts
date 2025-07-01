@@ -18,7 +18,7 @@ export const fetchWallet = createAsyncThunk('portfolio/fetchWallet', async (_, {
       return rejectWithValue('No portfolio data found')
     }
 
-    return response
+    return response.data
   } catch (error) {
     return rejectWithValue('Failed to fetch portfolio data')
   }
@@ -30,7 +30,7 @@ export const fetchTransactions = createAsyncThunk('portfolio/fetchTransactions',
     if (!response) {
       return rejectWithValue('No transaction history found')
     }
-    return response
+    return response.data
   } catch (error) {
     return rejectWithValue('Failed to fetch transaction history')
   }

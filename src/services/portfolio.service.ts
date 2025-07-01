@@ -1,20 +1,21 @@
 import type { AddTransactionPayload, TransactionItem, WalletResponse } from '@/types/portfolio'
 import apiInstance from './axios.config'
+import type { AxiosResponse } from 'axios'
 
 const portfolioService = {
-  getAll: async (): Promise<WalletResponse> => {
+  getAll: async (): Promise<AxiosResponse<WalletResponse>> => {
     return apiInstance.get('/portfolio')
   },
-  addItem: async (payload: AddTransactionPayload): Promise<TransactionItem> => {
+  addItem: async (payload: AddTransactionPayload): Promise<AxiosResponse<TransactionItem>> => {
     return apiInstance.post('/portfolio/transaction', payload)
   },
-  getHistory: async (): Promise<TransactionItem[]> => {
+  getHistory: async (): Promise<AxiosResponse<TransactionItem[]>> => {
     return apiInstance.get(`/portfolio/transactions`)
   },
   refreshValues: async (): Promise<void> => {
     return apiInstance.post('/portfolio/refresh-values')
   },
-  updateTransaction: async (id: string, payload: Partial<AddTransactionPayload>): Promise<TransactionItem> => {
+  updateTransaction: async (id: string, payload: Partial<AddTransactionPayload>): Promise<AxiosResponse<TransactionItem>> => {
     return apiInstance.put(`/portfolio/transaction/${id}`, payload)
   },
   deleteTransaction: async (id: string): Promise<void> => {
