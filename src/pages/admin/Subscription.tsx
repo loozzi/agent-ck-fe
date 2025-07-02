@@ -1,17 +1,38 @@
 import { useAppDispatch, useAppSelector } from '@/app/hook'
-import { fetchSubScriptionCodes } from '@/slices/subscription.slice'
+import { fetchSubScriptionCodes, createSubscriptionCode } from '@/slices/subscription.slice'
 import { useEffect } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Copy, Check } from 'lucide-react'
+import { Copy, Check, Plus } from 'lucide-react'
 import { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { toast } from 'react-toastify'
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
 
 const Subscription = () => {
   const { subscriptionCodes, isLoading } = useAppSelector((state) => state.subscription)
   const dispatch = useAppDispatch()
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [formData, setFormData] = useState({
+    user_email: '',
+    duration_days: ''
+  })
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+
+  // Calculate pagination
+  const totalItems = subscriptionCodes.length
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentItems = subscriptionCodes.slice(startIndex, endIndex)
 
   useEffect(() => {
     dispatch(
@@ -42,6 +63,36 @@ const Subscription = () => {
     }
   }
 
+  const handleCreateCode = async () => {
+    // Validation
+    if (!formData.user_email.trim()) {
+      toast.error('Vui lòng nhập email')
+      return
+    }
+
+    const durationDays = parseInt(formData.duration_days, 10)
+    if (!formData.duration_days || isNaN(durationDays) || durationDays < 1) {
+      toast.error('Số ngày phải là số nguyên từ 1 trở lên')
+      return
+    }
+
+    try {
+      const payload = {
+        user_email: formData.user_email.trim(),
+        duration_days: durationDays
+      }
+      await dispatch(createSubscriptionCode(payload)).unwrap()
+      setIsDialogOpen(false)
+      setFormData({ user_email: '', duration_days: '' })
+      toast.success('Tạo subscription code thành công!')
+      // Refresh the list
+      dispatch(fetchSubScriptionCodes({ user_email: '' }))
+    } catch (error) {
+      console.error('Failed to create subscription code:', error)
+      toast.error('Có lỗi xảy ra khi tạo subscription code')
+    }
+  }
+
   if (isLoading) {
     return (
       <div className='flex items-center justify-center h-64'>
@@ -54,57 +105,153 @@ const Subscription = () => {
     <div className='p-6'>
       <Card>
         <CardHeader>
-          <CardTitle>Quản lý Subscription Codes</CardTitle>
-          <CardDescription>Danh sách các mã subscription đã được tạo ({subscriptionCodes.length} mã)</CardDescription>
+          <div className='flex items-center justify-between'>
+            <div>
+              <CardTitle>Quản lý Subscription Codes</CardTitle>
+              <CardDescription>
+                Danh sách các mã subscription đã được tạo ({subscriptionCodes.length} mã)
+              </CardDescription>
+            </div>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className='cursor-pointer'>
+                  <Plus className='h-4 w-4 mr-2' />
+                  Tạo Code Mới
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Tạo Subscription Code Mới</DialogTitle>
+                  <DialogDescription>Nhập thông tin để tạo mã subscription mới</DialogDescription>
+                </DialogHeader>
+                <div className='grid gap-4 py-4'>
+                  <div className='grid grid-cols-4 items-center gap-4'>
+                    <Label htmlFor='user_email' className='text-right'>
+                      Email <span className='text-red-500'>*</span>
+                    </Label>
+                    <Input
+                      id='user_email'
+                      placeholder='Nhập email người dùng'
+                      className='col-span-3'
+                      value={formData.user_email}
+                      onChange={(e) => setFormData({ ...formData, user_email: e.target.value })}
+                    />
+                  </div>
+                  <div className='grid grid-cols-4 items-center gap-4'>
+                    <Label htmlFor='duration_days' className='text-right'>
+                      Số ngày <span className='text-red-500'>*</span>
+                    </Label>
+                    <Input
+                      id='duration_days'
+                      type='number'
+                      placeholder='Nhập số ngày (ví dụ: 30)'
+                      className='col-span-3'
+                      value={formData.duration_days}
+                      onChange={(e) => setFormData({ ...formData, duration_days: e.target.value })}
+                      min='1'
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant='outline' onClick={() => setIsDialogOpen(false)} className='cursor-pointer'>
+                    Hủy
+                  </Button>
+                  <Button onClick={handleCreateCode} disabled={isLoading} className='cursor-pointer'>
+                    {isLoading ? 'Đang tạo...' : 'Tạo Code'}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </CardHeader>
         <CardContent>
           {subscriptionCodes.length === 0 ? (
             <div className='text-center py-8 text-muted-foreground'>Không có subscription codes nào</div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Mã Code</TableHead>
-                  <TableHead>Thời hạn (ngày)</TableHead>
-                  <TableHead>Trạng thái</TableHead>
-                  <TableHead>Ngày tạo</TableHead>
-                  <TableHead>Ngày kích hoạt</TableHead>
-                  <TableHead>Zalo ID sử dụng</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {subscriptionCodes.map((code) => (
-                  <TableRow key={code.id}>
-                    <TableCell className='font-mono font-medium'>
-                      <div className='flex items-center gap-2'>
-                        <span>{code.code}</span>
-                        <Button
-                          variant='ghost'
-                          size='sm'
-                          className='h-6 w-6 p-0'
-                          onClick={() => copyToClipboard(code.code)}
-                        >
-                          {copiedCode === code.code ? (
-                            <Check className='h-3 w-3 text-green-600' />
-                          ) : (
-                            <Copy className='h-3 w-3' />
-                          )}
-                        </Button>
-                      </div>
-                    </TableCell>
-                    <TableCell className='text-center'>{code.duration_days} ngày</TableCell>
-                    <TableCell>
-                      <Badge variant={code.is_used ? 'secondary' : 'default'}>
-                        {code.is_used ? 'Đã sử dụng' : 'Chưa sử dụng'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{formatDate(code.created_at)}</TableCell>
-                    <TableCell>{formatDate(code.activated_at)}</TableCell>
-                    <TableCell className='font-mono text-xs'>{code.zalo_id_used || 'N/A'}</TableCell>
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Mã Code</TableHead>
+                    <TableHead>Thời hạn (ngày)</TableHead>
+                    <TableHead>Trạng thái</TableHead>
+                    <TableHead>Ngày tạo</TableHead>
+                    <TableHead>Ngày kích hoạt</TableHead>
+                    <TableHead>Zalo ID sử dụng</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {currentItems.map((code) => (
+                    <TableRow key={code.id}>
+                      <TableCell className='font-mono font-medium'>
+                        <div className='flex items-center gap-2'>
+                          <span>{code.code}</span>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            className='h-6 w-6 p-0'
+                            onClick={() => copyToClipboard(code.code)}
+                          >
+                            {copiedCode === code.code ? (
+                              <Check className='h-3 w-3 text-green-600' />
+                            ) : (
+                              <Copy className='h-3 w-3' />
+                            )}
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell className='text-center'>{code.duration_days} ngày</TableCell>
+                      <TableCell>
+                        <Badge variant={code.is_used ? 'secondary' : 'default'}>
+                          {code.is_used ? 'Đã sử dụng' : 'Chưa sử dụng'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{formatDate(code.created_at)}</TableCell>
+                      <TableCell>{formatDate(code.activated_at)}</TableCell>
+                      <TableCell className='font-mono text-xs'>{code.zalo_id_used || 'N/A'}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className='flex items-center justify-between mt-4'>
+                  <div className='text-sm text-muted-foreground'>
+                    Hiển thị {startIndex + 1} - {Math.min(endIndex, totalItems)} của {totalItems} items
+                  </div>
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                          className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                        />
+                      </PaginationItem>
+                      
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => setCurrentPage(page)}
+                            isActive={currentPage === page}
+                            className='cursor-pointer'
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+                      
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                          className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

@@ -1,6 +1,6 @@
 import subscriptionService from '@/services/subscription.service'
 import type { SubscriptionState } from '@/types/slices/subscription'
-import type { SubscriptionCodeParams, SubscriptionUpdateRolePayload } from '@/types/subscription'
+import type { CreateSupscriptionPayload, SubscriptionCodeParams, SubscriptionUpdateRolePayload } from '@/types/subscription'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
 
@@ -66,6 +66,23 @@ export const fetchSubScriptionCodes = createAsyncThunk(
   }
 )
 
+export const createSubscriptionCode = createAsyncThunk(
+  'subscription/createSubscriptionCode',
+  async (payload: CreateSupscriptionPayload, { rejectWithValue }) => {
+    try {
+      const response = await subscriptionService.createSubscription(payload)
+      if (!response.data) {
+        toast.error('Failed to create subscription code')
+        return rejectWithValue('Invalid data format')
+      }
+      toast.success('Subscription code created successfully')
+      return response.data
+    } catch (error) {
+      toast.error('Failed to create subscription code')
+      return rejectWithValue(error.response?.data?.message || 'An error occurred')
+    }
+  }
+)
 
 const subscriptionSlice = createSlice({
   name: 'subscription',
@@ -108,13 +125,23 @@ const subscriptionSlice = createSlice({
       .addCase(fetchSubScriptionCodes.fulfilled, (state, action) => {
         state.isLoading = false
         state.subscriptionCodes = action.payload
-      }
-      )
+      })
       .addCase(fetchSubScriptionCodes.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload as string
-      }
-      )
+      })
+      .addCase(createSubscriptionCode.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(createSubscriptionCode.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.subscriptionCodes.push(action.payload)
+      })
+      .addCase(createSubscriptionCode.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
   }
 })
 
