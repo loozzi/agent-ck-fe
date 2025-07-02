@@ -51,3 +51,14 @@ export interface UserSubscription {
   is_active: boolean
   created_at: string
 }
+
+
+export interface UserSubscriptionStatus {
+  id: string
+  email: string
+  full_name: string
+  role: string
+  status: string
+  zalo_id: string
+  onboarding_completed: boolean
+}

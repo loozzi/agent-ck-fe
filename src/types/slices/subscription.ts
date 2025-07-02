@@ -1,9 +1,9 @@
 import type { Subscription } from 'react-redux'
-import type { SubscriptionMessage, SubscriptionStatus } from '../subscription'
+import type { SubscriptionMessage, UserSubscriptionStatus } from '../subscription'
 
 export interface SubscriptionState {
   subscriptions: Subscription[]
-  subscriptionStatus: SubscriptionStatus[]
+  userSubscriptionStatus: UserSubscriptionStatus[]
   messages: SubscriptionMessage[]
   isLoading: boolean
   error: string | null
