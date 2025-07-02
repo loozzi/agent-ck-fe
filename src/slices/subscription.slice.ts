@@ -1,11 +1,11 @@
 import subscriptionService from '@/services/subscription.service'
 import type { SubscriptionState } from '@/types/slices/subscription'
-import type { SubscriptionUpdateRolePayload } from '@/types/subscription'
+import type { SubscriptionCodeParams, SubscriptionUpdateRolePayload } from '@/types/subscription'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
 
 const initialState: SubscriptionState = {
-  subscriptions: [],
+  subscriptionCodes: [],
   userSubscriptionStatus: [],
   messages: [],
   isLoading: false,
@@ -49,6 +49,24 @@ export const updateUserRole = createAsyncThunk(
   }
 )
 
+export const fetchSubScriptionCodes = createAsyncThunk(
+  'subscription/fetchSubScriptionCodes',
+  async (payload: SubscriptionCodeParams, { rejectWithValue }) => {
+    try {
+      const response = await subscriptionService.getSubscriptionCodes(payload)
+      if (!response.data || !Array.isArray(response.data)) {
+        toast.error('Failed to fetch subscription codes')
+        return rejectWithValue('Invalid data format')
+      }
+      return response.data
+    } catch (error) {
+      toast.error('Failed to fetch subscription codes')
+      return rejectWithValue(error.response?.data?.message || 'An error occurred')
+    }
+  }
+)
+
+
 const subscriptionSlice = createSlice({
   name: 'subscription',
   initialState,
@@ -82,8 +100,21 @@ const subscriptionSlice = createSlice({
       .addCase(updateUserRole.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload as string
-        toast.error(state.error || 'An error occurred while updating user role')
       })
+      .addCase(fetchSubScriptionCodes.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(fetchSubScriptionCodes.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.subscriptionCodes = action.payload
+      }
+      )
+      .addCase(fetchSubScriptionCodes.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      }
+      )
   }
 })
 

@@ -3,7 +3,7 @@ export interface CreateSupscriptionPayload {
   duration_days: number
 }
 
-export interface Subscription {
+export interface SubscriptionCode {
   id: string
   code: string
   user_id: string
@@ -61,4 +61,8 @@ export interface UserSubscriptionStatus {
   status: string
   zalo_id: string
   onboarding_completed: boolean
+}
+
+export interface SubscriptionCodeParams {
+  user_email?: string
 }

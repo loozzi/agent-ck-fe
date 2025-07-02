@@ -1,20 +1,21 @@
 import type {
   CreateSupscriptionPayload,
+  SubscriptionCode,
   SubscriptionMessage,
   SubscriptionStatus,
-  SubscriptionUpdateRolePayload
+  SubscriptionUpdateRolePayload,
+  SubscriptionCodeParams
 } from '@/types/subscription'
 import apiInstance from './axios.config'
 import type { AxiosResponse } from 'axios'
-import type { Subscription } from 'react-redux'
 
 const subscriptionService = {
-  createSubscription: (data: CreateSupscriptionPayload): Promise<AxiosResponse<Subscription>> => {
-    return apiInstance.post<Subscription>('/subscription/codes', data)
+  createSubscription: (data: CreateSupscriptionPayload): Promise<AxiosResponse<SubscriptionCode>> => {
+    return apiInstance.post<SubscriptionCode>('/subscription/codes', data)
   },
-  getAll: (user_email: string): Promise<AxiosResponse<Subscription[]>> => {
-    return apiInstance.get<Subscription[]>('/subscription/codes', {
-      params: { user_email }
+  getSubscriptionCodes: (params: SubscriptionCodeParams): Promise<AxiosResponse<SubscriptionCode[]>> => {
+    return apiInstance.get<SubscriptionCode[]>('/subscription/codes', {
+      params
     })
   },
   getStatus(): Promise<AxiosResponse<SubscriptionStatus>> {

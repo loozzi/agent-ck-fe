@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router'
 import AdminDashboard from '@/pages/admin/AdminDashboard'
 import AdminSetting from '@/pages/admin/Setting'
 import UserManagement from '@/pages/admin/UserManagement'
+import Subscription from '@/pages/admin/Subscription'
 
 export const adminRoutesConfig: RouteBrowser[] = [
   {
@@ -26,7 +27,7 @@ export const adminRoutesConfig: RouteBrowser[] = [
     {
         name: 'Subscription',
         route: '/admin/subscription',
-        element: <div>Admin Subscription Page</div>, // Placeholder for Subscription page
+        element: <Subscription />,
         exact: true
     }
 ]
