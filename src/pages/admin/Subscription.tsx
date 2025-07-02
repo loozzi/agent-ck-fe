@@ -1,13 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@/app/hook'
-import { fetchSubScriptionCodes, createSubscriptionCode } from '@/slices/subscription.slice'
-import { useEffect } from 'react'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Copy, Check, Plus, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react'
-import { useState } from 'react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -19,7 +13,6 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { toast } from 'react-toastify'
 import {
   Pagination,
   PaginationContent,
@@ -28,6 +21,12 @@ import {
   PaginationNext,
   PaginationPrevious
 } from '@/components/ui/pagination'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { createSubscriptionCode, fetchSubScriptionCodes } from '@/slices/subscription.slice'
+import { ArrowUpDown, Check, ChevronDown, ChevronUp, Copy, Plus } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 
 const Subscription = () => {
   const { subscriptionCodes = [], isLoading } = useAppSelector((state) => state.subscription)
@@ -47,12 +46,18 @@ const Subscription = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'used' | 'unused'>('all')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | 'none'>('none')
   const [sortField, setSortField] = useState<'created_at' | 'duration_days'>('created_at')
+  const [emailFilter, setEmailFilter] = useState('')
 
   // Filter and sort subscription codes
   const filteredCodes = subscriptionCodes.filter((code) => {
-    if (statusFilter === 'used') return code.is_used
-    if (statusFilter === 'unused') return !code.is_used
-    return true // 'all'
+    // Filter by status (client-side)
+    if (statusFilter === 'used' && !code.is_used) return false
+    if (statusFilter === 'unused' && code.is_used) return false
+
+    // Filter by email (client-side)
+    if (emailFilter && !code.user_email.toLowerCase().includes(emailFilter.toLowerCase())) return false
+
+    return true
   })
 
   const sortedCodes = [...filteredCodes].sort((a, b) => {
@@ -80,13 +85,19 @@ const Subscription = () => {
   const endIndex = startIndex + itemsPerPage
   const currentItems = sortedCodes.slice(startIndex, endIndex)
 
+  // Initial load
   useEffect(() => {
     dispatch(
       fetchSubScriptionCodes({
         user_email: ''
       })
     )
-  }, [])
+  }, [dispatch])
+
+  // Reset page when data changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [subscriptionCodes.length])
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A'
@@ -131,8 +142,8 @@ const Subscription = () => {
       setIsDialogOpen(false)
       setFormData({ user_email: '', duration_days: '' })
       toast.success('Tạo subscription code thành công!')
-      // Refresh the list
-      dispatch(fetchSubScriptionCodes({ user_email: '' }))
+      // Refresh the list with current email filter
+      dispatch(fetchSubScriptionCodes({ user_email: emailFilter.trim() }))
     } catch (error) {
       console.error('Failed to create subscription code:', error)
       toast.error('Có lỗi xảy ra khi tạo subscription code')
@@ -162,12 +173,9 @@ const Subscription = () => {
     setCurrentPage(1) // Reset về trang đầu
   }
 
-  if (isLoading && subscriptionCodes.length === 0) {
-    return (
-      <div className='flex items-center justify-center h-64'>
-        <div className='text-lg'>Đang tải dữ liệu...</div>
-      </div>
-    )
+  const handleEmailFilterChange = (value: string) => {
+    setEmailFilter(value)
+    // Page sẽ được reset khi dữ liệu mới được load từ API
   }
 
   return (
@@ -235,140 +243,170 @@ const Subscription = () => {
           </div>
         </CardHeader>
         <CardContent>
-          {/* Filter and Sort Controls */}
-          <div className='flex items-center gap-4 mb-4'>
-            <div className='flex items-center gap-2'>
-              <Label>Lọc theo trạng thái:</Label>
-              <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
-                <SelectTrigger className='w-[140px]'>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>Tất cả</SelectItem>
-                  <SelectItem value='used'>Đã sử dụng</SelectItem>
-                  <SelectItem value='unused'>Chưa sử dụng</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {subscriptionCodes.length === 0 ? (
-            <div className='text-center py-8 text-muted-foreground'>Không có subscription codes nào</div>
-          ) : totalItems === 0 ? (
-            <div className='text-center py-8 text-muted-foreground'>
-              Không có subscription codes nào phù hợp với bộ lọc
+          {isLoading ? (
+            <div className='flex items-center justify-center h-64'>
+              <div className='text-lg'>Đang tải dữ liệu...</div>
             </div>
           ) : (
             <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Mã Code</TableHead>
-                    <TableHead>
-                      <Button
-                        variant='ghost'
-                        className='h-auto p-0 font-semibold hover:bg-transparent'
-                        onClick={() => handleSortToggle('duration_days')}
-                      >
-                        <div className='flex items-center gap-1'>
-                          Thời hạn (ngày)
-                          {sortField === 'duration_days' && sortOrder === 'none' && <ArrowUpDown className='h-4 w-4' />}
-                          {sortField === 'duration_days' && sortOrder === 'asc' && <ChevronUp className='h-4 w-4' />}
-                          {sortField === 'duration_days' && sortOrder === 'desc' && <ChevronDown className='h-4 w-4' />}
-                          {sortField !== 'duration_days' && <ArrowUpDown className='h-4 w-4 opacity-40' />}
-                        </div>
-                      </Button>
-                    </TableHead>
-                    <TableHead>
-                      <Button
-                        variant='ghost'
-                        className='h-auto p-0 font-semibold hover:bg-transparent'
-                        onClick={() => handleSortToggle('created_at')}
-                      >
-                        <div className='flex items-center gap-1'>
-                          Ngày tạo
-                          {sortField === 'created_at' && sortOrder === 'none' && <ArrowUpDown className='h-4 w-4' />}
-                          {sortField === 'created_at' && sortOrder === 'asc' && <ChevronUp className='h-4 w-4' />}
-                          {sortField === 'created_at' && sortOrder === 'desc' && <ChevronDown className='h-4 w-4' />}
-                          {sortField !== 'created_at' && <ArrowUpDown className='h-4 w-4 opacity-40' />}
-                        </div>
-                      </Button>
-                    </TableHead>
-                    <TableHead>Ngày kích hoạt</TableHead>
-                    <TableHead>Zalo ID sử dụng</TableHead>
-                    <TableHead>Trạng thái</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {currentItems.map((code) => (
-                    <TableRow key={code.id}>
-                      <TableCell className='font-mono font-medium'>
-                        <div className='flex items-center gap-2'>
-                          <span>{code.code}</span>
+              <div className='flex items-center gap-4 mb-4 flex-wrap'>
+                <div className='flex items-center gap-2'>
+                  <Label>Tìm kiếm theo email:</Label>
+                  <Input
+                    placeholder='Nhập email để tìm kiếm...'
+                    value={emailFilter}
+                    onChange={(e) => handleEmailFilterChange(e.target.value)}
+                    className='w-[250px]'
+                  />
+                </div>
+                <div className='flex items-center gap-2'>
+                  <Label>Lọc theo trạng thái:</Label>
+                  <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+                    <SelectTrigger className='w-[140px]'>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='all'>Tất cả</SelectItem>
+                      <SelectItem value='used'>Đã sử dụng</SelectItem>
+                      <SelectItem value='unused'>Chưa sử dụng</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {subscriptionCodes.length === 0 ? (
+                <div className='text-center py-8 text-muted-foreground'>Không có subscription codes nào</div>
+              ) : totalItems === 0 ? (
+                <div className='text-center py-8 text-muted-foreground'>
+                  Không có subscription codes nào phù hợp với bộ lọc
+                </div>
+              ) : (
+                <>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Mã Code</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>
                           <Button
                             variant='ghost'
-                            size='sm'
-                            className='h-6 w-6 p-0 cursor-pointer'
-                            onClick={() => copyToClipboard(code.code)}
+                            className='h-auto p-0 font-semibold hover:bg-transparent'
+                            onClick={() => handleSortToggle('duration_days')}
                           >
-                            {copiedCode === code.code ? (
-                              <Check className='h-3 w-3 text-green-600' />
-                            ) : (
-                              <Copy className='h-3 w-3' />
-                            )}
+                            <div className='flex items-center gap-1'>
+                              Thời hạn (ngày)
+                              {sortField === 'duration_days' && sortOrder === 'none' && (
+                                <ArrowUpDown className='h-4 w-4' />
+                              )}
+                              {sortField === 'duration_days' && sortOrder === 'asc' && (
+                                <ChevronUp className='h-4 w-4' />
+                              )}
+                              {sortField === 'duration_days' && sortOrder === 'desc' && (
+                                <ChevronDown className='h-4 w-4' />
+                              )}
+                              {sortField !== 'duration_days' && <ArrowUpDown className='h-4 w-4 opacity-40' />}
+                            </div>
                           </Button>
-                        </div>
-                      </TableCell>
-                      <TableCell className='text-center'>{code.duration_days} ngày</TableCell>
-                      <TableCell>{formatDate(code.created_at)}</TableCell>
-                      <TableCell>{formatDate(code.activated_at)}</TableCell>
-                      <TableCell className='font-mono text-xs'>{code.zalo_id_used || 'N/A'}</TableCell>
-                      <TableCell>
-                        <Badge variant={code.is_used ? 'secondary' : 'default'}>
-                          {code.is_used ? 'Đã sử dụng' : 'Chưa sử dụng'}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className='flex items-center justify-between mt-4'>
-                  <div className='text-sm text-muted-foreground'>
-                    Hiển thị {startIndex + 1} - {Math.min(endIndex, totalItems)} của {totalItems} items
-                  </div>
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious
-                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                          className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                        />
-                      </PaginationItem>
-
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <PaginationItem key={page}>
-                          <PaginationLink
-                            onClick={() => setCurrentPage(page)}
-                            isActive={currentPage === page}
-                            className='cursor-pointer'
+                        </TableHead>
+                        <TableHead>
+                          <Button
+                            variant='ghost'
+                            className='h-auto p-0 font-semibold hover:bg-transparent'
+                            onClick={() => handleSortToggle('created_at')}
                           >
-                            {page}
-                          </PaginationLink>
-                        </PaginationItem>
+                            <div className='flex items-center gap-1'>
+                              Ngày tạo
+                              {sortField === 'created_at' && sortOrder === 'none' && (
+                                <ArrowUpDown className='h-4 w-4' />
+                              )}
+                              {sortField === 'created_at' && sortOrder === 'asc' && <ChevronUp className='h-4 w-4' />}
+                              {sortField === 'created_at' && sortOrder === 'desc' && (
+                                <ChevronDown className='h-4 w-4' />
+                              )}
+                              {sortField !== 'created_at' && <ArrowUpDown className='h-4 w-4 opacity-40' />}
+                            </div>
+                          </Button>
+                        </TableHead>
+                        <TableHead>Ngày kích hoạt</TableHead>
+                        <TableHead>Zalo ID sử dụng</TableHead>
+                        <TableHead>Trạng thái</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {currentItems.map((code) => (
+                        <TableRow key={code.id}>
+                          <TableCell className='font-mono font-medium'>
+                            <div className='flex items-center gap-2'>
+                              <span>{code.code}</span>
+                              <Button
+                                variant='ghost'
+                                size='sm'
+                                className='h-6 w-6 p-0 cursor-pointer'
+                                onClick={() => copyToClipboard(code.code)}
+                              >
+                                {copiedCode === code.code ? (
+                                  <Check className='h-3 w-3 text-green-600' />
+                                ) : (
+                                  <Copy className='h-3 w-3' />
+                                )}
+                              </Button>
+                            </div>
+                          </TableCell>
+                          <TableCell>{code.user_email}</TableCell>
+                          <TableCell className='text-center'>{code.duration_days} ngày</TableCell>
+                          <TableCell>{formatDate(code.created_at)}</TableCell>
+                          <TableCell>{formatDate(code.activated_at)}</TableCell>
+                          <TableCell className='font-mono text-xs'>{code.zalo_id_used || 'N/A'}</TableCell>
+                          <TableCell>
+                            <Badge variant={code.is_used ? 'secondary' : 'default'}>
+                              {code.is_used ? 'Đã sử dụng' : 'Chưa sử dụng'}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
                       ))}
+                    </TableBody>
+                  </Table>
 
-                      <PaginationItem>
-                        <PaginationNext
-                          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                          className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                </div>
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className='flex items-center justify-between mt-4'>
+                      <div className='text-sm text-muted-foreground'>
+                        Hiển thị {startIndex + 1} - {Math.min(endIndex, totalItems)} của {totalItems} items
+                      </div>
+                      <Pagination>
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious
+                              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                              className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                            />
+                          </PaginationItem>
+
+                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                            <PaginationItem key={page}>
+                              <PaginationLink
+                                onClick={() => setCurrentPage(page)}
+                                isActive={currentPage === page}
+                                className='cursor-pointer'
+                              >
+                                {page}
+                              </PaginationLink>
+                            </PaginationItem>
+                          ))}
+
+                          <PaginationItem>
+                            <PaginationNext
+                              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                              className={
+                                currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'
+                              }
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+                    </div>
+                  )}
+                </>
               )}
             </>
           )}

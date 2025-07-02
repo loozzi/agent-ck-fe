@@ -7,6 +7,7 @@ export interface SubscriptionCode {
   id: string
   code: string
   user_id: string
+  user_email: string
   duration_days: number
   is_used: boolean
   created_at: string

@@ -29,7 +29,7 @@ const subscriptionService = {
     return apiInstance.patch(`/subscription/admin/users/role`, data)
   },
   allUsers: (): Promise<AxiosResponse<any[]>> => {
-    return apiInstance.get<any[]>('/subscription/admin/users')
+    return apiInstance.get<any[]>('/admin/users')
   }
 }
 

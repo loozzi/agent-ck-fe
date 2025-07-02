@@ -58,7 +58,7 @@ const AdminLayout = () => {
     },
     {
       id: 'subscription',
-      title: 'Quản lý gói đăng ký',
+      title: 'Quản lý code',
       icon: <FaWallet className='w-4 h-4' />,
       href: '/admin/subscription'
     },
