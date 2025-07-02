@@ -8,7 +8,7 @@ import { fetchUserSubscriptionStatus, updateUserRole } from '@/slices/subscripti
 import { useEffect, useState } from 'react'
 
 const UserManagement = () => {
-  const { userSubscriptionStatus } = useAppSelector((state) => state.subscription)
+  const { userSubscriptionStatus = [], isLoading } = useAppSelector((state) => state.subscription)
   const dispatch = useAppDispatch()
 
   // Filter states
@@ -25,19 +25,6 @@ const UserManagement = () => {
         return 'default'
       case 'user':
         return 'secondary'
-      default:
-        return 'outline'
-    }
-  }
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'active':
-        return 'default'
-      case 'inactive':
-        return 'secondary'
-      case 'banned':
-        return 'destructive'
       default:
         return 'outline'
     }
@@ -92,12 +79,11 @@ const UserManagement = () => {
 
   useEffect(() => {
     dispatch(fetchUserSubscriptionStatus())
-  }, [dispatch])
+  }, [])
 
   return (
     <div className='p-6'>
       <h1 className='text-2xl font-bold mb-6'>Quản lý người dùng</h1>
-      
       {/* Filter Section */}
       <div className='mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
         <div className='space-y-2'>
@@ -108,7 +94,7 @@ const UserManagement = () => {
             onChange={(e) => setFilterNameEmail(e.target.value)}
           />
         </div>
-        
+
         <div className='space-y-2'>
           <label className='text-sm font-medium'>Vai trò</label>
           <Select value={filterRole} onValueChange={setFilterRole}>
@@ -124,7 +110,7 @@ const UserManagement = () => {
         </div>
 
         <div className='space-y-2'>
-          <label className='text-sm font-medium'>Trạng thái onboarding</label>
+          <label className='text-sm font-medium'>Trạng thái khảo sát</label>
           <Select value={filterOnboarding} onValueChange={setFilterOnboarding}>
             <SelectTrigger>
               <SelectValue placeholder='Chọn trạng thái' />
@@ -150,66 +136,73 @@ const UserManagement = () => {
         </div>
       </div>
 
-      <div className='mb-4 flex gap-2'>
-        <Button variant='outline' onClick={clearFilters}>
-          Xóa bộ lọc
-        </Button>
-        <span className='text-sm text-muted-foreground self-center'>
-          Hiển thị {filteredUsers.length} / {userSubscriptionStatus.length} người dùng
-        </span>
-      </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Email</TableHead>
-            <TableHead>Họ và tên</TableHead>
-            <TableHead>Vai trò</TableHead>
-            <TableHead>Trạng thái</TableHead>
-            <TableHead>Zalo ID</TableHead>
-            <TableHead>Hoàn thành onboarding</TableHead>
-            <TableHead>Thao tác</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredUsers.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell className='font-medium'>{user.email}</TableCell>
-              <TableCell>{user.full_name}</TableCell>
-              <TableCell>
-                <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>
-              </TableCell>
-              <TableCell>
-                <Badge variant={getStatusBadgeVariant(user.status)}>{user.status}</Badge>
-              </TableCell>
-              <TableCell>{user.zalo_id || 'Chưa có'}</TableCell>
-              <TableCell>
-                <Badge variant={user.onboarding_completed ? 'default' : 'destructive'}>
-                  {user.onboarding_completed ? 'Hoàn thành' : 'Chưa hoàn thành'}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <Select onValueChange={(newRole) => handleRoleUpdate(user.id, newRole)}>
-                  <SelectTrigger className='w-32'>
-                    <SelectValue placeholder='Đổi vai trò' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='admin' disabled={user.role === 'admin'}>
-                      Admin
-                    </SelectItem>
-                    <SelectItem value='trainer' disabled={user.role === 'trainer'}>
-                      Trainer
-                    </SelectItem>
-                    <SelectItem value='user' disabled={user.role === 'user'}>
-                      User
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {isLoading && userSubscriptionStatus.length === 0 ? (
+        <div className='flex justify-center items-center h-32'>
+          <div className='text-muted-foreground'>Đang tải dữ liệu...</div>
+        </div>
+      ) : (
+        <>
+          <div className='mb-4 flex gap-2'>
+            <Button variant='outline' onClick={clearFilters}>
+              Xóa bộ lọc
+            </Button>
+            <span className='text-sm text-muted-foreground self-center'>
+              Hiển thị {filteredUsers.length} / {userSubscriptionStatus.length} người dùng
+            </span>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Email</TableHead>
+                <TableHead>Họ và tên</TableHead>
+                {/* <TableHead>Trạng thái</TableHead> */}
+                <TableHead>Zalo ID</TableHead>
+                <TableHead>Khảo sát</TableHead>
+                <TableHead>Vai trò</TableHead>
+                <TableHead>Thao tác</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className='font-medium'>{user.email}</TableCell>
+                  <TableCell>{user.full_name}</TableCell>
+                  {/* <TableCell>
+                    <Badge variant={getStatusBadgeVariant(user.status)}>{user.status}</Badge>
+                  </TableCell> */}
+                  <TableCell>{user.zalo_id || 'Chưa có'}</TableCell>
+                  <TableCell>
+                    <Badge variant={user.onboarding_completed ? 'default' : 'destructive'}>
+                      {user.onboarding_completed ? 'Hoàn thành' : 'Chưa hoàn thành'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Select onValueChange={(newRole) => handleRoleUpdate(user.id, newRole)}>
+                      <SelectTrigger className='w-32'>
+                        <SelectValue placeholder='Đổi vai trò' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value='admin' disabled={user.role === 'admin'}>
+                          Admin
+                        </SelectItem>
+                        <SelectItem value='trainer' disabled={user.role === 'trainer'}>
+                          Trainer
+                        </SelectItem>
+                        <SelectItem value='user' disabled={user.role === 'user'}>
+                          User
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </>
+      )}
     </div>
   )
 }

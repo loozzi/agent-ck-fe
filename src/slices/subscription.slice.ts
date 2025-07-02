@@ -1,6 +1,10 @@
 import subscriptionService from '@/services/subscription.service'
 import type { SubscriptionState } from '@/types/slices/subscription'
-import type { CreateSupscriptionPayload, SubscriptionCodeParams, SubscriptionUpdateRolePayload } from '@/types/subscription'
+import type {
+  CreateSupscriptionPayload,
+  SubscriptionCodeParams,
+  SubscriptionUpdateRolePayload
+} from '@/types/subscription'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
 
@@ -22,7 +26,7 @@ export const fetchUserSubscriptionStatus = createAsyncThunk(
         toast.error('Failed to fetch user subscription status')
         return rejectWithValue('Invalid data format')
       }
-      console.log("dta", data)
+      console.log('dta', data)
       return data
     } catch (error) {
       toast.error('Failed to fetch user subscription status')
@@ -40,7 +44,7 @@ export const updateUserRole = createAsyncThunk(
         toast.error('Failed to update user role')
         return rejectWithValue('Failed to update user role')
       }
-      toast.success('User role updated successfully')
+      toast.success(response.data.message)
       return payload
     } catch (error) {
       toast.error('Failed to update user role')
@@ -109,7 +113,7 @@ const subscriptionSlice = createSlice({
       .addCase(updateUserRole.fulfilled, (state, action) => {
         state.isLoading = false
         const { user_id, new_role } = action.payload
-        const user = state.userSubscriptionStatus.find(user => user.id === user_id)
+        const user = state.userSubscriptionStatus.find((user) => user.id === user_id)
         if (user) {
           user.role = new_role
         }

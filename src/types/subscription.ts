@@ -43,6 +43,14 @@ export interface SubscriptionUpdateRolePayload {
   new_role: string
 }
 
+export interface SubscriptionUpdateRoleResponse {
+  message: string
+  user_id: string
+  email: string
+  old_role: string
+  new_role: string
+}
+
 export interface UserSubscription {
   status: string
   subscription_type: string
@@ -51,7 +59,6 @@ export interface UserSubscription {
   is_active: boolean
   created_at: string
 }
-
 
 export interface UserSubscriptionStatus {
   id: string

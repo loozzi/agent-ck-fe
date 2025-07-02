@@ -5,16 +5,32 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Copy, Check, Plus } from 'lucide-react'
+import { Copy, Check, Plus, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'react-toastify'
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious
+} from '@/components/ui/pagination'
 
 const Subscription = () => {
-  const { subscriptionCodes, isLoading } = useAppSelector((state) => state.subscription)
+  const { subscriptionCodes = [], isLoading } = useAppSelector((state) => state.subscription)
   const dispatch = useAppDispatch()
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -22,17 +38,47 @@ const Subscription = () => {
     user_email: '',
     duration_days: ''
   })
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
+  // Filter and sort state
+  const [statusFilter, setStatusFilter] = useState<'all' | 'used' | 'unused'>('all')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | 'none'>('none')
+  const [sortField, setSortField] = useState<'created_at' | 'duration_days'>('created_at')
+
+  // Filter and sort subscription codes
+  const filteredCodes = subscriptionCodes.filter((code) => {
+    if (statusFilter === 'used') return code.is_used
+    if (statusFilter === 'unused') return !code.is_used
+    return true // 'all'
+  })
+
+  const sortedCodes = [...filteredCodes].sort((a, b) => {
+    if (sortOrder === 'none') return 0
+
+    let valueA: number
+    let valueB: number
+
+    if (sortField === 'created_at') {
+      valueA = new Date(a.created_at).getTime()
+      valueB = new Date(b.created_at).getTime()
+    } else {
+      valueA = a.duration_days
+      valueB = b.duration_days
+    }
+
+    if (sortOrder === 'asc') return valueA - valueB
+    return valueB - valueA
+  })
+
   // Calculate pagination
-  const totalItems = subscriptionCodes.length
+  const totalItems = sortedCodes.length
   const totalPages = Math.ceil(totalItems / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const currentItems = subscriptionCodes.slice(startIndex, endIndex)
+  const currentItems = sortedCodes.slice(startIndex, endIndex)
 
   useEffect(() => {
     dispatch(
@@ -40,7 +86,7 @@ const Subscription = () => {
         user_email: ''
       })
     )
-  }, [dispatch])
+  }, [])
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A'
@@ -93,7 +139,30 @@ const Subscription = () => {
     }
   }
 
-  if (isLoading) {
+  const handleSortToggle = (field: 'created_at' | 'duration_days') => {
+    if (sortField !== field) {
+      // Nếu click vào field khác, set field mới và sort desc
+      setSortField(field)
+      setSortOrder('desc')
+    } else {
+      // Nếu click vào field hiện tại, cycle through các sort order
+      if (sortOrder === 'none') {
+        setSortOrder('desc')
+      } else if (sortOrder === 'desc') {
+        setSortOrder('asc')
+      } else {
+        setSortOrder('none')
+      }
+    }
+    setCurrentPage(1) // Reset về trang đầu
+  }
+
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value as 'all' | 'used' | 'unused')
+    setCurrentPage(1) // Reset về trang đầu
+  }
+
+  if (isLoading && subscriptionCodes.length === 0) {
     return (
       <div className='flex items-center justify-center h-64'>
         <div className='text-lg'>Đang tải dữ liệu...</div>
@@ -110,6 +179,7 @@ const Subscription = () => {
               <CardTitle>Quản lý Subscription Codes</CardTitle>
               <CardDescription>
                 Danh sách các mã subscription đã được tạo ({subscriptionCodes.length} mã)
+                {totalItems !== subscriptionCodes.length && ` - Hiển thị: ${totalItems} mã`}
               </CardDescription>
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -165,19 +235,68 @@ const Subscription = () => {
           </div>
         </CardHeader>
         <CardContent>
+          {/* Filter and Sort Controls */}
+          <div className='flex items-center gap-4 mb-4'>
+            <div className='flex items-center gap-2'>
+              <Label>Lọc theo trạng thái:</Label>
+              <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+                <SelectTrigger className='w-[140px]'>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>Tất cả</SelectItem>
+                  <SelectItem value='used'>Đã sử dụng</SelectItem>
+                  <SelectItem value='unused'>Chưa sử dụng</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           {subscriptionCodes.length === 0 ? (
             <div className='text-center py-8 text-muted-foreground'>Không có subscription codes nào</div>
+          ) : totalItems === 0 ? (
+            <div className='text-center py-8 text-muted-foreground'>
+              Không có subscription codes nào phù hợp với bộ lọc
+            </div>
           ) : (
             <>
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Mã Code</TableHead>
-                    <TableHead>Thời hạn (ngày)</TableHead>
-                    <TableHead>Trạng thái</TableHead>
-                    <TableHead>Ngày tạo</TableHead>
+                    <TableHead>
+                      <Button
+                        variant='ghost'
+                        className='h-auto p-0 font-semibold hover:bg-transparent'
+                        onClick={() => handleSortToggle('duration_days')}
+                      >
+                        <div className='flex items-center gap-1'>
+                          Thời hạn (ngày)
+                          {sortField === 'duration_days' && sortOrder === 'none' && <ArrowUpDown className='h-4 w-4' />}
+                          {sortField === 'duration_days' && sortOrder === 'asc' && <ChevronUp className='h-4 w-4' />}
+                          {sortField === 'duration_days' && sortOrder === 'desc' && <ChevronDown className='h-4 w-4' />}
+                          {sortField !== 'duration_days' && <ArrowUpDown className='h-4 w-4 opacity-40' />}
+                        </div>
+                      </Button>
+                    </TableHead>
+                    <TableHead>
+                      <Button
+                        variant='ghost'
+                        className='h-auto p-0 font-semibold hover:bg-transparent'
+                        onClick={() => handleSortToggle('created_at')}
+                      >
+                        <div className='flex items-center gap-1'>
+                          Ngày tạo
+                          {sortField === 'created_at' && sortOrder === 'none' && <ArrowUpDown className='h-4 w-4' />}
+                          {sortField === 'created_at' && sortOrder === 'asc' && <ChevronUp className='h-4 w-4' />}
+                          {sortField === 'created_at' && sortOrder === 'desc' && <ChevronDown className='h-4 w-4' />}
+                          {sortField !== 'created_at' && <ArrowUpDown className='h-4 w-4 opacity-40' />}
+                        </div>
+                      </Button>
+                    </TableHead>
                     <TableHead>Ngày kích hoạt</TableHead>
                     <TableHead>Zalo ID sử dụng</TableHead>
+                    <TableHead>Trạng thái</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -189,7 +308,7 @@ const Subscription = () => {
                           <Button
                             variant='ghost'
                             size='sm'
-                            className='h-6 w-6 p-0'
+                            className='h-6 w-6 p-0 cursor-pointer'
                             onClick={() => copyToClipboard(code.code)}
                           >
                             {copiedCode === code.code ? (
@@ -201,14 +320,14 @@ const Subscription = () => {
                         </div>
                       </TableCell>
                       <TableCell className='text-center'>{code.duration_days} ngày</TableCell>
+                      <TableCell>{formatDate(code.created_at)}</TableCell>
+                      <TableCell>{formatDate(code.activated_at)}</TableCell>
+                      <TableCell className='font-mono text-xs'>{code.zalo_id_used || 'N/A'}</TableCell>
                       <TableCell>
                         <Badge variant={code.is_used ? 'secondary' : 'default'}>
                           {code.is_used ? 'Đã sử dụng' : 'Chưa sử dụng'}
                         </Badge>
                       </TableCell>
-                      <TableCell>{formatDate(code.created_at)}</TableCell>
-                      <TableCell>{formatDate(code.activated_at)}</TableCell>
-                      <TableCell className='font-mono text-xs'>{code.zalo_id_used || 'N/A'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -228,7 +347,7 @@ const Subscription = () => {
                           className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                         />
                       </PaginationItem>
-                      
+
                       {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                         <PaginationItem key={page}>
                           <PaginationLink
@@ -240,7 +359,7 @@ const Subscription = () => {
                           </PaginationLink>
                         </PaginationItem>
                       ))}
-                      
+
                       <PaginationItem>
                         <PaginationNext
                           onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}

@@ -48,25 +48,25 @@ const AdminLayout = () => {
       id: 'dashboard',
       title: 'Bảng điều khiển',
       icon: <FaHome className='w-4 h-4' />,
-      href: 'admin/dashboard'
+      href: '/admin/dashboard'
     },
     {
       id: 'user-management',
       title: 'Quản lý người dùng',
       icon: <FaUsers className='w-4 h-4' />,
-      href: 'admin/user-management'
+      href: '/admin/user-management'
     },
     {
       id: 'subscription',
       title: 'Quản lý gói đăng ký',
       icon: <FaWallet className='w-4 h-4' />,
-      href: 'admin/subscription'
+      href: '/admin/subscription'
     },
     {
       id: 'settings',
       title: 'Cài đặt',
       icon: <IoIosSettings className='w-4 h-4' />,
-      href: 'admin/setting'
+      href: '/admin/setting'
     }
   ]
 

@@ -4,7 +4,8 @@ import type {
   SubscriptionMessage,
   SubscriptionStatus,
   SubscriptionUpdateRolePayload,
-  SubscriptionCodeParams
+  SubscriptionCodeParams,
+  SubscriptionUpdateRoleResponse
 } from '@/types/subscription'
 import apiInstance from './axios.config'
 import type { AxiosResponse } from 'axios'
@@ -24,9 +25,8 @@ const subscriptionService = {
   getMessages: (): Promise<AxiosResponse<SubscriptionMessage[]>> => {
     return apiInstance.get<SubscriptionMessage[]>('/subscription/messages')
   },
-  updateRole: (data: SubscriptionUpdateRolePayload): Promise<AxiosResponse<any>> => {
-    const { user_id } = data
-    return apiInstance.patch(`/subscription/admin/users/${user_id}/role`, data)
+  updateRole: (data: SubscriptionUpdateRolePayload): Promise<AxiosResponse<SubscriptionUpdateRoleResponse>> => {
+    return apiInstance.patch(`/subscription/admin/users/role`, data)
   },
   allUsers: (): Promise<AxiosResponse<any[]>> => {
     return apiInstance.get<any[]>('/subscription/admin/users')

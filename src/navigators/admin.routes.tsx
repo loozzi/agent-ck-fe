@@ -8,28 +8,28 @@ import Subscription from '@/pages/admin/Subscription'
 export const adminRoutesConfig: RouteBrowser[] = [
   {
     name: 'Dashboard',
-    route: '/admin/dashboard',
+    route: 'dashboard', // Đã có
     element: <AdminDashboard />,
     exact: true
   },
   {
     name: 'User Management',
-    route: '/admin/user-management',
+    route: 'user-management',
     element: <UserManagement />,
     exact: true
   },
   {
     name: 'Setting',
-    route: '/admin/setting',
+    route: 'setting',
     element: <AdminSetting />,
     exact: true
   },
-    {
-        name: 'Subscription',
-        route: '/admin/subscription',
-        element: <Subscription />,
-        exact: true
-    }
+  {
+    name: 'Subscription',
+    route: 'subscription',
+    element: <Subscription />,
+    exact: true
+  }
 ]
 
 const AdminNavigator = () => {
