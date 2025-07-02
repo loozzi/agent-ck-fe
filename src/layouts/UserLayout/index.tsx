@@ -3,10 +3,18 @@ import MobileHeader from '@/components/layouts/MobileHeader'
 import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
 import UserNavigator from '@/navigators/user.routes'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type JSX } from 'react'
 import { FaBookOpen, FaChartLine, FaHome, FaWallet } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
 import { MdOutlineMonitorHeart } from 'react-icons/md'
+
+export interface RouteItem {
+  id: string
+  title: string
+  icon: JSX.Element
+  href: string
+}
+
 const UserLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false)
@@ -43,7 +51,7 @@ const UserLayout = () => {
     return isSidebarCollapsed ? 'md:ml-16' : 'md:ml-64' // 64px when collapsed, 256px when expanded
   }
 
-  const sidebarItems: any[] = [
+  const sidebarItems: RouteItem[] = [
     {
       id: 'dashboard',
       title: 'Bảng điều khiển',

@@ -2,11 +2,11 @@ import { useAppSelector } from '@/app/hook'
 import MobileHeader from '@/components/layouts/MobileHeader'
 import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
-import UserNavigator from '@/navigators/user.routes'
-import { useState, useEffect } from 'react'
-import { FaBookOpen, FaChartLine, FaHome, FaWallet } from 'react-icons/fa'
+import AdminNavigator from '@/navigators/admin.routes'
+import { useEffect, useState } from 'react'
+import { FaHome, FaUsers, FaWallet } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
-import { MdOutlineMonitorHeart } from 'react-icons/md'
+import type { RouteItem } from '../UserLayout'
 const AdminLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false)
@@ -43,62 +43,30 @@ const AdminLayout = () => {
     return isSidebarCollapsed ? 'md:ml-16' : 'md:ml-64' // 64px when collapsed, 256px when expanded
   }
 
-  const sidebarItems: any[] = [
+  const sidebarItems: RouteItem[] = [
     {
       id: 'dashboard',
       title: 'Bảng điều khiển',
       icon: <FaHome className='w-4 h-4' />,
-      href: '/dashboard'
+      href: 'admin/dashboard'
     },
     {
-      id: 'portfolio',
-      title: 'Danh mục đầu tư',
-      icon: <MdOutlineMonitorHeart className='w-4 h-4' />,
-      href: '/portfolio'
-    },
-    {
-      id: 'history',
-      title: 'Lịch sử',
-      icon: <FaChartLine className='w-4 h-4' />,
-      href: '/transaction-history'
-    },
-    {
-      id: 'learning',
-      title: 'Học tập',
-      icon: <FaBookOpen className='w-4 h-4' />,
-      href: '/learning'
+      id: 'user-management',
+      title: 'Quản lý người dùng',
+      icon: <FaUsers className='w-4 h-4' />,
+      href: 'admin/user-management'
     },
     {
       id: 'subscription',
-      title: 'Gói dịch vụ',
+      title: 'Quản lý gói đăng ký',
       icon: <FaWallet className='w-4 h-4' />,
-      href: '/subscription'
+      href: 'admin/subscription'
     },
-    // {
-    //   id: 'projects',
-    //   title: 'Projects',
-    //   icon: <FaFolderOpen className='w-4 h-4' />,
-    //   badge: '12',
-    //   children: [
-    //     {
-    //       id: 'my-projects',
-    //       title: 'My Projects',
-    //       icon: <FaFolderOpen className='w-4 h-4' />,
-    //       href: '/projects/my'
-    //     },
-    //     {
-    //       id: 'shared-projects',
-    //       title: 'Shared Projects',
-    //       icon: <FaUsers className='w-4 h-4' />,
-    //       href: '/projects/shared'
-    //     }
-    //   ]
-    // },
     {
       id: 'settings',
       title: 'Cài đặt',
       icon: <IoIosSettings className='w-4 h-4' />,
-      href: '/setting'
+      href: 'admin/setting'
     }
   ]
 
@@ -132,7 +100,7 @@ const AdminLayout = () => {
         className={`flex-1 overflow-auto mt-16 md:mt-0 transition-all duration-300 ease-in-out ${getMainContentMargin()}`}
       >
         <div className='p-4 h-full'>
-          <UserNavigator />
+          <AdminNavigator />
         </div>
       </main>
     </SidebarProvider>
