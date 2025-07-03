@@ -35,20 +35,3 @@ export interface PaginatedResponse {
   limit: number
   offset: number
 }
-
-export interface StockResponse {
-  ticker: string
-  name: string
-  exchange: string
-  sectors: any
-  time: string
-  open: number
-  high: number
-  low: number
-  close: number
-  volume: number
-}
-
-export interface ListStockResponse extends PaginatedResponse {
-  stocks: StockResponse[]
-}

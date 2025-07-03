@@ -2,6 +2,7 @@ import authReducer from '@/slices/auth.slice'
 import chatReducer from '@/slices/chat.slice'
 import mbtiReducer from '@/slices/mbti.slice'
 import portfolioReducer from '@/slices/portfolio.slice'
+import stockReducer from '@/slices/stock.slice'
 import subscriptionReducer from '@/slices/subscription.slice'
 import surveyReducer from '@/slices/survey.slice'
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
@@ -14,7 +15,8 @@ const rootReducer = combineReducers({
   portfolio: portfolioReducer,
   survey: surveyReducer,
   subscription: subscriptionReducer,
-  chat: chatReducer
+  chat: chatReducer,
+  stock: stockReducer
 })
 
 const persistConfig = {
