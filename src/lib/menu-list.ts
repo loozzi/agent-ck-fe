@@ -1,4 +1,4 @@
-import { Tag, Users, Settings, Bookmark, SquarePen, LayoutGrid } from 'lucide-react'
+import { Bookmark, LayoutGrid, Settings, SquarePen, Tag, Users } from 'lucide-react'
 
 type Submenu = {
   href: string
@@ -19,7 +19,7 @@ type Group = {
   menus: Menu[]
 }
 
-export function getMenuList(pathname: string): Group[] {
+export function getMenuList(): Group[] {
   return [
     {
       groupLabel: '',

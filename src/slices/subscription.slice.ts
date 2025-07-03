@@ -30,7 +30,7 @@ export const fetchUserSubscriptionStatus = createAsyncThunk(
       return data
     } catch (error) {
       toast.error('Failed to fetch user subscription status')
-      return rejectWithValue(error.response?.data?.message || 'An error occurred')
+      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
     }
   }
 )
@@ -48,7 +48,7 @@ export const updateUserRole = createAsyncThunk(
       return payload
     } catch (error) {
       toast.error('Failed to update user role')
-      return rejectWithValue(error.response?.data?.message || 'An error occurred')
+      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
     }
   }
 )
@@ -65,7 +65,7 @@ export const fetchSubScriptionCodes = createAsyncThunk(
       return response.data
     } catch (error) {
       toast.error('Failed to fetch subscription codes')
-      return rejectWithValue(error.response?.data?.message || 'An error occurred')
+      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
     }
   }
 )
@@ -83,7 +83,7 @@ export const createSubscriptionCode = createAsyncThunk(
       return response.data
     } catch (error) {
       toast.error('Failed to create subscription code')
-      return rejectWithValue(error.response?.data?.message || 'An error occurred')
+      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
     }
   }
 )

@@ -10,7 +10,7 @@ import { fetchQuestions, fetchSurveyStatus, submitSurvey } from '@/slices/survey
 import type { SurveyPayload } from '@/types/survey'
 import { CheckCircle2, ChevronLeft, ChevronRight, Clock, FileText, History, Target } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate } from 'react-router'
 import { toast } from 'react-toastify'
 
 const Survey = () => {

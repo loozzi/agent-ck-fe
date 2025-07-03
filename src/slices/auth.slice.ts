@@ -29,7 +29,7 @@ export const signInAction = createAsyncThunk('auth/signIn', async (payload: Sign
         tokenType: token_type
       }
     } else {
-      toast.error(response.response.data.detail)
+      toast.error((response as any).response.data.detail || 'Đăng nhập không thành công')
       return rejectWithValue('Sai tài khoản hoặc mật khẩu')
     }
   } catch (error) {
@@ -61,7 +61,7 @@ export const signUpAction = createAsyncThunk('auth/signUp', async (payload: Sign
       return response.data
     } else {
       console.error('SignUp Error:', response)
-      toast.error(response.response.data.detail)
+      toast.error((response as any).response.data.detail)
       return rejectWithValue('Đăng ký không thành công')
     }
   } catch (error) {
@@ -122,17 +122,17 @@ const userSlice = createSlice({
         state.refreshToken = action.payload.refreshToken
         state.loading = false
       })
-      .addCase(signInAction.rejected, (state, action) => {
+      .addCase(signInAction.rejected, (state) => {
         state.loading = false
       })
       .addCase(signUpAction.pending, (state) => {
         state.loading = true
       })
-      .addCase(signUpAction.fulfilled, (state, action) => {
+      .addCase(signUpAction.fulfilled, (state) => {
         state.loading = false
         state.signUpSuccess = true
       })
-      .addCase(signUpAction.rejected, (state, action) => {
+      .addCase(signUpAction.rejected, (state) => {
         state.loading = false
       })
       .addCase(getMeAction.pending, (state) => {
@@ -143,7 +143,7 @@ const userSlice = createSlice({
         state.isAuthenticated = true
         state.loading = false
       })
-      .addCase(getMeAction.rejected, (state, action) => {
+      .addCase(getMeAction.rejected, (state) => {
         state.loading = false
         state.isAuthenticated = false
         state.user = null
@@ -162,13 +162,11 @@ const userSlice = createSlice({
         }
         state.loading = false
       })
-      .addCase(getSubscriptionStatus.rejected, (state, action) => {
+      .addCase(getSubscriptionStatus.rejected, (state) => {
         state.loading = false
         state.subscription = undefined
       })
-      .addDefaultCase((state) => {
-        // Handle any other actions that don't match
-      })
+      .addDefaultCase(() => {})
   }
 })
 

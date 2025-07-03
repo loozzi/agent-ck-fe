@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react'
-import Sidebar from '@/components/layouts/Sidebar'
-import MobileHeader from '@/components/layouts/MobileHeader'
-import SidebarProvider from '@/components/layouts/SidebarProvider'
-import { useSelector } from 'react-redux'
 import type { RootState } from '@/app/store'
-import { MdDashboard, MdOutlineMonitorHeart } from 'react-icons/md'
-import { FaChartLine, FaBookOpen } from 'react-icons/fa'
+import MobileHeader from '@/components/layouts/MobileHeader'
+import Sidebar from '@/components/layouts/Sidebar'
+import SidebarProvider from '@/components/layouts/SidebarProvider'
+import TrainerNavigator from '@/navigators/trainer.routes'
+import { useEffect, useState } from 'react'
+import { FaBookOpen, FaChartLine } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
-import { TrainerNavigator } from '@/navigators/trainer.routes'
+import { MdDashboard, MdOutlineMonitorHeart } from 'react-icons/md'
+import { useSelector } from 'react-redux'
 
 const TrainerLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
