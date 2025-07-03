@@ -22,17 +22,8 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', async (payload: 
     if (response.status !== 200) {
       return rejectWithValue('Failed to send message')
     }
-    const responseData = response.data
+    return response.data as ChatHistory
 
-    const history: ChatHistory = {
-      role: 'user',
-      content: responseData.response,
-      message_order: 0,
-      id: responseData.message_id,
-      session_id: '',
-      created_at: responseData.timestamp
-    }
-    return history
   } catch (error) {
     return rejectWithValue('Failed to send message')
   }

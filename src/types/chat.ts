@@ -3,9 +3,12 @@ export interface ChatPayload {
 }
 
 export interface ChatResponse {
-  response: string
-  timestamp: string
-  message_id: string
+  role: ChatRole
+  content: string
+  message_order: number
+  id: string
+  session_id: string
+  created_at: string
 }
 
 export type ChatRole = 'user' | 'assistant' | 'system'
