@@ -2,13 +2,12 @@ import { useAppDispatch, useAppSelector } from '@/app/hook'
 import AddTransactionDialog from '@/components/common/AddTransactionDialog'
 import DeleteConfirmationDialog from '@/components/common/DeleteConfirmationDialog'
 import EditTransactionDialog from '@/components/common/EditTransactionDialog'
-import StockDetailsDialog from '@/components/common/StockDetailsDialog'
+import TransactionHistory from '@/components/common/TransactionHistory'
 import WalletCard from '@/components/common/WalletCard'
 import { Button } from '@/components/ui/button'
 import { deleteTransaction, fetchTransactions, fetchWallet } from '@/slices/portfolio.slice'
 import { Receipt, RefreshCw, Wallet } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import TransactionHistory from '@/components/common/TransactionHistory'
 
 const Portfolio = () => {
   const wallet = useAppSelector((state) => state.portfolio.wallet)
@@ -18,8 +17,6 @@ const Portfolio = () => {
   const loading = useAppSelector((state) => state.portfolio.loading)
   const error = useAppSelector((state) => state.portfolio.error)
 
-  const [selectedStock, setSelectedStock] = useState<any>(null)
-  const [showStockDetails, setShowStockDetails] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [stockToDelete, setStockToDelete] = useState<any>(null)
   const [showDeleteTransactionDialog, setShowDeleteTransactionDialog] = useState(false)
@@ -153,9 +150,6 @@ const Portfolio = () => {
           onDelete={handleDeleteTransaction}
         />
       </div>
-
-      {/* Stock Details Dialog */}
-      <StockDetailsDialog item={selectedStock} open={showStockDetails} onOpenChange={setShowStockDetails} />
 
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmationDialog
