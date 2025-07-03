@@ -1,4 +1,5 @@
 import authReducer from '@/slices/auth.slice'
+import chatReducer from '@/slices/chat.slice'
 import mbtiReducer from '@/slices/mbti.slice'
 import portfolioReducer from '@/slices/portfolio.slice'
 import subscriptionReducer from '@/slices/subscription.slice'
@@ -12,7 +13,8 @@ const rootReducer = combineReducers({
   mbti: mbtiReducer,
   portfolio: portfolioReducer,
   survey: surveyReducer,
-  subscription: subscriptionReducer
+  subscription: subscriptionReducer,
+  chat: chatReducer
 })
 
 const persistConfig = {
