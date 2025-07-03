@@ -1,13 +1,12 @@
-import UserLayout from '@/layouts/UserLayout'
-import AdminLayout from '@/layouts/AdminLayout'
 import ProtectedRoute from '@/components/layouts/ProtectedRoute'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import UserAuth from '@/pages/auth/UserAuth'
+import AdminLayout from '@/layouts/AdminLayout'
+import UserLayout from '@/layouts/UserLayout'
 import SignOut from '@/pages/auth/SignOut'
 import Unauthorized from '@/pages/auth/Unauthorized'
+import UserAuth from '@/pages/auth/UserAuth'
 import Home from '@/pages/Home'
-import MBTI from '@/pages/user/MBTI'
 import Survey from '@/pages/user/Survey'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 const AppNavigator = () => {
   return (
@@ -19,8 +18,14 @@ const AppNavigator = () => {
         <Route path='/unauthorized' element={<Unauthorized />} />
         <Route path='/signout' element={<SignOut />} />
         <Route path='/' element={<Home />} />
-        <Route path='/mbti' element={<MBTI />} />
-        <Route path='/survey' element={<Survey />} />
+        <Route
+          path='/survey'
+          element={
+            <ProtectedRoute requiredRoles={['user']}>
+              <Survey />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Redirect root to user dashboard */}
         {/* Protected user routes */}

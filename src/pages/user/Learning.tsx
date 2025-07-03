@@ -2,109 +2,197 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Send, Bot, User, Loader2 } from 'lucide-react'
-
-interface Message {
-  id: string
-  content: string
-  sender: 'user' | 'ai'
-  timestamp: Date
-}
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog'
+import { Send, Bot, User, Loader2, Trash2 } from 'lucide-react'
+import { useAppDispatch, useAppSelector } from '@/app/hook'
+import { sendMessage, fetchChatHistories, deleteChatHistories } from '@/slices/chat.slice'
+import type { ChatHistory } from '@/types/chat'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import { toast } from 'react-toastify'
 
 const Learning = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      content:
-        'Chào bạn! Tôi là AI trợ lý học tập chứng khoán. Bạn có thể hỏi tôi về bất kỳ điều gì liên quan đến thị trường chứng khoán, phân tích kỹ thuật, đầu tư, và nhiều chủ đề khác. Bạn muốn học về điều gì hôm nay?',
-      sender: 'ai',
-      timestamp: new Date()
-    }
-  ])
+  const dispatch = useAppDispatch()
+  const { histories, loadingSend, loadingHistories, error } = useAppSelector((state) => state.chat)
+
   const [inputMessage, setInputMessage] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
   const [hasMoreHistory, setHasMoreHistory] = useState(true)
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false)
+  const [pendingUserMessage, setPendingUserMessage] = useState<ChatHistory | null>(null)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
 
-  // Mock API call để gửi tin nhắn
-  const sendMessageToAI = async (message: string): Promise<string> => {
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 2000))
+  // Helper function to get display messages including welcome message and pending message
+  const getDisplayMessages = (histories: ChatHistory[]): ChatHistory[] => {
+    let messages: ChatHistory[] = []
 
-    // Mock responses based on keywords
-    const lowerMessage = message.toLowerCase()
-    if (lowerMessage.includes('chứng khoán') || lowerMessage.includes('cổ phiếu')) {
-      return 'Chứng khoán là một công cụ đầu tư quan trọng. Để đầu tư hiệu quả, bạn cần hiểu về phân tích cơ bản và phân tích kỹ thuật. Bạn muốn tìm hiểu về phương pháp nào trước?'
-    } else if (lowerMessage.includes('phân tích')) {
-      return 'Có hai loại phân tích chính: Phân tích cơ bản (fundamental analysis) tập trung vào giá trị thực của công ty, và phân tích kỹ thuật (technical analysis) dựa trên biểu đồ giá và volume. Bạn muốn học về loại nào?'
-    } else if (lowerMessage.includes('risk') || lowerMessage.includes('rủi ro')) {
-      return 'Quản lý rủi ro là yếu tố then chốt trong đầu tư. Một số nguyên tắc cơ bản: đa dạng hóa danh mục, đặt stop-loss, không đầu tư quá 5-10% vào một cổ phiếu, và chỉ đầu tư số tiền có thể chấp nhận mất.'
+    if (histories.length === 0) {
+      // Return welcome message if no history
+      messages = [
+        {
+          id: 'welcome',
+          content:
+            'Chào bạn! Tôi là AI trợ lý học tập chứng khoán. Bạn có thể hỏi tôi về bất kỳ điều gì liên quan đến thị trường chứng khoán, phân tích kỹ thuật, đầu tư, và nhiều chủ đề khác. Bạn muốn học về điều gì hôm nay?',
+          role: 'assistant',
+          message_order: 0,
+          session_id: '',
+          created_at: new Date().toISOString()
+        }
+      ]
+    } else {
+      // Create a copy of the array before sorting to avoid mutating the Redux store
+      messages = [...histories].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
     }
 
-    return `Tôi hiểu bạn đang hỏi về "${message}". Đây là một chủ đề thú vị trong lĩnh vực chứng khoán. Để tôi giải thích chi tiết hơn cho bạn...`
+    // Add pending user message if exists
+    if (pendingUserMessage) {
+      messages.push(pendingUserMessage)
+    }
+
+    return messages
   }
 
-  // Mock API call để tải lịch sử
-  const loadHistoryMessages = async (): Promise<Message[]> => {
-    setIsLoadingHistory(true)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+  // Helper function to determine if message is from AI
+  const isAIMessage = (role: string) => role === 'assistant'
 
-    // Mock historical messages
-    const historyMessages: Message[] = [
-      {
-        id: `history-${Date.now()}-1`,
-        content: 'Làm thế nào để phân tích một cổ phiếu?',
-        sender: 'user',
-        timestamp: new Date(Date.now() - 3600000)
-      },
-      {
-        id: `history-${Date.now()}-2`,
-        content:
-          'Để phân tích một cổ phiếu, bạn cần xem xét nhiều yếu tố: tình hình tài chính công ty, xu hướng ngành, biểu đồ kỹ thuật, và các chỉ số định giá như P/E, P/B...',
-        sender: 'ai',
-        timestamp: new Date(Date.now() - 3590000)
-      }
-    ]
-
-    setIsLoadingHistory(false)
-    return historyMessages
+  // Helper function to format timestamp
+  const formatTimestamp = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString('vi-VN', {
+      hour: '2-digit',
+      minute: '2-digit'
+    })
   }
+
+  // Component to render formatted message content
+  const MessageContent = ({ content, isUserMessage = false }: { content: string; isUserMessage?: boolean }) => {
+    const codeBlockBg = isUserMessage ? 'bg-blue-500' : 'bg-gray-200'
+    const codeBg = isUserMessage ? 'bg-blue-500' : 'bg-gray-200'
+    const textColor = isUserMessage ? 'text-white' : 'text-gray-900'
+    const borderColor = isUserMessage ? 'border-blue-300' : 'border-gray-300'
+
+    return (
+      <div className={`text-sm leading-relaxed ${textColor}`}>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={{
+            h1: ({ children }) => <h1 className='text-lg font-bold mb-2'>{children}</h1>,
+            h2: ({ children }) => <h2 className='text-base font-bold mb-2'>{children}</h2>,
+            h3: ({ children }) => <h3 className='text-sm font-bold mb-1'>{children}</h3>,
+            p: ({ children }) => <p className='mb-2 last:mb-0'>{children}</p>,
+            strong: ({ children }) => <strong className='font-bold'>{children}</strong>,
+            em: ({ children }) => <em className='italic'>{children}</em>,
+            code: ({ children, ...props }) => {
+              const isInline = !props.className?.includes('language-')
+              return isInline ? (
+                <code
+                  className={`${codeBg} px-1 py-0.5 rounded text-xs font-mono ${isUserMessage ? 'text-blue-100' : 'text-gray-800'}`}
+                >
+                  {children}
+                </code>
+              ) : (
+                <pre className={`${codeBlockBg} p-2 rounded mt-2 overflow-x-auto`}>
+                  <code className={`text-xs font-mono ${isUserMessage ? 'text-blue-100' : 'text-gray-800'}`}>
+                    {children}
+                  </code>
+                </pre>
+              )
+            },
+            ul: ({ children }) => <ul className='list-disc list-inside mb-2 space-y-1'>{children}</ul>,
+            ol: ({ children }) => <ol className='list-decimal list-inside mb-2 space-y-1'>{children}</ol>,
+            li: ({ children }) => <li className='ml-2'>{children}</li>,
+            blockquote: ({ children }) => (
+              <blockquote className={`border-l-4 ${borderColor} pl-4 italic my-2`}>{children}</blockquote>
+            )
+          }}
+        >
+          {content}
+        </ReactMarkdown>
+      </div>
+    )
+  }
+
+  // Load chat history on component mount
+  useEffect(() => {
+    dispatch(fetchChatHistories({ limit: 20 }))
+  }, [dispatch])
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return
+    if (!inputMessage.trim() || loadingSend) return
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: inputMessage,
-      sender: 'user',
-      timestamp: new Date()
+    const messageToSend = inputMessage
+    setInputMessage('')
+
+    // Create pending user message for immediate display
+    const pendingMessage: ChatHistory = {
+      id: `pending-${Date.now()}`,
+      content: messageToSend,
+      role: 'user',
+      message_order: 0,
+      session_id: '',
+      created_at: new Date().toISOString()
     }
 
-    setMessages((prev) => [...prev, userMessage])
-    setInputMessage('')
-    setIsLoading(true)
+    // Set pending message to show immediately
+    setPendingUserMessage(pendingMessage)
+
+    // Safety timeout to clear pending message after 10 seconds
+    const timeoutId = setTimeout(() => {
+      setPendingUserMessage(null)
+    }, 10000)
 
     try {
-      const aiResponse = await sendMessageToAI(inputMessage)
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: aiResponse,
-        sender: 'ai',
-        timestamp: new Date()
-      }
-      setMessages((prev) => [...prev, aiMessage])
+      // Send message and wait for response
+      await dispatch(sendMessage({ message: messageToSend })).unwrap()
+
+      // Clear timeout since we'll refresh history
+      clearTimeout(timeoutId)
+
+      // Clear pending message immediately to avoid showing wrong role
+      setPendingUserMessage(null)
+
+      // Small delay to ensure API has processed, then refresh history
+      setTimeout(() => {
+        dispatch(fetchChatHistories({ limit: 50 }))
+      }, 300)
     } catch (error) {
       console.error('Error sending message:', error)
+      // Clear timeout and pending message on error
+      clearTimeout(timeoutId)
+      setPendingUserMessage(null)
     } finally {
-      setIsLoading(false)
-      // Focus back to input after AI response
+      // Focus back to input after sending
       setTimeout(() => {
         textareaRef.current?.focus()
-      }, 100)
+      }, 200)
+    }
+  }
+
+  const loadMoreHistory = async () => {
+    if (loadingHistories || !hasMoreHistory) return
+
+    try {
+      const result = await dispatch(
+        fetchChatHistories({
+          limit: 20
+        })
+      ).unwrap()
+
+      if (result.length < 20) {
+        setHasMoreHistory(false)
+      }
+    } catch (error) {
+      console.error('Error loading history:', error)
     }
   }
 
@@ -114,37 +202,96 @@ const Learning = () => {
       handleSendMessage()
     }
   }
+
   const handleScroll = async (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop } = e.currentTarget
 
     // Khi scroll lên đầu và còn lịch sử để tải
-    if (scrollTop === 0 && hasMoreHistory && !isLoadingHistory) {
-      try {
-        const historyMessages = await loadHistoryMessages()
-        if (historyMessages.length > 0) {
-          const currentScrollHeight = e.currentTarget.scrollHeight
-          setMessages((prev) => [...historyMessages, ...prev])
-
-          // Maintain scroll position after adding history
-          setTimeout(() => {
-            if (messagesContainerRef.current) {
-              const newScrollHeight = messagesContainerRef.current.scrollHeight
-              messagesContainerRef.current.scrollTop = newScrollHeight - currentScrollHeight
-            }
-          }, 100)
-        } else {
-          setHasMoreHistory(false)
-        }
-      } catch (error) {
-        console.error('Error loading history:', error)
-      }
+    if (scrollTop === 0 && hasMoreHistory && !loadingHistories) {
+      await loadMoreHistory()
     }
   }
 
-  // Auto scroll to bottom when new messages arrive
+  const handleDeleteHistories = async () => {
+    if (loadingHistories) return
+
+    try {
+      // Clear pending user message first
+      setPendingUserMessage(null)
+
+      // Dispatch delete action
+      await dispatch(deleteChatHistories()).unwrap()
+
+      // Clear local state and Redux store
+      setHasMoreHistory(true)
+
+      // Show success toast
+      toast.success('Đã xóa lịch sử trò chuyện thành công! Tất cả tin nhắn đã được xóa khỏi hệ thống.', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true
+      })
+    } catch (error) {
+      console.error('Error deleting histories:', error)
+
+      // Show error toast
+      toast.error('Có lỗi xảy ra khi xóa lịch sử. Vui lòng thử lại sau.', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true
+      })
+    }
+  }
+
+  // Get messages from Redux store
+  const messages = getDisplayMessages(histories)
+
+  // Auto clear pending message when Redux histories change (indicating new messages received)
+  useEffect(() => {
+    if (pendingUserMessage && histories.length > 0) {
+      // Get the most recent messages to check if our conversation has been updated
+      const sortedHistories = [...histories].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+
+      // Check if we have both user message and AI response after our pending message time
+      const pendingTime = new Date(pendingUserMessage.created_at).getTime()
+      const recentMessages = sortedHistories.filter((msg) => new Date(msg.created_at).getTime() >= pendingTime)
+
+      // If we have recent messages that include our user message, clear pending
+      const hasUserMessage = recentMessages.some(
+        (msg) => msg.role === 'user' && msg.content === pendingUserMessage.content
+      )
+
+      if (hasUserMessage) {
+        setPendingUserMessage(null)
+      }
+    }
+  }, [histories, pendingUserMessage])
+
+  // Clear pending message immediately when send operation completes
+  useEffect(() => {
+    if (!loadingSend && pendingUserMessage) {
+      // Small delay to let Redux store update, then clear pending
+      const timeoutId = setTimeout(() => {
+        setPendingUserMessage(null)
+      }, 100)
+
+      return () => clearTimeout(timeoutId)
+    }
+  }, [loadingSend, pendingUserMessage])
+
+  // Auto scroll to bottom when new messages arrive or pending message changes
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+  }, [histories, pendingUserMessage])
+
   // Auto resize textarea
   useEffect(() => {
     if (textareaRef.current) {
@@ -160,18 +307,65 @@ const Learning = () => {
         <div className='h-full flex flex-col mx-auto'>
           {/* Header */}
           <div className='shrink-0 px-3 md:px-6 py-3 md:py-4'>
-            <div className='flex items-center gap-2'>
-              <Bot className='w-4 h-4 md:w-6 md:h-6 text-blue-600' />
-              <h1 className='text-base md:text-xl font-semibold'>AI Học Chứng Khoán</h1>{' '}
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-2'>
+                <Bot className='w-4 h-4 md:w-6 md:h-6 text-blue-600' />
+                <h1 className='text-base md:text-xl font-semibold'>AI Học Chứng Khoán</h1>
+              </div>
+
+              {/* Clear History Button - only show if there are messages */}
+              {histories.length > 0 && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      disabled={loadingHistories}
+                      size='sm'
+                      variant='outline'
+                      className='flex items-center gap-1 text-xs md:text-sm cursor-pointer disabled:cursor-not-allowed border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 hover:text-red-700'
+                    >
+                      {loadingHistories ? (
+                        <Loader2 className='w-3 h-3 md:w-4 md:h-4 animate-spin' />
+                      ) : (
+                        <Trash2 className='w-3 h-3 md:w-4 md:h-4' />
+                      )}
+                      <span className='hidden md:inline'>Xóa lịch sử</span>
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Xác nhận xóa lịch sử</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Bạn có chắc chắn muốn xóa toàn bộ lịch sử trò chuyện? Hành động này không thể hoàn tác.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className='cursor-pointer'>Hủy</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDeleteHistories}
+                        className='bg-red-600 hover:bg-red-700 text-white cursor-pointer flex items-center gap-2'
+                      >
+                        <Trash2 className='w-4 h-4' />
+                        Xóa lịch sử
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
             </div>
           </div>
 
           {/* Messages */}
           <div className='flex-1 overflow-y-auto px-3 md:px-6 pb-4' ref={messagesContainerRef} onScroll={handleScroll}>
-            {isLoadingHistory && (
+            {loadingHistories && (
               <div className='flex justify-center py-4'>
                 <Loader2 className='w-4 h-4 md:w-6 md:h-6 animate-spin text-blue-600' />
                 <span className='ml-2 text-xs md:text-sm text-muted-foreground'>Đang tải lịch sử...</span>
+              </div>
+            )}
+
+            {error && (
+              <div className='flex justify-center py-4'>
+                <div className='bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm'>Có lỗi xảy ra: {error}</div>
               </div>
             )}
 
@@ -179,9 +373,9 @@ const Learning = () => {
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex gap-2 md:gap-3 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className={`flex gap-2 md:gap-3 ${!isAIMessage(message.role) ? 'justify-end' : 'justify-start'}`}
                 >
-                  {message.sender === 'ai' && (
+                  {isAIMessage(message.role) && (
                     <Avatar className='w-6 h-6 md:w-8 md:h-8 shrink-0 mt-1'>
                       <AvatarFallback className='bg-blue-100'>
                         <Bot className='w-3 h-3 md:w-4 md:h-4 text-blue-600' />
@@ -191,23 +385,20 @@ const Learning = () => {
 
                   <div
                     className={`max-w-[80%] md:max-w-[70%] rounded-lg px-3 py-2 ${
-                      message.sender === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'
+                      !isAIMessage(message.role) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'
                     }`}
                   >
-                    <p className='text-sm whitespace-pre-wrap break-words leading-relaxed'>{message.content}</p>
+                    <MessageContent content={message.content} isUserMessage={!isAIMessage(message.role)} />
                     <span
                       className={`text-xs mt-1 block opacity-70 ${
-                        message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
+                        !isAIMessage(message.role) ? 'text-blue-100' : 'text-gray-500'
                       }`}
                     >
-                      {message.timestamp.toLocaleTimeString('vi-VN', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
+                      {formatTimestamp(message.created_at)}
                     </span>
                   </div>
 
-                  {message.sender === 'user' && (
+                  {!isAIMessage(message.role) && (
                     <Avatar className='w-6 h-6 md:w-8 md:h-8 shrink-0 mt-1'>
                       <AvatarFallback className='bg-green-100'>
                         <User className='w-3 h-3 md:w-4 md:h-4 text-green-600' />
@@ -217,7 +408,7 @@ const Learning = () => {
                 </div>
               ))}
 
-              {isLoading && (
+              {loadingSend && (
                 <div className='flex gap-2 md:gap-3 justify-start'>
                   <Avatar className='w-6 h-6 md:w-8 md:h-8 shrink-0 mt-1'>
                     <AvatarFallback className='bg-blue-100'>
@@ -250,16 +441,16 @@ const Learning = () => {
                 onKeyDown={handleKeyDown}
                 placeholder='Nhập câu hỏi về chứng khoán...'
                 className='min-h-[44px] max-h-24 md:max-h-32 resize-none text-sm border-0 focus:border-0 focus:ring-0 shadow-none bg-gray-50 rounded-lg'
-                disabled={isLoading}
+                disabled={loadingSend}
               />
             </div>
             <Button
               onClick={handleSendMessage}
-              disabled={!inputMessage.trim() || isLoading}
+              disabled={!inputMessage.trim() || loadingSend}
               size='icon'
-              className='h-11 w-11 shrink-0 bg-blue-600 hover:bg-blue-700 shadow-none'
+              className='h-11 w-11 shrink-0 bg-blue-600 hover:bg-blue-700 shadow-none cursor-pointer disabled:cursor-not-allowed'
             >
-              {isLoading ? <Loader2 className='w-4 h-4 animate-spin' /> : <Send className='w-4 h-4' />}
+              {loadingSend ? <Loader2 className='w-4 h-4 animate-spin' /> : <Send className='w-4 h-4' />}
             </Button>
           </div>
           <p className='text-xs text-muted-foreground mt-2 text-center md:text-left'>

@@ -1,13 +1,14 @@
 import { useAppDispatch, useAppSelector } from '@/app/hook'
-import { Button } from '@/components/ui/button'
-import { fetchTransactions, fetchWallet } from '@/slices/portfolio.slice'
-import { useEffect, useState } from 'react'
-import WalletCard from '@/components/common/WalletCard'
-import TransactionCard from '@/components/common/TransactionCard'
 import AddTransactionDialog from '@/components/common/AddTransactionDialog'
-import StockDetailsDialog from '@/components/common/StockDetailsDialog'
 import DeleteConfirmationDialog from '@/components/common/DeleteConfirmationDialog'
-import { RefreshCw, Wallet, Receipt } from 'lucide-react'
+import EditTransactionDialog from '@/components/common/EditTransactionDialog'
+import StockDetailsDialog from '@/components/common/StockDetailsDialog'
+import WalletCard from '@/components/common/WalletCard'
+import { Button } from '@/components/ui/button'
+import { deleteTransaction, fetchTransactions, fetchWallet } from '@/slices/portfolio.slice'
+import { Receipt, RefreshCw, Wallet } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import TransactionHistory from '@/components/common/TransactionHistory'
 
 const Portfolio = () => {
   const wallet = useAppSelector((state) => state.portfolio.wallet)
@@ -21,21 +22,14 @@ const Portfolio = () => {
   const [showStockDetails, setShowStockDetails] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [stockToDelete, setStockToDelete] = useState<any>(null)
+  const [showDeleteTransactionDialog, setShowDeleteTransactionDialog] = useState(false)
+  const [transactionToDelete, setTransactionToDelete] = useState<any>(null)
+  const [showEditTransactionDialog, setShowEditTransactionDialog] = useState(false)
+  const [transactionToEdit, setTransactionToEdit] = useState<any>(null)
 
   const handleTransactionSuccess = () => {
     dispatch(fetchWallet())
     dispatch(fetchTransactions())
-  }
-
-  const handleViewStock = (item: any) => {
-    setSelectedStock(item)
-    setShowStockDetails(true)
-  }
-
-  const handleEditStock = (item: any) => {
-    // TODO: Implement edit stock functionality
-    console.log('Edit stock:', item)
-    // You can implement a separate edit dialog here
   }
 
   const handleBuyStock = (ticker: string) => {
@@ -50,11 +44,6 @@ const Portfolio = () => {
     // This could open AddTransactionDialog with ticker pre-filled and action set to 'sell'
   }
 
-  const handleDeleteStock = (item: any) => {
-    setStockToDelete(item)
-    setShowDeleteDialog(true)
-  }
-
   const confirmDeleteStock = () => {
     if (stockToDelete) {
       // TODO: Call API to delete stock from portfolio
@@ -63,6 +52,34 @@ const Portfolio = () => {
       setShowDeleteDialog(false)
       setStockToDelete(null)
     }
+  }
+
+  const handleDeleteTransaction = (transaction: any) => {
+    setTransactionToDelete(transaction)
+    setShowDeleteTransactionDialog(true)
+  }
+
+  const confirmDeleteTransaction = () => {
+    if (transactionToDelete) {
+      dispatch(deleteTransaction(transactionToDelete.id)).then(() => {
+        // Refresh data after successful deletion
+        dispatch(fetchWallet())
+        dispatch(fetchTransactions())
+      })
+      setShowDeleteTransactionDialog(false)
+      setTransactionToDelete(null)
+    }
+  }
+
+  const handleEditTransaction = (transaction: any) => {
+    setTransactionToEdit(transaction)
+    setShowEditTransactionDialog(true)
+  }
+
+  const handleEditTransactionSuccess = () => {
+    // Refresh data after successful update
+    dispatch(fetchWallet())
+    dispatch(fetchTransactions())
   }
 
   useEffect(() => {
@@ -89,7 +106,7 @@ const Portfolio = () => {
             dispatch(fetchTransactions())
           }}
           disabled={loading}
-          className='flex items-center gap-2 cursor-pointer'
+          className='flex items-center gap-2 cursor-pointer bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg px-4 py-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed'
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           {loading ? 'Đang tải...' : 'Làm mới'}
@@ -113,15 +130,7 @@ const Portfolio = () => {
         {wallet && wallet.length > 0 ? (
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
             {wallet.map((item) => (
-              <WalletCard
-                key={item.id}
-                item={item}
-                onView={handleViewStock}
-                onEdit={handleEditStock}
-                onBuy={handleBuyStock}
-                onSell={handleSellStock}
-                onDelete={handleDeleteStock}
-              />
+              <WalletCard key={item.id} item={item} onBuy={handleBuyStock} onSell={handleSellStock} />
             ))}
           </div>
         ) : (
@@ -138,18 +147,11 @@ const Portfolio = () => {
           <Receipt className='w-6 h-6 mr-2 text-blue-600' />
           Lịch sử giao dịch
         </h2>
-        {transactions && transactions.length > 0 ? (
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {transactions.map((transaction) => (
-              <TransactionCard key={transaction.id} transaction={transaction} />
-            ))}
-          </div>
-        ) : (
-          <div className='text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-lg'>
-            <Receipt className='w-12 h-12 mx-auto text-gray-400 mb-4' />
-            <p className='text-gray-600 dark:text-gray-400'>Chưa có giao dịch nào</p>
-          </div>
-        )}
+        <TransactionHistory
+          transactions={transactions || []}
+          onEdit={handleEditTransaction}
+          onDelete={handleDeleteTransaction}
+        />
       </div>
 
       {/* Stock Details Dialog */}
@@ -161,6 +163,22 @@ const Portfolio = () => {
         onOpenChange={setShowDeleteDialog}
         onConfirm={confirmDeleteStock}
         ticker={stockToDelete?.ticker || ''}
+      />
+
+      {/* Delete Transaction Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        open={showDeleteTransactionDialog}
+        onOpenChange={setShowDeleteTransactionDialog}
+        onConfirm={confirmDeleteTransaction}
+        ticker={transactionToDelete?.ticker || ''}
+      />
+
+      {/* Edit Transaction Dialog */}
+      <EditTransactionDialog
+        transaction={transactionToEdit}
+        open={showEditTransactionDialog}
+        onOpenChange={setShowEditTransactionDialog}
+        onSuccess={handleEditTransactionSuccess}
       />
     </div>
   )

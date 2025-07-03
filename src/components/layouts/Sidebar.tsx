@@ -30,6 +30,7 @@ interface SidebarProps {
   onMobileMenuToggle?: (isOpen: boolean) => void
   isMobileMenuOpen?: boolean
   onCollapsedChange?: (collapsed: boolean) => void
+  role: 'user' | 'admin' | 'trainer'
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -38,7 +39,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   className,
   onMobileMenuToggle,
   isMobileMenuOpen,
-  onCollapsedChange
+  onCollapsedChange,
+  role
 }) => {
   const [collapsed, setCollapsed] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -85,18 +87,46 @@ const Sidebar: React.FC<SidebarProps> = ({
   const handleLogout = () => {
     navigate('/signout')
   }
+
+  // Get background colors based on role
+  const getRoleColors = () => {
+    switch (role) {
+      case 'admin':
+        return {
+          background: 'bg-cyan-900',
+          border: 'border-cyan-700',
+          accent: 'hover:bg-cyan-800'
+        }
+      case 'trainer':
+        return {
+          background: 'bg-green-900',
+          border: 'border-green-700',
+          accent: 'hover:bg-green-800'
+        }
+      case 'user':
+      default:
+        return {
+          background: 'bg-slate-900',
+          border: 'border-slate-700',
+          accent: 'hover:bg-slate-700'
+        }
+    }
+  }
+
+  const roleColors = getRoleColors()
   return (
     <>
       {' '}
       {/* Mobile Overlay */}
       {isMobile && isMobileMenuOpen && (
-        <div className='fixed inset-0 bg-black/30 backdrop-blur-sm z-30 md:hidden' onClick={closeMobileMenu} />
+        <div className={`fixed inset-0 bg-black/30 backdrop-blur-sm z-30 md:hidden`} onClick={closeMobileMenu} />
       )}
       <SidebarContext.Provider value={{ collapsed: isMobile ? false : collapsed, toggleCollapsed }}>
         {' '}
         <div
           className={cn(
-            'flex flex-col bg-slate-900 text-white transition-all duration-300 h-screen',
+            'flex flex-col text-white transition-all duration-300 h-screen',
+            roleColors.background,
             // Desktop styles - fixed position
             !isMobile && 'fixed left-0 top-0 z-30',
             !isMobile && (collapsed ? 'w-16' : 'w-64'),
@@ -109,7 +139,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           {' '}
           {/* Header - only show on desktop */}
           {!isMobile && (
-            <div className='p-4 border-b border-slate-700 flex-shrink-0'>
+            <div className={`p-4 border-b flex-shrink-0 ${roleColors.border}`}>
               <div className='flex items-center justify-between'>
                 {/* Only show logo on desktop when not collapsed */}
                 {!collapsed && (
@@ -126,7 +156,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   variant='ghost'
                   size='icon'
                   onClick={toggleCollapsed}
-                  className='text-white hover:bg-slate-700 cursor-pointer'
+                  className={`text-white cursor-pointer ${roleColors.accent}`}
                 >
                   {collapsed ? <MdChevronRight /> : <MdChevronLeft />}
                 </Button>
@@ -164,7 +194,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {/* Account */}
                 {accountItems.length > 0 && (
                   <>
-                    {!(isMobile ? false : collapsed) && <Separator className='bg-slate-700' />}
+                    {!(isMobile ? false : collapsed) && (
+                      <Separator className={roleColors.border.replace('border-', 'bg-')} />
+                    )}
                     {!(isMobile ? false : collapsed) && (
                       <h3 className='text-xs font-semibold text-slate-400 uppercase tracking-wide px-3'>Account</h3>
                     )}
@@ -178,7 +210,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </ScrollArea>{' '}
           {/* User Profile */}
           {user && (
-            <div className='p-4 border-t border-slate-700 flex-shrink-0'>
+            <div className={`p-4 border-t flex-shrink-0 ${roleColors.border}`}>
               {(isMobile ? false : collapsed) ? (
                 <div className='flex justify-center'>
                   <Avatar className='w-8 h-8'>
@@ -211,7 +243,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}{' '}
           {/* Logout Button - Moved to bottom */}
-          <div className='p-4 border-t border-slate-700 flex-shrink-0'>
+          <div className={`p-4 border-t flex-shrink-0 ${roleColors.border}`}>
             {(isMobile ? false : collapsed) ? (
               <div className='relative group'>
                 <Button
