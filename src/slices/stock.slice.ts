@@ -25,7 +25,7 @@ export const fetchAllStocks = createAsyncThunk(
       }
       return response.data
     } catch (error) {
-      return rejectWithValue((error as any).response?.data || 'Failed to fetch stocks')
+      return rejectWithValue('Không thể lấy danh sách cổ phiếu. Vui lòng thử lại sau.')
     }
   }
 )
@@ -42,7 +42,7 @@ export const fetchStockByTicker = createAsyncThunk(
       }
       return response.data
     } catch (error) {
-      return rejectWithValue((error as any).response?.data || 'Failed to fetch stock by ticker')
+      return rejectWithValue('Không thể lấy thông tin cổ phiếu. Vui lòng thử lại sau.')
     }
   }
 )
@@ -59,7 +59,7 @@ export const fetchListStocksByName = createAsyncThunk(
       }
       return response.data
     } catch (error) {
-      return rejectWithValue((error as any).response?.data || 'Failed to fetch stock by ticker')
+      return rejectWithValue('Không thể tìm kiếm cổ phiếu. Vui lòng thử lại sau.')
     }
   }
 )

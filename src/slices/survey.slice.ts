@@ -19,9 +19,15 @@ const initialState: SurveyState = {
 export const fetchQuestions = createAsyncThunk('survey/fetchQuestions', async (_, { rejectWithValue }) => {
   try {
     const response = await surveyService.getQuestions()
+    if (response.status !== 200) {
+      const errorMessage =
+        (response as any).response?.data?.detail || 'Không thể lấy câu hỏi khảo sát. Vui lòng thử lại sau.'
+      toast.error(errorMessage)
+      return rejectWithValue(errorMessage)
+    }
     return response.data
   } catch (error: any) {
-    return rejectWithValue(error.response?.data || 'Failed to fetch questions')
+    return rejectWithValue('Không thể lấy câu hỏi khảo sát. Vui lòng thử lại sau.')
   }
 })
 

@@ -25,7 +25,7 @@ export const fetchNews = createAsyncThunk('news/fetchNews', async (params: GetNe
     const { data } = response
     return data
   } catch (error) {
-    return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+    return rejectWithValue('Không thể lấy tin tức. Vui lòng thử lại sau.')
   }
 })
 
@@ -40,7 +40,7 @@ export const fetchPendingNews = createAsyncThunk(
       }
       return response.data
     } catch (error) {
-      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+      return rejectWithValue('Không thể lấy tin tức đang chờ. Vui lòng thử lại sau.')
     }
   }
 )
@@ -56,7 +56,7 @@ export const fetchLatestNews = createAsyncThunk(
       }
       return response.data
     } catch (error) {
-      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+      return rejectWithValue('Không thể lấy tin tức mới nhất. Vui lòng thử lại sau.')
     }
   }
 )

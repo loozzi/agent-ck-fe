@@ -99,8 +99,8 @@ export const createSubscriptionCode = createAsyncThunk(
       toast.success('Mã đăng ký đã được tạo thành công')
       return response.data
     } catch (error) {
-      toast.error('Failed to create subscription code')
-      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+      toast.error('Không thể tạo mã đăng ký')
+      return rejectWithValue('Không thể tạo mã đăng ký')
     }
   }
 )
@@ -118,8 +118,8 @@ export const deleteSubscriptionCode = createAsyncThunk(
       toast.success('Mã đăng ký đã được xóa thành công')
       return codeId
     } catch (error) {
-      toast.error('Failed to delete subscription code')
-      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+      toast.error('Không thể xóa mã đăng ký')
+      return rejectWithValue('Không thể xóa mã đăng ký')
     }
   }
 )
@@ -135,8 +135,8 @@ export const revorkCode = createAsyncThunk('subscription/revorkCode', async (use
     toast.success('Mã đăng ký đã được revork thành công')
     return userId
   } catch (error) {
-    toast.error('Failed to revork subscription code')
-    return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+    toast.error('Không thể revork mã đăng ký')
+    return rejectWithValue('Không thể revork mã đăng ký')
   }
 })
 

@@ -27,7 +27,7 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', async (payload: 
     }
     return response.data as ChatHistory
   } catch (error) {
-    return rejectWithValue('Failed to send message')
+    return rejectWithValue('Không thể gửi tin nhắn. Vui lòng thử lại sau.')
   }
 })
 
@@ -44,7 +44,7 @@ export const fetchChatHistories = createAsyncThunk(
       }
       return response.data
     } catch (error) {
-      return rejectWithValue('Failed to fetch chat histories')
+      return rejectWithValue('Không thể lấy lịch sử trò chuyện. Vui lòng thử lại sau.')
     }
   }
 )
@@ -60,7 +60,7 @@ export const clearChatCache = createAsyncThunk('chat/clearCache', async (_, { re
     }
     return true // Indicate success
   } catch (error) {
-    return rejectWithValue('Failed to clear chat cache')
+    return rejectWithValue('Không thể xóa bộ nhớ cache trò chuyện. Vui lòng thử lại sau.')
   }
 })
 
@@ -75,7 +75,7 @@ export const fetchChatSessionInfo = createAsyncThunk('chat/fetchSessionInfo', as
     }
     return response.data
   } catch (error) {
-    return rejectWithValue('Failed to fetch chat session info')
+    return rejectWithValue('Không thể lấy thông tin phiên trò chuyện. Vui lòng thử lại sau.')
   }
 })
 
@@ -91,7 +91,7 @@ export const fetchChatHealth = createAsyncThunk('chat/fetchHealth', async (_, { 
     }
     return response.data
   } catch (error) {
-    return rejectWithValue('Failed to fetch chat health')
+    return rejectWithValue('Không thể lấy trạng thái sức khỏe trò chuyện. Vui lòng thử lại sau.')
   }
 })
 
@@ -106,7 +106,7 @@ export const deleteChatHistories = createAsyncThunk('chat/deleteHistories', asyn
     }
     return true // Indicate success
   } catch (error) {
-    return rejectWithValue('Failed to delete chat histories')
+    return rejectWithValue('Không thể xóa lịch sử trò chuyện. Vui lòng thử lại sau.')
   }
 })
 
@@ -132,7 +132,7 @@ const chatSlice = createSlice({
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.loadingSend = false
-        state.error = (action.payload as string) || 'Failed to send message'
+        state.error = action.payload as string
       })
       .addCase(fetchChatHistories.pending, (state) => {
         state.loadingHistories = true
@@ -145,7 +145,7 @@ const chatSlice = createSlice({
       })
       .addCase(fetchChatHistories.rejected, (state, action) => {
         state.loadingHistories = false
-        state.error = (action.payload as string) || 'Failed to fetch chat histories'
+        state.error = action.payload as string
       })
       .addCase(clearChatCache.pending, (state) => {
         state.cacheCleared = false
@@ -157,7 +157,7 @@ const chatSlice = createSlice({
       })
       .addCase(clearChatCache.rejected, (state, action) => {
         state.cacheCleared = false
-        state.error = (action.payload as string) || 'Failed to clear chat cache'
+        state.error = action.payload as string
       })
       .addCase(fetchChatSessionInfo.pending, (state) => {
         state.loadingSessionInfo = true
@@ -170,7 +170,7 @@ const chatSlice = createSlice({
       })
       .addCase(fetchChatSessionInfo.rejected, (state, action) => {
         state.loadingSessionInfo = false
-        state.error = (action.payload as string) || 'Failed to fetch chat session info'
+        state.error = action.payload as string
       })
       .addCase(fetchChatHealth.pending, (state) => {
         state.loadingHealth = true
@@ -183,7 +183,7 @@ const chatSlice = createSlice({
       })
       .addCase(fetchChatHealth.rejected, (state, action) => {
         state.loadingHealth = false
-        state.error = (action.payload as string) || 'Failed to fetch chat health'
+        state.error = action.payload as string
       })
       .addCase(deleteChatHistories.pending, (state) => {
         state.loadingHistories = true
@@ -196,7 +196,7 @@ const chatSlice = createSlice({
       })
       .addCase(deleteChatHistories.rejected, (state, action) => {
         state.loadingHistories = false
-        state.error = (action.payload as string) || 'Failed to delete chat histories'
+        state.error = action.payload as string
       })
   }
 })

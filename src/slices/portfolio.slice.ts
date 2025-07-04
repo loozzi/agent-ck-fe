@@ -23,7 +23,7 @@ export const fetchWallet = createAsyncThunk('portfolio/fetchWallet', async (_, {
 
     return response.data
   } catch (error) {
-    return rejectWithValue('Failed to fetch portfolio data')
+    return rejectWithValue('Không thể lấy dữ liệu ví. Vui lòng thử lại sau.')
   }
 })
 
@@ -39,7 +39,7 @@ export const fetchTransactions = createAsyncThunk('portfolio/fetchTransactions',
 
     return response.data
   } catch (error) {
-    return rejectWithValue('Failed to fetch transaction history')
+    return rejectWithValue('Không thể lấy lịch sử giao dịch. Vui lòng thử lại sau.')
   }
 })
 
@@ -71,7 +71,7 @@ export const deleteTransaction = createAsyncThunk(
       toast.success('Đã xóa giao dịch thành công')
       return id
     } catch (error) {
-      return rejectWithValue('Failed to delete transaction')
+      return rejectWithValue('Đã xóa giao dịch thành công')
     }
   }
 )
@@ -89,7 +89,7 @@ export const updateTransaction = createAsyncThunk(
       }
       return response.data
     } catch (error) {
-      return rejectWithValue('Failed to update transaction')
+      return rejectWithValue('Không thể cập nhật giao dịch. Vui lòng thử lại sau.')
     }
   }
 )
