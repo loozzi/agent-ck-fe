@@ -44,11 +44,9 @@ export const getMeAction = createAsyncThunk('auth/getMe', async (_, { rejectWith
     if (response.status === 200) {
       return response.data
     } else {
-      console.error('GetMe Error:', response)
       return rejectWithValue('Không thể lấy thông tin người dùng')
     }
   } catch (error) {
-    console.error('GetMe Error:', error)
     return rejectWithValue(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi lấy thông tin người dùng')
   }
 })
@@ -76,11 +74,9 @@ export const getSubscriptionStatus = createAsyncThunk('auth/getSubscriptionStatu
     if (response.status === 200) {
       return response.data
     } else {
-      console.error('Get Subscription Status Error:', response)
       return rejectWithValue('Không thể lấy trạng thái đăng ký')
     }
   } catch (error) {
-    console.error('Get Subscription Status Error:', error)
     return rejectWithValue(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi lấy trạng thái đăng ký')
   }
 })

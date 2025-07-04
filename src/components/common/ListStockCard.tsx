@@ -1,8 +1,8 @@
-import type { StockResponse } from '@/types/response'
+import type { Stock } from '@/types/stock'
 import StockCard from './StockCard'
 
 interface ListStockCardProps {
-  data: StockResponse[]
+  data: Stock[]
   loading?: boolean
   className?: string
 }

@@ -1,6 +1,7 @@
 import surveyService from '@/services/survey.service'
 import type { SurveyPayload, SurveyState } from '@/types/survey'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { toast } from 'react-toastify'
 
 const initialState: SurveyState = {
   questions: null,
@@ -18,9 +19,15 @@ const initialState: SurveyState = {
 export const fetchQuestions = createAsyncThunk('survey/fetchQuestions', async (_, { rejectWithValue }) => {
   try {
     const response = await surveyService.getQuestions()
+    if (response.status !== 200) {
+      const errorMessage =
+        (response as any).response?.data?.detail || 'Không thể lấy câu hỏi khảo sát. Vui lòng thử lại sau.'
+      toast.error(errorMessage)
+      return rejectWithValue(errorMessage)
+    }
     return response.data
   } catch (error: any) {
-    return rejectWithValue(error.response?.data || 'Failed to fetch questions')
+    return rejectWithValue('Không thể lấy câu hỏi khảo sát. Vui lòng thử lại sau.')
   }
 })
 
@@ -29,9 +36,14 @@ export const submitSurvey = createAsyncThunk(
   async (data: SurveyPayload, { rejectWithValue }) => {
     try {
       const response = await surveyService.submit(data)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể gửi khảo sát. Vui lòng thử lại sau.'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
       return response.data
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Failed to submit survey')
+      return rejectWithValue(error.response?.data || 'Không thể gửi khảo sát. Vui lòng thử lại sau.')
     }
   }
 )
@@ -39,18 +51,28 @@ export const submitSurvey = createAsyncThunk(
 export const fetchSurveyStatus = createAsyncThunk('survey/fetchSurveyStatus', async (_, { rejectWithValue }) => {
   try {
     const response = await surveyService.getStatus()
+    if (response.status !== 200) {
+      const errorMessage = (response as any).response?.data?.detail || 'Lỗi khi lấy trạng thái khảo sát'
+      toast.error(errorMessage)
+      return rejectWithValue(errorMessage)
+    }
     return response.data
   } catch (error: any) {
-    return rejectWithValue(error.response?.data || 'Failed to fetch survey status')
+    return rejectWithValue(error.response?.data || 'Lỗi khi lấy trạng thái khảo sát')
   }
 })
 
 export const fetchMySurvey = createAsyncThunk('survey/fetchMySurvey', async (_, { rejectWithValue }) => {
   try {
     const response = await surveyService.mySurvey()
+    if (response.status !== 200) {
+      const errorMessage = (response as any).response?.data?.detail || 'Không thể lấy khảo sát của bạn'
+      toast.error(errorMessage)
+      return rejectWithValue(errorMessage)
+    }
     return response.data
   } catch (error: any) {
-    return rejectWithValue(error.response?.data || 'Failed to fetch my survey')
+    return rejectWithValue(error.response?.data || 'Không thể lấy khảo sát của bạn')
   }
 })
 

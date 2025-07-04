@@ -30,6 +30,12 @@ const subscriptionService = {
   },
   allUsers: (): Promise<AxiosResponse<any[]>> => {
     return apiInstance.get<any[]>('/admin/users')
+  },
+  deleteSubscriptionCode: (codeId: string): Promise<AxiosResponse<void>> => {
+    return apiInstance.delete<void>(`/admin/codes`, { params: { code_id: codeId } })
+  },
+  revorkCode: (userId: string): Promise<AxiosResponse<void>> => {
+    return apiInstance.delete<void>(`/admin/users/subscription`, { params: { user_id: userId } })
   }
 }
 

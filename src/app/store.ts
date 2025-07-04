@@ -1,7 +1,9 @@
 import authReducer from '@/slices/auth.slice'
 import chatReducer from '@/slices/chat.slice'
 import mbtiReducer from '@/slices/mbti.slice'
+import newsReducer from '@/slices/news.slice'
 import portfolioReducer from '@/slices/portfolio.slice'
+import stockReducer from '@/slices/stock.slice'
 import subscriptionReducer from '@/slices/subscription.slice'
 import surveyReducer from '@/slices/survey.slice'
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
@@ -14,13 +16,15 @@ const rootReducer = combineReducers({
   portfolio: portfolioReducer,
   survey: surveyReducer,
   subscription: subscriptionReducer,
-  chat: chatReducer
+  chat: chatReducer,
+  stock: stockReducer,
+  news: newsReducer
 })
 
 const persistConfig = {
   key: 'root',
   storage: storage,
-  blacklist: [], // reducers that you don't want to persist
+  blacklist: ['portfolio', 'survey', 'subscription', 'stock', 'news'],
   whiteList: ['auth'] // reducers that you want to persist
 }
 

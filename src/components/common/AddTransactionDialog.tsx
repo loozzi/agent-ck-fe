@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import {
@@ -14,9 +14,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus } from 'lucide-react'
-import { useAppDispatch } from '@/app/hook'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Check, ChevronsUpDown, Plus, Loader2 } from 'lucide-react'
+import { useAppDispatch, useAppSelector } from '@/app/hook'
 import { addTransaction } from '@/slices/portfolio.slice'
+import { cn } from '@/lib/utils'
+import { fetchListStocksByName } from '@/slices/stock.slice'
 
 interface AddTransactionDialogProps {
   onSuccess?: () => void
@@ -35,7 +39,29 @@ const validationSchema = Yup.object({
 
 const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
   const [open, setOpen] = useState(false)
+  const [openCombobox, setOpenCombobox] = useState(false)
+  const [searchValue, setSearchValue] = useState('')
   const dispatch = useAppDispatch()
+  const { stocks, loading } = useAppSelector((state) => state.stock)
+
+  // Debounced search function
+  const handleSearch = useCallback(
+    (value: string) => {
+      if (value.trim().length > 0) {
+        dispatch(fetchListStocksByName({ q: value.trim(), limit: 50 }))
+      }
+    },
+    [dispatch]
+  )
+
+  // Debounce the search
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleSearch(searchValue)
+    }, 300)
+
+    return () => clearTimeout(timeoutId)
+  }, [searchValue, handleSearch])
 
   const formik = useFormik({
     initialValues: {
@@ -59,6 +85,8 @@ const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
       dispatch(addTransaction(transactionData))
       resetForm()
       setOpen(false)
+      setOpenCombobox(false)
+      setSearchValue('')
       setSubmitting(false)
       onSuccess?.()
     }
@@ -68,6 +96,8 @@ const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
     setOpen(newOpen)
     if (!newOpen) {
       formik.resetForm()
+      setOpenCombobox(false)
+      setSearchValue('')
     }
   }
 
@@ -94,16 +124,76 @@ const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
             {/* Ticker */}
             <div className='grid gap-2'>
               <Label htmlFor='ticker'>Mã cổ phiếu *</Label>
-              <Input
-                id='ticker'
-                name='ticker'
-                type='text'
-                placeholder='VD: AAPL, MSFT, GOOGL'
-                value={formik.values.ticker}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className={formik.touched.ticker && formik.errors.ticker ? 'border-red-500' : ''}
-              />
+              <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant='outline'
+                    role='combobox'
+                    aria-expanded={openCombobox}
+                    className={cn(
+                      'max-w-[372px] justify-between cursor-pointer',
+                      formik.touched.ticker && formik.errors.ticker ? 'border-red-500' : ''
+                    )}
+                  >
+                    <span className='truncate text-left'>
+                      {formik.values.ticker
+                        ? `${formik.values.ticker} - ${stocks?.find((stock) => stock.ticker === formik.values.ticker)?.name || formik.values.ticker} ${(stocks?.find((stock) => stock.ticker === formik.values.ticker)?.name.slice(0, 38) || formik.values.ticker).length > 38 ? '...' : ''}`
+                        : 'Chọn mã cổ phiếu...'}
+                    </span>
+                    <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className='w-[360px] p-0' align='start' sideOffset={4}>
+                  <Command>
+                    <CommandInput
+                      placeholder='Tìm kiếm mã cổ phiếu...'
+                      value={searchValue}
+                      onValueChange={setSearchValue}
+                    />
+                    <CommandList className='max-h-60'>
+                      {loading ? (
+                        <div className='flex items-center justify-center p-4'>
+                          <Loader2 className='h-4 w-4 animate-spin' />
+                          <span className='ml-2 text-sm text-gray-500'>Đang tìm kiếm...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <CommandEmpty>
+                            {searchValue.trim() ? 'Không tìm thấy mã cổ phiếu nào.' : 'Nhập để tìm kiếm mã cổ phiếu...'}
+                          </CommandEmpty>
+                          <CommandGroup>
+                            {stocks?.map((stock) => (
+                              <CommandItem
+                                key={stock.ticker}
+                                value={`${stock.ticker} ${stock.name}`.toLowerCase()}
+                                className='cursor-pointer px-2 py-2'
+                                onSelect={async () => {
+                                  await formik.setFieldValue('ticker', stock.ticker)
+                                  formik.setFieldTouched('ticker', true)
+                                  formik.validateForm()
+                                  setOpenCombobox(false)
+                                  setSearchValue('')
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4 shrink-0',
+                                    formik.values.ticker === stock.ticker ? 'opacity-100' : 'opacity-0'
+                                  )}
+                                />
+                                <div className='flex flex-col min-w-0 flex-1 overflow-hidden'>
+                                  <span className='font-medium text-sm truncate'>{stock.ticker}</span>
+                                  <span className='text-xs text-gray-500 truncate'>{stock.name}</span>
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </>
+                      )}
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
               {formik.touched.ticker && formik.errors.ticker && (
                 <p className='text-sm text-red-500'>{formik.errors.ticker}</p>
               )}
@@ -160,13 +250,13 @@ const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
 
             {/* Price */}
             <div className='grid gap-2'>
-              <Label htmlFor='price'>Giá ($) *</Label>
+              <Label htmlFor='price'>Giá (nghìn VNĐ) *</Label>
               <Input
                 id='price'
                 name='price'
                 type='number'
                 step='0.01'
-                placeholder='VD: 150.25'
+                placeholder='VD: 150.5'
                 value={formik.values.price}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
