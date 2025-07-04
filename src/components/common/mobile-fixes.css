@@ -1,0 +1,71 @@
+/* Custom scrollbar utilities for mobile tabs */
+.scrollbar-hide {
+  /* Firefox */
+  scrollbar-width: none;
+  /* Safari and Chrome */
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Smooth scrolling for tab navigation */
+.tab-scroll {
+  scroll-behavior: smooth;
+}
+
+/* Improved tab spacing on mobile */
+@media (max-width: 640px) {
+  .tab-trigger-mobile {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+  }
+}
+
+/* Ensure tab content doesn't overflow */
+.tab-content {
+  overflow-x: hidden;
+}
+
+/* Better spacing for mobile cards */
+@media (max-width: 640px) {
+  .news-card-mobile {
+    margin-bottom: 0.75rem;
+  }
+
+  .news-card-mobile:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Improved responsive typography */
+.news-title-mobile {
+  font-size: 0.875rem;
+  line-height: 1.25;
+}
+
+.news-description-mobile {
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+
+/* Better badge spacing on mobile */
+.news-badges-mobile {
+  gap: 0.25rem;
+}
+
+/* Improved button spacing on mobile */
+.button-group-mobile {
+  gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .button-group-mobile {
+    flex-direction: column;
+  }
+
+  .button-group-mobile > * {
+    width: 100%;
+  }
+}

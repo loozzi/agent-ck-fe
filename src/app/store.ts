@@ -1,6 +1,7 @@
 import authReducer from '@/slices/auth.slice'
 import chatReducer from '@/slices/chat.slice'
 import mbtiReducer from '@/slices/mbti.slice'
+import newsReducer from '@/slices/news.slice'
 import portfolioReducer from '@/slices/portfolio.slice'
 import stockReducer from '@/slices/stock.slice'
 import subscriptionReducer from '@/slices/subscription.slice'
@@ -16,13 +17,14 @@ const rootReducer = combineReducers({
   survey: surveyReducer,
   subscription: subscriptionReducer,
   chat: chatReducer,
-  stock: stockReducer
+  stock: stockReducer,
+  news: newsReducer
 })
 
 const persistConfig = {
   key: 'root',
   storage: storage,
-  blacklist: ['portfolio', 'survey', 'subscription', 'stock'],
+  blacklist: ['portfolio', 'survey', 'subscription', 'stock', 'news'],
   whiteList: ['auth'] // reducers that you want to persist
 }
 

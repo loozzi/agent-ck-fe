@@ -6,6 +6,6 @@
 [ ] Tạo popup chat với bot ở tất cả màn hình
 [X] Xóa code & Revork code
 [ ] Thêm các màn hình trainer
-[ ] Tạo component news
+[X] Tạo component news
 [ ] Tạo landing page
 [ ] Lấy thông tin user zalo để hiển thị thông tin
