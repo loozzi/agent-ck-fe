@@ -122,7 +122,6 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className={`fixed inset-0 bg-black/30 backdrop-blur-sm z-30 md:hidden`} onClick={closeMobileMenu} />
       )}
       <SidebarContext.Provider value={{ collapsed: isMobile ? false : collapsed, toggleCollapsed }}>
-        {' '}
         <div
           className={cn(
             'flex flex-col text-white transition-all duration-300 h-screen',
@@ -136,7 +135,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             className
           )}
         >
-          {' '}
           {/* Header - only show on desktop */}
           {!isMobile && (
             <div className={`p-4 border-b flex-shrink-0 ${roleColors.border}`}>
@@ -182,7 +180,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                       <div className='px-3' />
                     )}
                     {otherItems.map((item) => (
-                      <SidebarMenuItem key={item.id} item={item} />
+                      <SidebarMenuItem key={item.id} item={{ ...item, onClick: toggleCollapsed }} />
                     ))}
                   </div>
                 )}
