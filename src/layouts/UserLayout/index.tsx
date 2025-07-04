@@ -3,8 +3,8 @@ import MobileHeader from '@/components/layouts/MobileHeader'
 import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
 import UserNavigator from '@/navigators/user.routes'
-import { useState, useEffect, type JSX } from 'react'
-import { FaBookOpen, FaChartLine, FaHome, FaWallet } from 'react-icons/fa'
+import { useEffect, useState, type JSX } from 'react'
+import { FaBookOpen, FaHome, FaWallet } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
 import { MdOutlineMonitorHeart } from 'react-icons/md'
 
@@ -63,12 +63,6 @@ const UserLayout = () => {
       title: 'Danh mục đầu tư',
       icon: <MdOutlineMonitorHeart className='w-4 h-4' />,
       href: '/portfolio'
-    },
-    {
-      id: 'history',
-      title: 'Lịch sử',
-      icon: <FaChartLine className='w-4 h-4' />,
-      href: '/transaction-history'
     },
     {
       id: 'learning',

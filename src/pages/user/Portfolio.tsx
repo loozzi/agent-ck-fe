@@ -6,14 +6,12 @@ import TransactionHistory from '@/components/common/TransactionHistory'
 import WalletCard from '@/components/common/WalletCard'
 import { Button } from '@/components/ui/button'
 import { deleteTransaction, fetchTransactions, fetchWallet } from '@/slices/portfolio.slice'
-import { fetchAllStocks } from '@/slices/stock.slice'
 import { Receipt, RefreshCw, Wallet } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 const Portfolio = () => {
   const wallet = useAppSelector((state) => state.portfolio.wallet)
   const transactions = useAppSelector((state) => state.portfolio.transactions)
-  const { stocks } = useAppSelector((state) => state.stock)
   const dispatch = useAppDispatch()
 
   const loading = useAppSelector((state) => state.portfolio.loading)
@@ -84,7 +82,6 @@ const Portfolio = () => {
   useEffect(() => {
     dispatch(fetchWallet())
     dispatch(fetchTransactions())
-    dispatch(fetchAllStocks({}))
   }, [dispatch])
 
   return (

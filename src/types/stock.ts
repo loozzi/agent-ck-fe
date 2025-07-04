@@ -24,3 +24,9 @@ export interface StockFilter {
   sector?: string
   exchange?: string
 }
+
+export interface StockSearchParams {
+  q: string
+  limit?: number
+  offset?: number
+}

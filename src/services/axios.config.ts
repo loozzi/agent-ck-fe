@@ -1,6 +1,7 @@
 import { store } from '@/app/store'
 import { authActions } from '@/slices/auth.slice'
 import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const apiInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/',

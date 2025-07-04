@@ -1,7 +1,8 @@
 import stockService from '@/services/stock.service'
 import type { StockState } from '@/types/slices/stock'
-import type { StockFilter } from '@/types/stock'
+import type { StockFilter, StockSearchParams } from '@/types/stock'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { toast } from 'react-toastify'
 
 const initialState: StockState = {
   stocks: [],
@@ -17,6 +18,11 @@ export const fetchAllStocks = createAsyncThunk(
   async (filter: StockFilter, { rejectWithValue }) => {
     try {
       const response = await stockService.getAll(filter)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể lấy danh sách cổ phiếu'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
       return response.data
     } catch (error) {
       return rejectWithValue((error as any).response?.data || 'Failed to fetch stocks')
@@ -28,7 +34,29 @@ export const fetchStockByTicker = createAsyncThunk(
   'stock/fetchStockByTicker',
   async (ticker: string, { rejectWithValue }) => {
     try {
-      const response = await import('@/services/stock.service').then((module) => module.default.getByTicker(ticker))
+      const response = await stockService.getByTicker(ticker)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể lấy thông tin cổ phiếu'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+      return response.data
+    } catch (error) {
+      return rejectWithValue((error as any).response?.data || 'Failed to fetch stock by ticker')
+    }
+  }
+)
+
+export const fetchListStocksByName = createAsyncThunk(
+  'stock/fetchListStocksByName',
+  async (params: StockSearchParams, { rejectWithValue }) => {
+    try {
+      const response = await stockService.search(params)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể tìm kiếm cổ phiếu'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
       return response.data
     } catch (error) {
       return rejectWithValue((error as any).response?.data || 'Failed to fetch stock by ticker')
@@ -42,18 +70,18 @@ const stockSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchAllStocks.pending, (state) => {
+      .addCase(fetchListStocksByName.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(fetchAllStocks.fulfilled, (state, action) => {
+      .addCase(fetchListStocksByName.fulfilled, (state, action) => {
         state.stocks = action.payload.stocks
         state.total = action.payload.total
         state.limit = action.payload.limit
         state.offset = action.payload.offset
         state.loading = false
       })
-      .addCase(fetchAllStocks.rejected, (state, action) => {
+      .addCase(fetchListStocksByName.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })

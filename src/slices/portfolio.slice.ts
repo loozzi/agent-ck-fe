@@ -2,6 +2,7 @@ import portfolioService from '@/services/portfolio.service'
 import type { AddTransactionPayload } from '@/types/portfolio'
 import type { PortfolioState } from '@/types/slices/portfolio'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { toast } from 'react-toastify'
 
 const initialState: PortfolioState = {
   wallet: [],
@@ -14,8 +15,10 @@ const initialState: PortfolioState = {
 export const fetchWallet = createAsyncThunk('portfolio/fetchWallet', async (_, { rejectWithValue }) => {
   try {
     const response = await portfolioService.getAll()
-    if (!response) {
-      return rejectWithValue('No portfolio data found')
+    if (response.status !== 200) {
+      const errorMessage = (response as any).response?.data?.detail || 'Không thể lấy dữ liệu ví. Vui lòng thử lại sau.'
+      toast.error(errorMessage)
+      return rejectWithValue(errorMessage)
     }
 
     return response.data
@@ -27,9 +30,13 @@ export const fetchWallet = createAsyncThunk('portfolio/fetchWallet', async (_, {
 export const fetchTransactions = createAsyncThunk('portfolio/fetchTransactions', async (_, { rejectWithValue }) => {
   try {
     const response = await portfolioService.getHistory()
-    if (!response) {
-      return rejectWithValue('No transaction history found')
+    if (response.status !== 200) {
+      const errorMessage =
+        (response as any).response?.data?.detail || 'Không thể lấy lịch sử giao dịch. Vui lòng thử lại sau.'
+      toast.error(errorMessage)
+      return rejectWithValue(errorMessage)
     }
+
     return response.data
   } catch (error) {
     return rejectWithValue('Failed to fetch transaction history')
@@ -41,9 +48,17 @@ export const addTransaction = createAsyncThunk(
   async (payload: AddTransactionPayload, { rejectWithValue }) => {
     try {
       const response = await portfolioService.addItem(payload)
+
+      if (response.status !== 200) {
+        const errorMessage =
+          (response as any).response?.data?.detail || 'Không thể thêm giao dịch. Vui lòng kiểm tra lại thông tin.'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+
       return response
     } catch (error) {
-      return rejectWithValue('Failed to add portfolio item')
+      return rejectWithValue('')
     }
   }
 )
@@ -53,6 +68,7 @@ export const deleteTransaction = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       await portfolioService.deleteTransaction(id)
+      toast.success('Đã xóa giao dịch thành công')
       return id
     } catch (error) {
       return rejectWithValue('Failed to delete transaction')
@@ -65,6 +81,12 @@ export const updateTransaction = createAsyncThunk(
   async ({ id, payload }: { id: string; payload: Partial<AddTransactionPayload> }, { rejectWithValue }) => {
     try {
       const response = await portfolioService.updateTransaction(id, payload)
+      if (response.status !== 200) {
+        const errorMessage =
+          (response as any).response?.data?.detail || 'Không thể cập nhật giao dịch. Vui lòng kiểm tra lại thông tin.'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
       return response.data
     } catch (error) {
       return rejectWithValue('Failed to update transaction')

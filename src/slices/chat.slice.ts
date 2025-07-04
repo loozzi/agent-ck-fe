@@ -2,6 +2,7 @@ import chatService from '@/services/chat.service'
 import type { ChatHistory, ChatHistoryParams, ChatPayload } from '@/types/chat'
 import type { ChatState } from '@/types/slices/chat.types'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { toast } from 'react-toastify'
 
 const initialState: ChatState = {
   histories: [],
@@ -20,10 +21,11 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', async (payload: 
   try {
     const response = await chatService.send(payload)
     if (response.status !== 200) {
-      return rejectWithValue('Failed to send message')
+      const errorMessage = (response as any).response?.data?.detail || 'Không thể gửi tin nhắn. Vui lòng thử lại sau.'
+      toast.error(errorMessage)
+      return rejectWithValue(errorMessage)
     }
     return response.data as ChatHistory
-
   } catch (error) {
     return rejectWithValue('Failed to send message')
   }
@@ -35,7 +37,10 @@ export const fetchChatHistories = createAsyncThunk(
     try {
       const response = await chatService.history(params)
       if (response.status !== 200) {
-        return rejectWithValue('Failed to fetch chat histories')
+        const errorMessage =
+          (response as any).response?.data?.detail || 'Không thể lấy lịch sử trò chuyện. Vui lòng thử lại sau.'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
       }
       return response.data
     } catch (error) {
@@ -48,7 +53,10 @@ export const clearChatCache = createAsyncThunk('chat/clearCache', async (_, { re
   try {
     const response = await chatService.clearCache()
     if (response.status !== 200) {
-      return rejectWithValue('Failed to clear chat cache')
+      const errorMessage =
+        (response as any).response?.data?.detail || 'Không thể xóa bộ nhớ cache trò chuyện. Vui lòng thử lại sau.'
+      toast.error(errorMessage)
+      return rejectWithValue(errorMessage)
     }
     return true // Indicate success
   } catch (error) {
@@ -60,7 +68,10 @@ export const fetchChatSessionInfo = createAsyncThunk('chat/fetchSessionInfo', as
   try {
     const response = await chatService.session()
     if (response.status !== 200) {
-      return rejectWithValue('Failed to fetch chat session info')
+      const errorMessage =
+        (response as any).response?.data?.detail || 'Không thể lấy thông tin phiên trò chuyện. Vui lòng thử lại sau.'
+      toast.error(errorMessage)
+      return rejectWithValue(errorMessage)
     }
     return response.data
   } catch (error) {
@@ -72,7 +83,11 @@ export const fetchChatHealth = createAsyncThunk('chat/fetchHealth', async (_, { 
   try {
     const response = await chatService.health()
     if (response.status !== 200) {
-      return rejectWithValue('Failed to fetch chat health')
+      const errorMessage =
+        (response as any).response?.data?.detail ||
+        'Không thể lấy trạng thái sức khỏe trò chuyện. Vui lòng thử lại sau.'
+      toast.error(errorMessage)
+      return rejectWithValue(errorMessage)
     }
     return response.data
   } catch (error) {
@@ -84,7 +99,10 @@ export const deleteChatHistories = createAsyncThunk('chat/deleteHistories', asyn
   try {
     const response = await chatService.clear()
     if (response.status !== 200) {
-      return rejectWithValue('Failed to delete chat histories')
+      const errorMessage =
+        (response as any).response?.data?.detail || 'Không thể xóa lịch sử trò chuyện. Vui lòng thử lại sau.'
+      toast.error(errorMessage)
+      return rejectWithValue(errorMessage)
     }
     return true // Indicate success
   } catch (error) {

@@ -144,7 +144,7 @@ const TransactionHistory = ({ transactions, onEdit, onDelete }: TransactionHisto
               </TableHeader>
               <TableBody>
                 {currentTransactions.map((transaction) => {
-                  const isBuy = transaction.action?.toLowerCase() === 'buy'
+                  const isBuy = transaction?.action!?.toLowerCase() === 'buy'
                   const quantity = transaction.quantity || 0
                   const price = transaction.price || 0
                   const totalValue = quantity * price

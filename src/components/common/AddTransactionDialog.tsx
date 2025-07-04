@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import {
@@ -16,10 +16,11 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Check, ChevronsUpDown, Plus, Loader2 } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '@/app/hook'
 import { addTransaction } from '@/slices/portfolio.slice'
 import { cn } from '@/lib/utils'
+import { fetchListStocksByName } from '@/slices/stock.slice'
 
 interface AddTransactionDialogProps {
   onSuccess?: () => void
@@ -39,17 +40,28 @@ const validationSchema = Yup.object({
 const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
   const [open, setOpen] = useState(false)
   const [openCombobox, setOpenCombobox] = useState(false)
+  const [searchValue, setSearchValue] = useState('')
   const dispatch = useAppDispatch()
-  const { stocks } = useAppSelector((state) => state.stock)
+  const { stocks, loading } = useAppSelector((state) => state.stock)
 
-  // Function to remove Vietnamese accents
-  const removeVietnameseAccents = (str: string) => {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/đ/g, 'd')
-      .replace(/Đ/g, 'D')
-  }
+  // Debounced search function
+  const handleSearch = useCallback(
+    (value: string) => {
+      if (value.trim().length > 0) {
+        dispatch(fetchListStocksByName({ q: value.trim(), limit: 50 }))
+      }
+    },
+    [dispatch]
+  )
+
+  // Debounce the search
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleSearch(searchValue)
+    }, 300)
+
+    return () => clearTimeout(timeoutId)
+  }, [searchValue, handleSearch])
 
   const formik = useFormik({
     initialValues: {
@@ -74,6 +86,7 @@ const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
       resetForm()
       setOpen(false)
       setOpenCombobox(false)
+      setSearchValue('')
       setSubmitting(false)
       onSuccess?.()
     }
@@ -84,6 +97,7 @@ const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
     if (!newOpen) {
       formik.resetForm()
       setOpenCombobox(false)
+      setSearchValue('')
     }
   }
 
@@ -131,35 +145,51 @@ const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
                 </PopoverTrigger>
                 <PopoverContent className='w-[360px] p-0' align='start' sideOffset={4}>
                   <Command>
-                    <CommandInput placeholder='Tìm kiếm mã cổ phiếu...' />
+                    <CommandInput
+                      placeholder='Tìm kiếm mã cổ phiếu...'
+                      value={searchValue}
+                      onValueChange={setSearchValue}
+                    />
                     <CommandList className='max-h-60'>
-                      <CommandEmpty>Không tìm thấy mã cổ phiếu nào.</CommandEmpty>
-                      <CommandGroup>
-                        {stocks?.map((stock) => (
-                          <CommandItem
-                            key={stock.ticker}
-                            value={`${stock.ticker} ${stock.name} ${removeVietnameseAccents(stock.name)}`.toLowerCase()}
-                            className='cursor-pointer px-2 py-2'
-                            onSelect={async () => {
-                              await formik.setFieldValue('ticker', stock.ticker)
-                              formik.setFieldTouched('ticker', true)
-                              formik.validateForm()
-                              setOpenCombobox(false)
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                'mr-2 h-4 w-4 shrink-0',
-                                formik.values.ticker === stock.ticker ? 'opacity-100' : 'opacity-0'
-                              )}
-                            />
-                            <div className='flex flex-col min-w-0 flex-1 overflow-hidden'>
-                              <span className='font-medium text-sm truncate'>{stock.ticker}</span>
-                              <span className='text-xs text-gray-500 truncate'>{stock.name}</span>
-                            </div>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
+                      {loading ? (
+                        <div className='flex items-center justify-center p-4'>
+                          <Loader2 className='h-4 w-4 animate-spin' />
+                          <span className='ml-2 text-sm text-gray-500'>Đang tìm kiếm...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <CommandEmpty>
+                            {searchValue.trim() ? 'Không tìm thấy mã cổ phiếu nào.' : 'Nhập để tìm kiếm mã cổ phiếu...'}
+                          </CommandEmpty>
+                          <CommandGroup>
+                            {stocks?.map((stock) => (
+                              <CommandItem
+                                key={stock.ticker}
+                                value={`${stock.ticker} ${stock.name}`.toLowerCase()}
+                                className='cursor-pointer px-2 py-2'
+                                onSelect={async () => {
+                                  await formik.setFieldValue('ticker', stock.ticker)
+                                  formik.setFieldTouched('ticker', true)
+                                  formik.validateForm()
+                                  setOpenCombobox(false)
+                                  setSearchValue('')
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4 shrink-0',
+                                    formik.values.ticker === stock.ticker ? 'opacity-100' : 'opacity-0'
+                                  )}
+                                />
+                                <div className='flex flex-col min-w-0 flex-1 overflow-hidden'>
+                                  <span className='font-medium text-sm truncate'>{stock.ticker}</span>
+                                  <span className='text-xs text-gray-500 truncate'>{stock.name}</span>
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </>
+                      )}
                     </CommandList>
                   </Command>
                 </PopoverContent>

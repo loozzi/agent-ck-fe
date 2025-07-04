@@ -20,13 +20,17 @@ export const fetchUserSubscriptionStatus = createAsyncThunk(
   'subscription/fetchUserSubscriptionStatus',
   async (_, { rejectWithValue }) => {
     try {
-      const response = subscriptionService.allUsers()
+      const response = await subscriptionService.allUsers()
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể lấy trạng thái đăng ký người dùng'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
       const { data } = await response
       if (!data || !Array.isArray(data)) {
-        toast.error('Failed to fetch user subscription status')
-        return rejectWithValue('Invalid data format')
+        toast.error('Không thể lấy trạng thái đăng ký người dùng')
+        return rejectWithValue('Không thể lấy trạng thái đăng ký người dùng')
       }
-      console.log('dta', data)
       return data
     } catch (error) {
       toast.error('Failed to fetch user subscription status')
@@ -41,8 +45,9 @@ export const updateUserRole = createAsyncThunk(
     try {
       const response = await subscriptionService.updateRole(payload)
       if (response.status !== 200) {
-        toast.error('Failed to update user role')
-        return rejectWithValue('Failed to update user role')
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể cập nhật vai trò người dùng'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
       }
       toast.success(response.data.message)
       return payload
@@ -58,9 +63,15 @@ export const fetchSubScriptionCodes = createAsyncThunk(
   async (payload: SubscriptionCodeParams, { rejectWithValue }) => {
     try {
       const response = await subscriptionService.getSubscriptionCodes(payload)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể lấy mã đăng ký'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+
       if (!response.data || !Array.isArray(response.data)) {
-        toast.error('Failed to fetch subscription codes')
-        return rejectWithValue('Invalid data format')
+        toast.error('Không thể lấy mã đăng ký')
+        return rejectWithValue('Không thể lấy mã đăng ký')
       }
       return response.data
     } catch (error) {
@@ -75,11 +86,17 @@ export const createSubscriptionCode = createAsyncThunk(
   async (payload: CreateSupscriptionPayload, { rejectWithValue }) => {
     try {
       const response = await subscriptionService.createSubscription(payload)
-      if (!response.data) {
-        toast.error('Failed to create subscription code')
-        return rejectWithValue('Invalid data format')
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể tạo mã đăng ký'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
       }
-      toast.success('Subscription code created successfully')
+
+      if (!response.data) {
+        toast.error('Không thể tạo mã đăng ký')
+        return rejectWithValue('Không thể tạo mã đăng ký')
+      }
+      toast.success('Mã đăng ký đã được tạo thành công')
       return response.data
     } catch (error) {
       toast.error('Failed to create subscription code')
