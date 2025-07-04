@@ -1,4 +1,12 @@
 import { useAppDispatch, useAppSelector } from '@/app/hook'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -23,8 +31,13 @@ import {
 } from '@/components/ui/pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { createSubscriptionCode, fetchSubScriptionCodes } from '@/slices/subscription.slice'
-import { ArrowUpDown, Check, ChevronDown, ChevronUp, Copy, Plus } from 'lucide-react'
+import {
+  createSubscriptionCode,
+  deleteSubscriptionCode,
+  fetchSubScriptionCodes,
+  revorkCode
+} from '@/slices/subscription.slice'
+import { ArrowUpDown, Check, ChevronDown, ChevronUp, Copy, Plus, Trash2, UserX } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 
@@ -38,6 +51,12 @@ const Subscription = () => {
     duration_days: ''
   })
 
+  // Delete and revoke confirmation states
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [revokeConfirmOpen, setRevokeConfirmOpen] = useState(false)
+  const [selectedCode, setSelectedCode] = useState<any>(null)
+  const [actionLoading, setActionLoading] = useState(false)
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
@@ -45,7 +64,7 @@ const Subscription = () => {
   // Filter and sort state
   const [statusFilter, setStatusFilter] = useState<'all' | 'used' | 'unused'>('all')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | 'none'>('none')
-  const [sortField, setSortField] = useState<'created_at' | 'duration_days'>('created_at')
+  const [sortField, setSortField] = useState<'activated_at' | 'duration_days'>('activated_at')
   const [emailFilter, setEmailFilter] = useState('')
 
   // Filter and sort subscription codes
@@ -66,9 +85,9 @@ const Subscription = () => {
     let valueA: number
     let valueB: number
 
-    if (sortField === 'created_at') {
-      valueA = new Date(a.created_at).getTime()
-      valueB = new Date(b.created_at).getTime()
+    if (sortField === 'activated_at') {
+      valueA = new Date(a.activated_at).getTime()
+      valueB = new Date(b.activated_at).getTime()
     } else {
       valueA = a.duration_days
       valueB = b.duration_days
@@ -150,7 +169,7 @@ const Subscription = () => {
     }
   }
 
-  const handleSortToggle = (field: 'created_at' | 'duration_days') => {
+  const handleSortToggle = (field: 'activated_at' | 'duration_days') => {
     if (sortField !== field) {
       // Nếu click vào field khác, set field mới và sort desc
       setSortField(field)
@@ -176,6 +195,50 @@ const Subscription = () => {
   const handleEmailFilterChange = (value: string) => {
     setEmailFilter(value)
     // Page sẽ được reset khi dữ liệu mới được load từ API
+  }
+
+  const handleDeleteCode = async () => {
+    if (!selectedCode) return
+
+    setActionLoading(true)
+    try {
+      await dispatch(deleteSubscriptionCode(selectedCode.id)).unwrap()
+      setDeleteConfirmOpen(false)
+      setSelectedCode(null)
+      // Refresh the list
+      dispatch(fetchSubScriptionCodes({ user_email: emailFilter.trim() }))
+    } catch (error) {
+      console.error('Failed to delete subscription code:', error)
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleRevokeUser = async () => {
+    if (!selectedCode) return
+
+    setActionLoading(true)
+    try {
+      await dispatch(revorkCode(selectedCode.user_id)).unwrap()
+      setRevokeConfirmOpen(false)
+      setSelectedCode(null)
+      // Refresh the list
+      dispatch(fetchSubScriptionCodes({ user_email: emailFilter.trim() }))
+    } catch (error) {
+      console.error('Failed to revoke user subscription:', error)
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const openDeleteConfirm = (code: any) => {
+    setSelectedCode(code)
+    setDeleteConfirmOpen(true)
+  }
+
+  const openRevokeConfirm = (code: any) => {
+    setSelectedCode(code)
+    setRevokeConfirmOpen(true)
   }
 
   return (
@@ -312,24 +375,25 @@ const Subscription = () => {
                           <Button
                             variant='ghost'
                             className='h-auto p-0 font-semibold hover:bg-transparent'
-                            onClick={() => handleSortToggle('created_at')}
+                            onClick={() => handleSortToggle('activated_at')}
                           >
                             <div className='flex items-center gap-1'>
-                              Ngày tạo
-                              {sortField === 'created_at' && sortOrder === 'none' && (
+                              Ngày kích hoạt
+                              {sortField === 'activated_at' && sortOrder === 'none' && (
                                 <ArrowUpDown className='h-4 w-4' />
                               )}
-                              {sortField === 'created_at' && sortOrder === 'asc' && <ChevronUp className='h-4 w-4' />}
-                              {sortField === 'created_at' && sortOrder === 'desc' && (
+                              {sortField === 'activated_at' && sortOrder === 'asc' && <ChevronUp className='h-4 w-4' />}
+                              {sortField === 'activated_at' && sortOrder === 'desc' && (
                                 <ChevronDown className='h-4 w-4' />
                               )}
-                              {sortField !== 'created_at' && <ArrowUpDown className='h-4 w-4 opacity-40' />}
+                              {sortField !== 'activated_at' && <ArrowUpDown className='h-4 w-4 opacity-40' />}
                             </div>
                           </Button>
                         </TableHead>
-                        <TableHead>Ngày kích hoạt</TableHead>
-                        <TableHead>Zalo ID sử dụng</TableHead>
+                        {/* <TableHead>Ngày kích hoạt</TableHead> */}
+                        {/* <TableHead>Zalo ID sử dụng</TableHead> */}
                         <TableHead>Trạng thái</TableHead>
+                        <TableHead className='w-[120px]'>Thao tác</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -354,13 +418,44 @@ const Subscription = () => {
                           </TableCell>
                           <TableCell>{code.user_email}</TableCell>
                           <TableCell className='text-center'>{code.duration_days} ngày</TableCell>
-                          <TableCell>{formatDate(code.created_at)}</TableCell>
                           <TableCell>{formatDate(code.activated_at)}</TableCell>
-                          <TableCell className='font-mono text-xs'>{code.zalo_id_used || 'N/A'}</TableCell>
+                          {/* <TableCell>{formatDate(code.activated_at)}</TableCell> */}
+                          {/* <TableCell className='font-mono text-xs'>{code.zalo_id_used || 'N/A'}</TableCell> */}
                           <TableCell>
                             <Badge variant={code.is_used ? 'secondary' : 'default'}>
                               {code.is_used ? 'Đã sử dụng' : 'Chưa sử dụng'}
                             </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className='flex items-center gap-1'>
+                              <Button
+                                variant='ghost'
+                                size='sm'
+                                className={`h-8 w-8 p-0 cursor-pointer ${
+                                  code.is_used
+                                    ? 'text-blue-600 hover:text-blue-800 hover:bg-blue-50'
+                                    : 'text-gray-400 cursor-not-allowed'
+                                }`}
+                                onClick={() => openRevokeConfirm(code)}
+                                disabled={!code.is_used}
+                                title={
+                                  code.is_used
+                                    ? 'Revoke subscription - Thu hồi quyền premium'
+                                    : 'Code chưa được sử dụng'
+                                }
+                              >
+                                <UserX className='h-4 w-4' />
+                              </Button>
+                              <Button
+                                variant='ghost'
+                                size='sm'
+                                className='h-8 w-8 p-0 cursor-pointer text-red-600 hover:text-red-800 hover:bg-red-50'
+                                onClick={() => openDeleteConfirm(code)}
+                                title='Delete code - Xóa vĩnh viễn'
+                              >
+                                <Trash2 className='h-4 w-4' />
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -412,6 +507,58 @@ const Subscription = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn xóa subscription code này không?
+              <br />
+              <strong>Code: {selectedCode?.code}</strong>
+              <br />
+              <strong>Email: {selectedCode?.user_email}</strong>
+              <br />
+              <span className='text-red-600'>Hành động này không thể hoàn tác!</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button variant='outline' onClick={() => setDeleteConfirmOpen(false)} disabled={actionLoading}>
+              Hủy
+            </Button>
+            <Button variant='destructive' onClick={handleDeleteCode} disabled={actionLoading}>
+              {actionLoading ? 'Đang xóa...' : 'Xóa'}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Revoke Confirmation Dialog */}
+      <AlertDialog open={revokeConfirmOpen} onOpenChange={setRevokeConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận revoke</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn revoke subscription của user này không?
+              <br />
+              <strong>Email: {selectedCode?.user_email}</strong>
+              <br />
+              <strong>Code: {selectedCode?.code}</strong>
+              <br />
+              <span className='text-amber-600'>User sẽ mất quyền truy cập premium và trở về tài khoản free!</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button variant='outline' onClick={() => setRevokeConfirmOpen(false)} disabled={actionLoading}>
+              Hủy
+            </Button>
+            <Button variant='destructive' onClick={handleRevokeUser} disabled={actionLoading}>
+              {actionLoading ? 'Đang revoke...' : 'Revoke'}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

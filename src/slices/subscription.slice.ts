@@ -105,6 +105,41 @@ export const createSubscriptionCode = createAsyncThunk(
   }
 )
 
+export const deleteSubscriptionCode = createAsyncThunk(
+  'subscription/deleteSubscriptionCode',
+  async (codeId: string, { rejectWithValue }) => {
+    try {
+      const response = await subscriptionService.deleteSubscriptionCode(codeId)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể xóa mã đăng ký'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+      toast.success('Mã đăng ký đã được xóa thành công')
+      return codeId
+    } catch (error) {
+      toast.error('Failed to delete subscription code')
+      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+    }
+  }
+)
+
+export const revorkCode = createAsyncThunk('subscription/revorkCode', async (userId: string, { rejectWithValue }) => {
+  try {
+    const response = await subscriptionService.revorkCode(userId)
+    if (response.status !== 200) {
+      const errorMessage = (response as any).response?.data?.detail || 'Không thể revork mã đăng ký'
+      toast.error(errorMessage)
+      return rejectWithValue(errorMessage)
+    }
+    toast.success('Mã đăng ký đã được revork thành công')
+    return userId
+  } catch (error) {
+    toast.error('Failed to revork subscription code')
+    return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+  }
+})
+
 const subscriptionSlice = createSlice({
   name: 'subscription',
   initialState,
@@ -160,6 +195,30 @@ const subscriptionSlice = createSlice({
         state.subscriptionCodes.push(action.payload)
       })
       .addCase(createSubscriptionCode.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(deleteSubscriptionCode.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(deleteSubscriptionCode.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.subscriptionCodes = state.subscriptionCodes.filter((code) => code.id !== action.payload)
+      })
+      .addCase(deleteSubscriptionCode.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(revorkCode.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(revorkCode.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.userSubscriptionStatus = state.userSubscriptionStatus.filter((user) => user.id !== action.payload)
+      })
+      .addCase(revorkCode.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload as string
       })
