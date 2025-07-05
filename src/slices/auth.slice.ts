@@ -1,20 +1,20 @@
 import authService from '@/services/auth.service'
 import subscriptionService from '@/services/subscription.service'
 import userService from '@/services/user.service'
+import type { AuthState } from '@/types/auth'
 import type { SignInPayload, SignUpPayload } from '@/types/payload'
-import type { UserResponse } from '@/types/response'
-import type { UserSubscription } from '@/types/subscription'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
 
-interface AuthState {
-  isAuthenticated: boolean
-  user: UserResponse | null
-  token: string | null
-  refreshToken?: string | null
-  loading: boolean
-  signUpSuccess?: boolean
-  subscription?: UserSubscription
+const initialState: AuthState = {
+  isAuthenticated: false,
+  user: null,
+  sessions: undefined,
+  active_sessions: 0,
+  token: null,
+  loading: false,
+  refreshToken: null,
+  signUpSuccess: false
 }
 
 export const signInAction = createAsyncThunk('auth/signIn', async (payload: SignInPayload, { rejectWithValue }) => {
@@ -81,17 +81,22 @@ export const getSubscriptionStatus = createAsyncThunk('auth/getSubscriptionStatu
   }
 })
 
+export const getSessionsAction = createAsyncThunk('auth/getSessions', async (_, { rejectWithValue }) => {
+  try {
+    const response = await authService.getSessions()
+    if (response.status === 200) {
+      return response.data
+    } else {
+      return rejectWithValue('Không thể lấy danh sách phiên đăng nhập')
+    }
+  } catch (error) {
+    return rejectWithValue(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi lấy danh sách phiên đăng nhập')
+  }
+})
+
 const userSlice = createSlice({
   name: 'auth',
-  initialState: {
-    isAuthenticated: false,
-    user: null,
-    roles: [],
-    token: null,
-    loading: false,
-    refreshToken: null,
-    signUpSuccess: false
-  } as AuthState,
+  initialState: initialState,
   reducers: {
     signOut: (state) => {
       state.isAuthenticated = false
@@ -162,7 +167,19 @@ const userSlice = createSlice({
         state.loading = false
         state.subscription = undefined
       })
-      .addDefaultCase(() => {})
+      .addCase(getSessionsAction.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(getSessionsAction.fulfilled, (state, action) => {
+        state.sessions = action.payload.sessions
+        state.active_sessions = action.payload.active_sessions
+        state.loading = false
+      })
+      .addCase(getSessionsAction.rejected, (state) => {
+        state.loading = false
+        state.sessions = undefined
+        state.active_sessions = 0
+      })
   }
 })
 
