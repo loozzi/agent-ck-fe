@@ -43,6 +43,37 @@ const Survey = () => {
 
   // Use mock data if API fails or for development
   const surveyData = questions
+  const parts = surveyData ? [surveyData.part1, surveyData.part2, surveyData.part3].filter(Boolean) : []
+  const currentPartData = parts[currentPart]
+  const currentQuestion = currentPartData?.questions?.[currentQuestionIndex]
+
+  // Add keyboard event listener for Enter key
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && !isCompleted && currentQuestion) {
+        const currentAnswer = answers[currentQuestion.id]
+        const isCurrentQuestionAnswered = currentAnswer !== undefined && currentAnswer !== null && currentAnswer !== ''
+
+        if (isCurrentQuestionAnswered) {
+          // Handle next logic inline
+          if (currentQuestionIndex < (currentPartData?.questions?.length || 0) - 1) {
+            setCurrentQuestionIndex((prev) => prev + 1)
+          } else if (currentPart < parts.length - 1) {
+            setCurrentPart((prev) => prev + 1)
+            setCurrentQuestionIndex(0)
+          } else {
+            // Survey completed
+            setIsCompleted(true)
+          }
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [currentQuestion, answers, isCompleted, currentPart, currentQuestionIndex, parts, currentPartData])
 
   if (isLoading) {
     return (
@@ -77,10 +108,6 @@ const Survey = () => {
   }
 
   if (!surveyData) return null
-
-  const parts = [surveyData.part1, surveyData.part2, surveyData.part3].filter(Boolean)
-  const currentPartData = parts[currentPart]
-  const currentQuestion = currentPartData?.questions?.[currentQuestionIndex]
 
   // Calculate total progress
   const totalQuestions = parts.reduce((sum, part) => sum + (part?.questions?.length || 0), 0)
@@ -356,6 +383,15 @@ const Survey = () => {
                   <ChevronRight className='h-4 w-4' />
                 </Button>
               </div>
+              {isCurrentQuestionAnswered && (
+                <div className='mt-2 text-xs text-gray-500 text-center'>
+                  💡 Nhấn{' '}
+                  <kbd className='px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg'>
+                    Enter
+                  </kbd>{' '}
+                  để tiếp tục
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
