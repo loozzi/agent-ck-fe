@@ -33,13 +33,30 @@ apiInstance.interceptors.response.use(
     return response
   },
   (error) => {
-    if (error.status === 403 || error.response.data.onboarding_required) window.location.href = '/survey'
-    if (error.status === 401 && error.response.data.detail === 'Refresh token đã hết hạn hoặc không hợp lệ') {
-      store.dispatch(authActions.signOut())
-      window.location.href = '/auth/login'
-      return Promise.reject(new Error('Refresh token expired or invalid'))
+    // Check if error response exists and has data
+    const status = error.response?.status || error.status
+    const responseData = error.response?.data
+
+    if (status === 403 || responseData?.onboarding_required) {
+      console.log('Onboarding required, redirecting to survey...')
+      window.location.href = '/survey'
+      return Promise.reject(error)
     }
-    if (error.status === 401 && error.response.data.detail === 'Token không hợp lệ') {
+
+    // Handle refresh token expired - logout and redirect to login
+    if (status === 401) {
+      if (
+        responseData?.detail === 'Refresh token đã hết hạn hoặc không hợp lệ' ||
+        responseData?.detail === 'Phiên đăng nhập đã hết hạn hoặc bị vô hiệu hóa'
+      ) {
+        store.dispatch(authActions.signOut())
+        window.location.href = '/auth/login'
+        return Promise.reject(new Error('Refresh token expired or invalid'))
+      }
+    }
+
+    // Handle invalid token - try to refresh
+    if (status === 401 && responseData?.detail === 'Token không hợp lệ') {
       const refreshToken = store.getState().auth.refreshToken
       if (refreshToken) {
         return apiInstance
@@ -53,13 +70,18 @@ apiInstance.interceptors.response.use(
           .catch((refreshError) => {
             console.error('Refresh token failed:', refreshError)
             store.dispatch(authActions.signOut())
+            window.location.href = '/auth/login'
             return Promise.reject(refreshError)
           })
       } else {
         store.dispatch(authActions.signOut())
+        window.location.href = '/auth/login'
+        return Promise.reject(new Error('No refresh token available'))
       }
     }
-    return error
+
+    // For all other errors, reject the promise
+    return Promise.reject(error)
   }
 )
 

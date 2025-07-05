@@ -2,6 +2,7 @@ import { useAppSelector } from '@/app/hook'
 import MobileHeader from '@/components/layouts/MobileHeader'
 import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
+import ChatAssistantButton from '@/components/common/ChatAssistantButton'
 import AdminNavigator from '@/navigators/admin.routes'
 import { useEffect, useState } from 'react'
 import { FaHome, FaUsers, FaWallet } from 'react-icons/fa'
@@ -103,6 +104,9 @@ const AdminLayout = () => {
           <AdminNavigator />
         </div>
       </main>
+
+      {/* Chat Assistant Button - Fixed floating button */}
+      <ChatAssistantButton />
     </SidebarProvider>
   )
 }

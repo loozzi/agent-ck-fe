@@ -2,6 +2,7 @@ import { useAppSelector } from '@/app/hook'
 import MobileHeader from '@/components/layouts/MobileHeader'
 import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
+import ChatAssistantButton from '@/components/common/ChatAssistantButton'
 import TrainerNavigator from '@/navigators/trainer.routes'
 import { useEffect, useState } from 'react'
 import { FaBookOpen, FaChartLine } from 'react-icons/fa'
@@ -110,6 +111,9 @@ const TrainerLayout = () => {
           <TrainerNavigator />
         </div>
       </main>
+
+      {/* Chat Assistant Button - Fixed floating button */}
+      <ChatAssistantButton />
     </SidebarProvider>
   )
 }
