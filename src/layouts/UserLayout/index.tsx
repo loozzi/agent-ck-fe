@@ -2,6 +2,7 @@ import { useAppSelector } from '@/app/hook'
 import MobileHeader from '@/components/layouts/MobileHeader'
 import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
+import ChatAssistantButton from '@/components/common/ChatAssistantButton'
 import UserNavigator from '@/navigators/user.routes'
 import { useEffect, useState, type JSX } from 'react'
 import { FaBookOpen, FaHome, FaWallet } from 'react-icons/fa'
@@ -137,6 +138,9 @@ const UserLayout = () => {
           <UserNavigator />
         </div>
       </main>
+
+      {/* Chat Assistant Button - Fixed floating button */}
+      <ChatAssistantButton />
     </SidebarProvider>
   )
 }
