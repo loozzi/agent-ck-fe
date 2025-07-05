@@ -17,7 +17,7 @@ export interface SignUpResponse {
   [key: string]: any
 }
 
-export type UserRole = 'admin' | 'user' | 'viewer'
+export type UserRole = 'admin' | 'user' | 'trainer'
 
 export interface UserResponse {
   id: string
