@@ -180,7 +180,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                       <div className='px-3' />
                     )}
                     {otherItems.map((item) => (
-                      <SidebarMenuItem key={item.id} item={{ ...item, onClick: toggleCollapsed }} />
+                      <SidebarMenuItem
+                        key={item.id}
+                        item={{ ...item, onClick: isMobile ? toggleCollapsed : () => {} }}
+                      />
                     ))}
                   </div>
                 )}
