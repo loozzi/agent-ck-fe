@@ -26,7 +26,7 @@ const subscriptionService = {
     return apiInstance.get<SubscriptionMessage[]>('/subscription/messages')
   },
   updateRole: (data: SubscriptionUpdateRolePayload): Promise<AxiosResponse<SubscriptionUpdateRoleResponse>> => {
-    return apiInstance.patch(`/subscription/admin/users/role`, data)
+    return apiInstance.patch(`/admin/users/role`, data)
   },
   allUsers: (): Promise<AxiosResponse<any[]>> => {
     return apiInstance.get<any[]>('/admin/users')
