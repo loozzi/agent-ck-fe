@@ -1,5 +1,6 @@
 import ProtectedRoute from '@/components/layouts/ProtectedRoute'
 import AdminLayout from '@/layouts/AdminLayout'
+import TrainerLayout from '@/layouts/TrainerLayout'
 import UserLayout from '@/layouts/UserLayout'
 import SignOut from '@/pages/auth/SignOut'
 import Unauthorized from '@/pages/auth/Unauthorized'
@@ -44,6 +45,16 @@ const AppNavigator = () => {
           element={
             <ProtectedRoute requiredRoles={['admin']}>
               <AdminLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected trainer routes */}
+        <Route
+          path='/trainer/*'
+          element={
+            <ProtectedRoute requiredRoles={['trainer']}>
+              <TrainerLayout />
             </ProtectedRoute>
           }
         />

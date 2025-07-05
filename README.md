@@ -5,7 +5,9 @@
 [X] Chỉnh sửa giao diện trang học tập
 [ ] Tạo popup chat với bot ở tất cả màn hình
 [X] Xóa code & Revork code
-[ ] Thêm các màn hình trainer
+[X] Thêm các màn hình trainer
 [X] Tạo component news
 [ ] Tạo landing page
 [ ] Lấy thông tin user zalo để hiển thị thông tin
+[X] Quản lý prompt
+[ ] Quản lý Logic rule
