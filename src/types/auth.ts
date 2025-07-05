@@ -29,6 +29,8 @@ export interface UserResponse {
   status: string
   role: UserRole
   zalo_id: any
+  zalo_name: string
+  onboarding_completed: boolean
 
   [key: string]: any
 }

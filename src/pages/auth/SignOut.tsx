@@ -1,5 +1,5 @@
 import { useAppDispatch } from '@/app/hook'
-import { authActions } from '@/slices/auth.slice'
+import { signOutAction } from '@/slices/auth.slice'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router'
 
@@ -8,7 +8,7 @@ const SignOut = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    dispatch(authActions.signOut())
+    dispatch(signOutAction())
     navigate('/signin')
   }, [])
 

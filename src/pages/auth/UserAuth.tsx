@@ -25,6 +25,7 @@ const UserAuth = () => {
   const signUpSuccess = useAppSelector((state) => state.auth.signUpSuccess)
   const isLoading = useAppSelector((state) => state.auth.loading)
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  const user = useAppSelector((state) => state.auth.user)
 
   // Determine sign in/up state based on current URL
   const [isSignIn, setIsSignIn] = useState<boolean>(() => {
@@ -126,6 +127,14 @@ const UserAuth = () => {
       navigate('/')
     }
   }, [isAuthenticated, navigate])
+
+  useEffect(() => {
+    if (isAuthenticated && user && user.role === 'user' && user.onboarding_completed === false) {
+      navigate('/survey')
+    } else if (isAuthenticated) {
+      navigate('/')
+    }
+  }, [user, isAuthenticated])
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4'>

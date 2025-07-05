@@ -94,6 +94,21 @@ export const getSessionsAction = createAsyncThunk('auth/getSessions', async (_, 
   }
 })
 
+export const signOutAction = createAsyncThunk('auth/signOut', async (_, { rejectWithValue }) => {
+  try {
+    const response = await authService.signOut()
+    if (response.status === 200) {
+      toast.success('Đăng xuất thành công')
+      return true
+    } else {
+      return rejectWithValue('Không thể đăng xuất')
+    }
+  } catch (error) {
+    toast.error('Đã xảy ra lỗi khi đăng xuất')
+    return rejectWithValue(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi đăng xuất')
+  }
+})
+
 const userSlice = createSlice({
   name: 'auth',
   initialState: initialState,
@@ -179,6 +194,20 @@ const userSlice = createSlice({
         state.loading = false
         state.sessions = undefined
         state.active_sessions = 0
+      })
+      .addCase(signOutAction.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(signOutAction.fulfilled, (state) => {
+        state.isAuthenticated = false
+        state.user = null
+        state.token = null
+        state.refreshToken = null
+        state.loading = false
+        state.signUpSuccess = false
+      })
+      .addCase(signOutAction.rejected, (state) => {
+        state.loading = false
       })
   }
 })
