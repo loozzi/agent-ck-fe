@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Switch } from '@/components/ui/switch'
 import { MoreHorizontal, Edit, Eye, Trash2, Activity, Clock, Zap, Target } from 'lucide-react'
 import type { LogicRule } from '@/types/logicRules'
-import { formatDistanceToNow } from 'date-fns'
+import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 
 interface LogicRuleCardProps {
@@ -92,7 +92,7 @@ export const LogicRuleCard: React.FC<LogicRuleCardProps> = ({
 
   const formatDate = (dateString: string) => {
     try {
-      return formatDistanceToNow(new Date(dateString), { addSuffix: true, locale: vi })
+      return format(new Date(dateString), 'dd/MM/yyyy', { locale: vi })
     } catch {
       return dateString
     }

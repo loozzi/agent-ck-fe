@@ -12,4 +12,4 @@
 [X] Quản lý prompt
 [X] Quản lý Logic rule
 [O] Chỉnh sửa phần auth
-[ ] Sửa phần logic rule -> chuyển từ giờ cập nhật sang ngày cập nhật
+[X] Sửa phần logic rule -> chuyển từ giờ cập nhật sang ngày cập nhật
