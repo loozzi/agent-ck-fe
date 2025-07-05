@@ -8,6 +8,8 @@
 [X] Thêm các màn hình trainer
 [X] Tạo component news
 [ ] Tạo landing page
-[ ] Lấy thông tin user zalo để hiển thị thông tin
+[ ] Lấy thông tin user zalo đpể hiển thị thông tin
 [X] Quản lý prompt
-[ ] Quản lý Logic rule
+[X] Quản lý Logic rule
+[O] Chỉnh sửa phần auth
+[ ] Sửa phần logic rule -> chuyển từ giờ cập nhật sang ngày cập nhật
