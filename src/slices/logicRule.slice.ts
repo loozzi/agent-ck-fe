@@ -82,6 +82,24 @@ export const updateLogicRule = createAsyncThunk(
   }
 )
 
+export const deleteLogicRule = createAsyncThunk(
+  'logicRule/deleteLogicRule',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await logicRuleService.remove(id)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response.data.detail || 'Không thể xóa quy tắc logic'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+
+      return id
+    } catch (error) {
+      return rejectWithValue('Không thể xóa quy tắc logic')
+    }
+  }
+)
+
 const logicRuleSlice = createSlice({
   name: 'logicRule',
   initialState,
@@ -141,6 +159,18 @@ const logicRuleSlice = createSlice({
         state.isLoading = false
       })
       .addCase(updateLogicRule.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(deleteLogicRule.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(deleteLogicRule.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.logicRules = state.logicRules.filter((rule) => rule.id !== action.payload)
+      })
+      .addCase(deleteLogicRule.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload as string
       })

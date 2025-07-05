@@ -41,6 +41,102 @@
   cursor: not-allowed;
 }
 
+/* Global cursor styles for interactive elements */
+button:not(:disabled),
+select:not(:disabled),
+input[type='button']:not(:disabled),
+input[type='submit']:not(:disabled),
+input[type='reset']:not(:disabled),
+input[type='checkbox']:not(:disabled),
+input[type='radio']:not(:disabled),
+a:not(.disabled),
+[role='button']:not(.disabled),
+[role='tab']:not(.disabled),
+[role='menuitem']:not(.disabled),
+[role='option']:not(.disabled),
+[role='combobox']:not(.disabled),
+[role='listbox']:not(.disabled),
+[tabindex='0']:not(.disabled),
+[onclick]:not(.disabled),
+.clickable:not(.disabled),
+.badge,
+.switch,
+.tabs-trigger,
+.select-trigger,
+.select-content,
+.select-item,
+.dropdown-menu-trigger,
+.dropdown-menu-item,
+.card:hover,
+.dialog-trigger,
+.popover-trigger,
+.tooltip-trigger,
+.accordion-trigger,
+.collapsible-trigger,
+.navigation-menu-trigger,
+.hover-card-trigger,
+.alert-dialog-trigger,
+.context-menu-trigger,
+.menubar-trigger {
+  cursor: pointer !important;
+}
+
+/* Shadcn/UI specific selectors */
+[data-radix-collection-item],
+[data-radix-dropdown-menu-item],
+[data-radix-select-item],
+[data-radix-tabs-trigger],
+[data-radix-switch-thumb],
+[data-radix-dialog-trigger],
+[data-radix-popover-trigger],
+[data-radix-tooltip-trigger],
+[data-radix-menubar-trigger],
+[data-radix-context-menu-trigger],
+[data-radix-accordion-trigger],
+[data-radix-collapsible-trigger],
+[data-radix-navigation-menu-trigger],
+[data-radix-hover-card-trigger],
+[data-radix-alert-dialog-trigger] {
+  cursor: pointer !important;
+}
+
+/* Disabled states */
+button:disabled,
+select:disabled,
+input:disabled,
+a.disabled,
+[role='button'].disabled,
+.disabled {
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
+
+/* Form labels */
+label,
+.form-label {
+  cursor: pointer !important;
+}
+
+/* Drag and drop */
+.draggable,
+.sortable-handle,
+.drag-handle {
+  cursor: grab !important;
+}
+
+.draggable:active,
+.sortable-handle:active,
+.drag-handle:active {
+  cursor: grabbing !important;
+}
+
+/* Loading states */
+.loading,
+.spinner,
+[aria-busy='true'] {
+  cursor: wait !important;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
