@@ -1,4 +1,5 @@
 import FeedbackLogger from '@/pages/trainer/FeedbackLogger'
+import PromtDetail from '@/pages/trainer/PromtDetail'
 import PromtManagement from '@/pages/trainer/PromtManagement'
 import RuleController from '@/pages/trainer/RuleController'
 import TrainerDashboard from '@/pages/trainer/TrainerDashboard'
@@ -29,6 +30,12 @@ export const trainerRouterConfig: RouteBrowser[] = [
     element: <FeedbackLogger />,
     exact: true,
     name: 'Feedback logger'
+  },
+  {
+    route: '/prompts/:id',
+    element: <PromtDetail />,
+    exact: true,
+    name: 'Chi tiết prompt'
   }
 ]
 
