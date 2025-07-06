@@ -20,7 +20,7 @@
 
 [X] Sửa phần logic rule -> chuyển từ giờ cập nhật sang ngày cập nhật
 
-[ ] GUEST: Tạo landing page trang chủ: Hiển thị news, một số mã gợi ý trong ngày, list subscription...
+[O] GUEST: Tạo landing page trang chủ: Hiển thị news, một số mã gợi ý trong ngày, list subscription...
 
 [ ] USER: Sửa lại dasboard user (hiển thị thông tin các mã đang theo dõi, news...)
 

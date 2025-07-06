@@ -1,6 +1,9 @@
 import { useAppSelector } from '@/app/hook'
+import Header from '@/components/layouts/Header'
+import HeroSection from '@/components/common/HeroSection'
+import NewsSection from '@/components/common/NewsSection'
 import { useEffect } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const Home = () => {
   const { user } = useAppSelector((state) => state.auth)
@@ -9,23 +12,20 @@ const Home = () => {
   useEffect(() => {
     const role = user?.role
 
-    if (role === 'user') {
-      navigate('/dashboard')
-    } else if (role === 'admin') {
+    if (role === 'admin') {
       navigate('/admin/dashboard')
     } else if (role === 'trainer') {
       navigate('/trainer/dashboard')
     }
-  }, [user])
+  }, [user, navigate])
 
   return (
-    <div>
-      <NavLink to='/signin' className='text-blue-500 hover:underline'>
-        Sign In
-      </NavLink>
-      <NavLink to={'/dashboard'} className='text-blue-500 hover:underline ml-4'>
-        Dashboard
-      </NavLink>
+    <div className='min-h-screen bg-gray-50'>
+      <Header />
+      <main className='pt-14'>
+        <HeroSection />
+        <NewsSection />
+      </main>
     </div>
   )
 }
