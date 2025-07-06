@@ -24,6 +24,10 @@ import { fetchListStocksByName } from '@/slices/stock.slice'
 
 interface AddTransactionDialogProps {
   onSuccess?: () => void
+  prefilledTicker?: string
+  prefilledAction?: 'buy' | 'sell'
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 const validationSchema = Yup.object({
@@ -37,12 +41,22 @@ const validationSchema = Yup.object({
   note: Yup.string().required('Ghi chú là bắt buộc').min(1, 'Ghi chú không được để trống')
 })
 
-const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
-  const [open, setOpen] = useState(false)
+const AddTransactionDialog = ({
+  onSuccess,
+  prefilledTicker,
+  prefilledAction,
+  open: externalOpen,
+  onOpenChange
+}: AddTransactionDialogProps) => {
+  const [internalOpen, setInternalOpen] = useState(false)
   const [openCombobox, setOpenCombobox] = useState(false)
   const [searchValue, setSearchValue] = useState('')
   const dispatch = useAppDispatch()
   const { stocks, loading } = useAppSelector((state) => state.stock)
+
+  // Use external open state if provided, otherwise use internal state
+  const open = externalOpen !== undefined ? externalOpen : internalOpen
+  const setOpen = onOpenChange || setInternalOpen
 
   // Debounced search function
   const handleSearch = useCallback(
@@ -65,8 +79,8 @@ const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
 
   const formik = useFormik({
     initialValues: {
-      ticker: '',
-      action: '',
+      ticker: prefilledTicker || '',
+      action: prefilledAction || '',
       quantity: '',
       price: '',
       note: ''
@@ -92,6 +106,19 @@ const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
     }
   })
 
+  // Reset form when prefilled data changes
+  useEffect(() => {
+    if (prefilledTicker || prefilledAction) {
+      formik.setValues({
+        ticker: prefilledTicker || '',
+        action: prefilledAction || '',
+        quantity: '',
+        price: '',
+        note: ''
+      })
+    }
+  }, [prefilledTicker, prefilledAction, formik.setValues])
+
   const handleOpenChange = (newOpen: boolean) => {
     setOpen(newOpen)
     if (!newOpen) {
@@ -103,12 +130,15 @@ const AddTransactionDialog = ({ onSuccess }: AddTransactionDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant='outline' className='flex items-center gap-2 cursor-pointer'>
-          <Plus className='w-4 h-4' />
-          Thêm giao dịch
-        </Button>
-      </DialogTrigger>
+      {/* Only show trigger if not externally controlled */}
+      {externalOpen === undefined && (
+        <DialogTrigger asChild>
+          <Button variant='outline' className='flex items-center gap-2 cursor-pointer'>
+            <Plus className='w-4 h-4' />
+            Thêm giao dịch
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>

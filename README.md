@@ -24,7 +24,7 @@
 
 [ ] USER: Sửa lại dasboard user (hiển thị thông tin các mã đang theo dõi, news...)
 
-[ ] USER: Tự động reload portfolio sau khi người dùng thêm giao dịch mới
+[X] USER: Tự động reload portfolio sau khi người dùng thêm giao dịch mới
 
 [ ] ADMIN: Subscription loại bỏ, admin có thể thêm, chỉnh sửa các subscription
 
@@ -34,7 +34,7 @@
 
 [ ] USER: Ở màn hình chatbot, hiển thị ra list câu hỏi gợi ý cho người dùng, khi người dùng bấm vào thì tự gửi cho chat luôn
 
-[ ] USER: Chỉnh sửa màn "Danh mục đầu tư" thành "Ví của tôi" => Đồng thời giảm kích thước danh mục chứng khoán
+[X] USER: Chỉnh sửa màn "Danh mục đầu tư" thành "Ví của tôi" => Đồng thời giảm kích thước danh mục chứng khoán
 
 [ ] USER: Màn hình chiến lược đầu tư -> chia 2 vùng để so sánh chiến lược của AI và của người dùng -> yêu cầu vẽ history chart để người dùng theo dõi
 

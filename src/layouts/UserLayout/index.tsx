@@ -1,13 +1,12 @@
 import { useAppSelector } from '@/app/hook'
+import ChatAssistantButton from '@/components/common/ChatAssistantButton'
 import MobileHeader from '@/components/layouts/MobileHeader'
 import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
-import ChatAssistantButton from '@/components/common/ChatAssistantButton'
 import UserNavigator from '@/navigators/user.routes'
 import { useEffect, useState, type JSX } from 'react'
 import { FaBookOpen, FaHome, FaWallet } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
-import { MdOutlineMonitorHeart } from 'react-icons/md'
 
 export interface RouteItem {
   id: string
@@ -61,8 +60,8 @@ const UserLayout = () => {
     },
     {
       id: 'portfolio',
-      title: 'Danh mục đầu tư',
-      icon: <MdOutlineMonitorHeart className='w-4 h-4' />,
+      title: 'Ví của tôi',
+      icon: <FaWallet className='w-4 h-4' />,
       href: '/portfolio'
     },
     {
