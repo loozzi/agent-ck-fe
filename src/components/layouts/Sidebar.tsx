@@ -8,6 +8,8 @@ import React, { useState, useEffect } from 'react'
 import { MdChevronLeft, MdChevronRight, MdLogout } from 'react-icons/md'
 import SidebarMenuItem from './SidebarItem'
 import { useNavigate } from 'react-router'
+import type { UserResponse } from '@/types/auth'
+import { useAppSelector } from '@/app/hook'
 
 export interface SidebarItem {
   id: string
@@ -21,11 +23,6 @@ export interface SidebarItem {
 
 interface SidebarProps {
   items: SidebarItem[]
-  user?: {
-    name: string
-    role: string
-    avatar?: string
-  }
   className?: string
   onMobileMenuToggle?: (isOpen: boolean) => void
   isMobileMenuOpen?: boolean
@@ -35,7 +32,6 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({
   items,
-  user,
   className,
   onMobileMenuToggle,
   isMobileMenuOpen,
@@ -44,7 +40,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const [collapsed, setCollapsed] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-
+  const user = useAppSelector((state) => state.auth.user) as UserResponse | null
   const navigate = useNavigate()
 
   // Detect mobile screen size
@@ -217,7 +213,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   <Avatar className='w-8 h-8'>
                     <AvatarImage src={user.avatar} />
                     <AvatarFallback>
-                      {user.name
+                      {user.full_name
                         .split(' ')
                         .map((n) => n[0])
                         .join('')}
@@ -229,14 +225,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                   <Avatar className='w-10 h-10'>
                     <AvatarImage src={user.avatar} />
                     <AvatarFallback>
-                      {user.name
+                      {user.full_name
                         .split(' ')
                         .map((n) => n[0])
                         .join('')}
                     </AvatarFallback>
                   </Avatar>
                   <div className='flex-1 min-w-0'>
-                    <p className='text-sm font-medium truncate'>{user.name}</p>
+                    <p className='text-sm font-medium truncate'>{user.zalo_name || user.full_name}</p>
                     <p className='text-xs text-slate-400 truncate'>{user.role}</p>
                   </div>
                 </div>

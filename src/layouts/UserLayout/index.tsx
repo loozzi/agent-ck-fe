@@ -1,4 +1,3 @@
-import { useAppSelector } from '@/app/hook'
 import ChatAssistantButton from '@/components/common/ChatAssistantButton'
 import MobileHeader from '@/components/layouts/MobileHeader'
 import Sidebar from '@/components/layouts/Sidebar'
@@ -19,7 +18,6 @@ const UserLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false)
   const [isMobile, setIsMobile] = useState<boolean>(false)
-  const user = useAppSelector((state) => state.auth.user)
 
   // Detect mobile screen size
   useEffect(() => {
@@ -104,12 +102,6 @@ const UserLayout = () => {
     }
   ]
 
-  const sampleUser = {
-    name: user?.full_name || 'User Name',
-    role: user?.role || 'Viewer',
-    avatar: '/avatars/eva-murphy.jpg'
-  }
-
   return (
     <SidebarProvider>
       {/* Mobile Header - fixed trên mobile */}
@@ -122,7 +114,6 @@ const UserLayout = () => {
       {/* Sidebar - sẽ tự động fixed trên cả desktop và mobile */}
       <Sidebar
         items={sidebarItems}
-        user={sampleUser}
         onMobileMenuToggle={setIsMobileMenuOpen}
         isMobileMenuOpen={isMobileMenuOpen}
         onCollapsedChange={handleSidebarToggle}
