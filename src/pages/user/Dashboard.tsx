@@ -3,13 +3,16 @@ import MarketStats from '@/components/common/MarketStats'
 import NewsList from '@/components/common/NewsList'
 import NewsSearch from '@/components/common/NewsSearch'
 import NewsTimeline from '@/components/common/NewsTimeline'
+import EmailNotificationDialog from '@/components/common/EmailNotificationDialog'
+import EmailSettingsButton from '@/components/common/EmailSettingsButton'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { getSubscriptionStatus } from '@/slices/auth.slice'
+import { getSubscriptionStatus, getMeAction } from '@/slices/auth.slice'
 import { fetchLatestNews, fetchNews, fetchPendingNews } from '@/slices/news.slice'
 import type { GetNewsParams } from '@/types/news'
+import { hasDeclinedEmailNotification } from '@/utils/emailPreferences'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { BarChart3, Bell, Globe, RefreshCw, TrendingUp, Users } from 'lucide-react'
@@ -20,8 +23,18 @@ const UserDashboard = () => {
   const { subscription, user } = useAppSelector((state) => state.auth)
   const { latestNews, pendingNews, news, isLoading } = useAppSelector((state) => state.news)
   const [refreshTime, setRefreshTime] = useState(new Date())
+  const [showEmailDialog, setShowEmailDialog] = useState(false)
 
   useEffect(() => {
+    // Check if user has email, if not show dialog
+    // Also check if user has previously declined email notifications
+    if (user) {
+      const hasDeclined = hasDeclinedEmailNotification(user.id)
+      if (!user.email && !hasDeclined) {
+        setShowEmailDialog(true)
+      }
+    }
+
     dispatch(getSubscriptionStatus())
 
     // Fetch different types of news
@@ -38,7 +51,7 @@ const UserDashboard = () => {
         importance: 'high'
       })
     )
-  }, [])
+  }, [dispatch, user])
 
   const handleRefresh = () => {
     setRefreshTime(new Date())
@@ -61,21 +74,68 @@ const UserDashboard = () => {
     dispatch(fetchNews(params))
   }
 
+  const handleEmailComplete = async (email: string) => {
+    console.log('Email updated:', email)
+    // Refresh user data to get updated email
+    try {
+      await dispatch(getMeAction())
+    } catch (error) {
+      console.error('Error refreshing user data:', error)
+    }
+  }
+
+  const handleEmailDecline = () => {
+    console.log('User declined email notifications')
+    // Optional: You can track this event for analytics
+  }
+
+  const handleManualEmailDialog = () => {
+    // When user manually opens the dialog, reset any decline preference
+    // This allows them to change their mind
+    setShowEmailDialog(true)
+  }
+
   // Group news by importance
   const highImportanceNews = news.filter((n) => n.importance === 'high')
   const mediumImportanceNews = news.filter((n) => n.importance === 'medium')
 
   return (
     <div className='space-y-6'>
+      {/* EmailNotificationDialog */}
+      <EmailNotificationDialog
+        open={showEmailDialog}
+        onOpenChange={setShowEmailDialog}
+        onComplete={handleEmailComplete}
+        onDecline={handleEmailDecline}
+        userId={user?.id}
+      />
+
       {/* Header Section */}
-      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
-        <div>
-          <h1 className='text-2xl sm:text-3xl font-bold tracking-tight'>Thị trường chứng khoán</h1>
-          <p className='text-muted-foreground text-sm sm:text-base'>
-            Chào mừng {user?.full_name || 'User'} - Trạng thái: {subscription?.status || 'Inactive'}
-          </p>
+      <div className='flex flex-col gap-4'>
+        <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
+          <div className='flex-1'>
+            <h1 className='text-2xl sm:text-3xl font-bold tracking-tight'>Thị trường chứng khoán</h1>
+            <p className='text-muted-foreground text-sm sm:text-base'>
+              Chào mừng {user?.full_name || 'User'} - Trạng thái: {subscription?.status || 'Inactive'}
+            </p>
+          </div>
+
+          {/* Desktop Actions */}
+          <div className='hidden lg:flex items-center space-x-2'>
+            <EmailSettingsButton onClick={handleManualEmailDialog} hasEmail={!!user?.email} />
+            <Badge variant='outline' className='text-xs'>
+              Cập nhật lần cuối: {format(refreshTime, 'HH:mm', { locale: vi })}
+            </Badge>
+            <Button variant='outline' size='sm' onClick={handleRefresh} disabled={isLoading}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+              <span>Làm mới</span>
+            </Button>
+          </div>
         </div>
-        <div className='flex items-center space-x-2'>
+
+        {/* Mobile and Tablet Actions */}
+        <div className='flex lg:hidden flex-wrap items-center gap-2'>
+          <EmailSettingsButton onClick={handleManualEmailDialog} hasEmail={!!user?.email} />
           <Badge variant='outline' className='text-xs'>
             Cập nhật lần cuối: {format(refreshTime, 'HH:mm', { locale: vi })}
           </Badge>
@@ -88,14 +148,14 @@ const UserDashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className='grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4'>
+      <div className='grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4'>
         <Card>
           <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
             <CardTitle className='text-xs sm:text-sm font-medium'>Tin nóng</CardTitle>
             <Bell className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent>
-            <div className='text-xl sm:text-2xl font-bold text-red-600'>{highImportanceNews.length}</div>
+            <div className='text-lg sm:text-xl md:text-2xl font-bold text-red-600'>{highImportanceNews.length}</div>
             <p className='text-xs text-muted-foreground'>Tin quan trọng</p>
           </CardContent>
         </Card>
@@ -105,7 +165,7 @@ const UserDashboard = () => {
             <TrendingUp className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent>
-            <div className='text-xl sm:text-2xl font-bold text-blue-600'>{latestNews.length}</div>
+            <div className='text-lg sm:text-xl md:text-2xl font-bold text-blue-600'>{latestNews.length}</div>
             <p className='text-xs text-muted-foreground'>Tin tức mới</p>
           </CardContent>
         </Card>
@@ -115,7 +175,7 @@ const UserDashboard = () => {
             <Users className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent>
-            <div className='text-xl sm:text-2xl font-bold text-orange-600'>{pendingNews.length}</div>
+            <div className='text-lg sm:text-xl md:text-2xl font-bold text-orange-600'>{pendingNews.length}</div>
             <p className='text-xs text-muted-foreground'>Tin chờ phát</p>
           </CardContent>
         </Card>
@@ -125,16 +185,16 @@ const UserDashboard = () => {
             <Globe className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent>
-            <div className='text-xl sm:text-2xl font-bold'>{news.length}</div>
+            <div className='text-lg sm:text-xl md:text-2xl font-bold'>{news.length}</div>
             <p className='text-xs text-muted-foreground'>Tất cả tin tức</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Main Content */}
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6'>
+      <div className='grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6'>
         {/* Latest News - Main Column */}
-        <div className='lg:col-span-2 order-2 lg:order-1'>
+        <div className='xl:col-span-2 order-2 xl:order-1'>
           <NewsList
             news={latestNews}
             title='Tin tức mới nhất'
@@ -146,7 +206,7 @@ const UserDashboard = () => {
         </div>
 
         {/* Sidebar */}
-        <div className='space-y-4 sm:space-y-6 order-1 lg:order-2'>
+        <div className='space-y-4 sm:space-y-6 order-1 xl:order-2'>
           {/* Market Stats */}
           <MarketStats news={news} isLoading={isLoading} />
 
