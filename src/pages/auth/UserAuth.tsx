@@ -10,6 +10,7 @@ import type { SignUpPayload } from '@/types/payload'
 import { Eye, EyeOff, Lock, Mail, Shield, TrendingUp, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import ZaloIcon from '@/assets/zalo.png'
 
 interface FormErrors {
   email?: string
@@ -106,12 +107,9 @@ const UserAuth = () => {
     }
   }
 
-  const handleToggleAuthMode = () => {
-    if (isSignIn) {
-      navigate('/signup')
-    } else {
-      navigate('/signin')
-    }
+  const handleZaloLogin = () => {
+    // TODO: handle login with Zalo
+    console.log('Zalo login clicked')
   }
 
   useEffect(() => {
@@ -279,7 +277,7 @@ const UserAuth = () => {
             </div>
 
             {/* Switch between Sign In/Up */}
-            <div className='text-center'>
+            {/*            <div className='text-center'>
               <p className='text-sm text-gray-600 dark:text-gray-400'>
                 {isSignIn ? 'Chưa có tài khoản?' : 'Đã có tài khoản?'}
               </p>
@@ -290,6 +288,17 @@ const UserAuth = () => {
                 onClick={handleToggleAuthMode}
               >
                 {isSignIn ? 'Đăng ký ngay' : 'Đăng nhập ngay'}
+              </Button>
+            </div>*/}
+            <div className='text-center'>
+              <Button
+                type='button'
+                variant='link'
+                className='bg-blue-600 hover:bg-blue-700 font-medium p-0 text-white border border-blue-600 hover:border-blue-700 px-2 py-1 rounded no-underline hover:no-underline'
+                onClick={handleZaloLogin}
+              >
+                <img src={ZaloIcon} alt='Zalo Icon' className='inline-block h-4 w-4 mr-1' />
+                Đăng nhập bằng Zalo
               </Button>
             </div>
 

@@ -15,7 +15,7 @@ const AppNavigator = () => {
       <Routes>
         {/* Public routes */}
         <Route path='/signin' element={<UserAuth />} />
-        <Route path='/signup' element={<UserAuth />} />
+        {/* <Route path='/signup' element={<UserAuth />} /> */}
         <Route path='/unauthorized' element={<Unauthorized />} />
         <Route path='/signout' element={<SignOut />} />
         <Route path='/' element={<Home />} />
