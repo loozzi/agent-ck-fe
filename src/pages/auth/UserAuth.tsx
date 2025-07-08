@@ -1,16 +1,17 @@
 import { useAppDispatch, useAppSelector } from '@/app/hook'
+import ZaloIcon from '@/assets/zalo.png'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
+import apiInstance from '@/services/axios.config'
 import { getMeAction, signInAction, signUpAction } from '@/slices/auth.slice'
 import type { SignUpPayload } from '@/types/payload'
 import { Eye, EyeOff, Lock, Mail, Shield, TrendingUp, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import ZaloIcon from '@/assets/zalo.png'
 
 interface FormErrors {
   email?: string
@@ -27,6 +28,7 @@ const UserAuth = () => {
   const isLoading = useAppSelector((state) => state.auth.loading)
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
   const user = useAppSelector((state) => state.auth.user)
+  // const { authorization_url } = useAppSelector((state) => state.zalo)
 
   // Determine sign in/up state based on current URL
   const [isSignIn, setIsSignIn] = useState<boolean>(() => {
@@ -107,9 +109,9 @@ const UserAuth = () => {
     }
   }
 
-  const handleZaloLogin = () => {
-    // TODO: handle login with Zalo
-    console.log('Zalo login clicked')
+  const handleZaloLogin = async () => {
+    // dispatch(fetchZaloAuthUrl())
+    await apiInstance.get('/auth/zalo/login')
   }
 
   useEffect(() => {
