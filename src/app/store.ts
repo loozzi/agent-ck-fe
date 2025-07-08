@@ -8,6 +8,7 @@ import promptReducer from '@/slices/prompt.slice'
 import stockReducer from '@/slices/stock.slice'
 import subscriptionReducer from '@/slices/subscription.slice'
 import surveyReducer from '@/slices/survey.slice'
+import zaloReducer from '@/slices/zalo.slice'
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { persistReducer, persistStore } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
@@ -22,13 +23,14 @@ const rootReducer = combineReducers({
   stock: stockReducer,
   news: newsReducer,
   prompt: promptReducer,
-  logicRule: logicRuleReducer
+  logicRule: logicRuleReducer,
+  zalo: zaloReducer
 })
 
 const persistConfig = {
   key: 'root',
   storage: storage,
-  blacklist: ['portfolio', 'survey', 'subscription', 'stock', 'news', 'prompt', 'logicRule'],
+  blacklist: ['portfolio', 'survey', 'subscription', 'stock', 'news', 'prompt', 'logicRule', 'zalo'],
   whiteList: ['auth'] // reducers that you want to persist
 }
 

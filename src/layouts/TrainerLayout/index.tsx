@@ -1,8 +1,7 @@
-import { useAppSelector } from '@/app/hook'
+import ChatAssistantButton from '@/components/common/ChatAssistantButton'
 import MobileHeader from '@/components/layouts/MobileHeader'
 import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
-import ChatAssistantButton from '@/components/common/ChatAssistantButton'
 import TrainerNavigator from '@/navigators/trainer.routes'
 import { useEffect, useState } from 'react'
 import { FaBookOpen, FaChartLine } from 'react-icons/fa'
@@ -13,7 +12,6 @@ const TrainerLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false)
   const [isMobile, setIsMobile] = useState<boolean>(false)
-  const user = useAppSelector((state) => state.auth.user)
 
   // Detect mobile screen size
   useEffect(() => {
@@ -78,12 +76,6 @@ const TrainerLayout = () => {
     // }
   ]
 
-  const sampleUser = {
-    name: user?.full_name || 'Trainer Name',
-    role: user?.role || 'Trainer',
-    avatar: '/avatars/trainer.jpg'
-  }
-
   return (
     <SidebarProvider>
       {/* Mobile Header - fixed trên mobile */}
@@ -96,7 +88,6 @@ const TrainerLayout = () => {
       {/* Sidebar - sẽ tự động fixed trên cả desktop và mobile */}
       <Sidebar
         items={sidebarItems}
-        user={sampleUser}
         onMobileMenuToggle={setIsMobileMenuOpen}
         isMobileMenuOpen={isMobileMenuOpen}
         onCollapsedChange={handleSidebarToggle}

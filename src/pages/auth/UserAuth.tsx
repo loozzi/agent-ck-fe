@@ -1,10 +1,12 @@
 import { useAppDispatch, useAppSelector } from '@/app/hook'
+import ZaloIcon from '@/assets/zalo.png'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
+import apiInstance from '@/services/axios.config'
 import { getMeAction, signInAction, signUpAction } from '@/slices/auth.slice'
 import type { SignUpPayload } from '@/types/payload'
 import { Eye, EyeOff, Lock, Mail, Shield, TrendingUp, User } from 'lucide-react'
@@ -26,6 +28,7 @@ const UserAuth = () => {
   const isLoading = useAppSelector((state) => state.auth.loading)
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
   const user = useAppSelector((state) => state.auth.user)
+  // const { authorization_url } = useAppSelector((state) => state.zalo)
 
   // Determine sign in/up state based on current URL
   const [isSignIn, setIsSignIn] = useState<boolean>(() => {
@@ -106,12 +109,9 @@ const UserAuth = () => {
     }
   }
 
-  const handleToggleAuthMode = () => {
-    if (isSignIn) {
-      navigate('/signup')
-    } else {
-      navigate('/signin')
-    }
+  const handleZaloLogin = async () => {
+    // dispatch(fetchZaloAuthUrl())
+    await apiInstance.get('/auth/zalo/login')
   }
 
   useEffect(() => {
@@ -279,7 +279,7 @@ const UserAuth = () => {
             </div>
 
             {/* Switch between Sign In/Up */}
-            <div className='text-center'>
+            {/*            <div className='text-center'>
               <p className='text-sm text-gray-600 dark:text-gray-400'>
                 {isSignIn ? 'Chưa có tài khoản?' : 'Đã có tài khoản?'}
               </p>
@@ -290,6 +290,17 @@ const UserAuth = () => {
                 onClick={handleToggleAuthMode}
               >
                 {isSignIn ? 'Đăng ký ngay' : 'Đăng nhập ngay'}
+              </Button>
+            </div>*/}
+            <div className='text-center'>
+              <Button
+                type='button'
+                variant='link'
+                className='bg-blue-600 hover:bg-blue-700 font-medium p-0 text-white border border-blue-600 hover:border-blue-700 px-2 py-1 rounded no-underline hover:no-underline'
+                onClick={handleZaloLogin}
+              >
+                <img src={ZaloIcon} alt='Zalo Icon' className='inline-block h-4 w-4 mr-1' />
+                Đăng nhập bằng Zalo
               </Button>
             </div>
 

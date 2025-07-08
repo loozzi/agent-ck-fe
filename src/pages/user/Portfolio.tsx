@@ -23,6 +23,9 @@ const Portfolio = () => {
   const [transactionToDelete, setTransactionToDelete] = useState<any>(null)
   const [showEditTransactionDialog, setShowEditTransactionDialog] = useState(false)
   const [transactionToEdit, setTransactionToEdit] = useState<any>(null)
+  const [showAddTransactionDialog, setShowAddTransactionDialog] = useState(false)
+  const [prefilledTicker, setPrefilledTicker] = useState<string>('')
+  const [prefilledAction, setPrefilledAction] = useState<'buy' | 'sell' | ''>('')
 
   const handleTransactionSuccess = () => {
     dispatch(fetchWallet())
@@ -30,15 +33,22 @@ const Portfolio = () => {
   }
 
   const handleBuyStock = (ticker: string) => {
-    // TODO: Open buy transaction dialog with pre-filled ticker
-    console.log('Buy more stock:', ticker)
-    // This could open AddTransactionDialog with ticker pre-filled and action set to 'buy'
+    setPrefilledTicker(ticker)
+    setPrefilledAction('buy')
+    setShowAddTransactionDialog(true)
   }
 
   const handleSellStock = (ticker: string) => {
-    // TODO: Open sell transaction dialog with pre-filled ticker
-    console.log('Sell stock:', ticker)
-    // This could open AddTransactionDialog with ticker pre-filled and action set to 'sell'
+    setPrefilledTicker(ticker)
+    setPrefilledAction('sell')
+    setShowAddTransactionDialog(true)
+  }
+
+  const handleAddTransactionSuccess = () => {
+    setShowAddTransactionDialog(false)
+    setPrefilledTicker('')
+    setPrefilledAction('')
+    handleTransactionSuccess()
   }
 
   const confirmDeleteStock = () => {
@@ -90,7 +100,7 @@ const Portfolio = () => {
       <div className='mb-8'>
         <h1 className='text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center'>
           <Wallet className='w-8 h-8 mr-3 text-blue-600' />
-          Danh mục đầu tư
+          Ví của tôi
         </h1>
         <p className='text-gray-600 dark:text-gray-400'>Quản lý danh mục và theo dõi giao dịch của bạn</p>
       </div>
@@ -125,7 +135,7 @@ const Portfolio = () => {
           Danh mục cổ phiếu
         </h2>
         {wallet && wallet.length > 0 ? (
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
             {wallet.map((item) => (
               <WalletCard key={item.id} item={item} onBuy={handleBuyStock} onSell={handleSellStock} />
             ))}
@@ -173,6 +183,15 @@ const Portfolio = () => {
         open={showEditTransactionDialog}
         onOpenChange={setShowEditTransactionDialog}
         onSuccess={handleEditTransactionSuccess}
+      />
+
+      {/* Add Transaction Dialog (External Control) */}
+      <AddTransactionDialog
+        open={showAddTransactionDialog}
+        onOpenChange={setShowAddTransactionDialog}
+        onSuccess={handleAddTransactionSuccess}
+        prefilledTicker={prefilledTicker}
+        prefilledAction={prefilledAction as 'buy' | 'sell'}
       />
     </div>
   )

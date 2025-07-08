@@ -1,0 +1,158 @@
+/* Header styles - Minimal & Clean Design with Blue Theme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+}
+
+.header-minimal {
+  /* Remove fixed positioning from CSS as we handle it with Tailwind */
+  background: #2563eb;
+  border-bottom: 1px solid #1d4ed8;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+}
+
+.dropdown-minimal {
+  animation: slideDown 0.15s ease-out;
+  border: 1px solid #dbeafe;
+  box-shadow:
+    0 4px 6px -1px rgba(59, 130, 246, 0.1),
+    0 2px 4px -1px rgba(59, 130, 246, 0.06);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nav-item-minimal {
+  position: relative;
+}
+
+.nav-item-minimal::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #bfdbfe;
+  transition: width 0.3s ease;
+}
+
+.nav-item-minimal:hover::after {
+  width: 100%;
+}
+
+/* Logo minimal style */
+.logo-minimal {
+  background: #1d4ed8;
+  box-shadow: 0 2px 4px rgba(29, 78, 216, 0.2);
+  transition: all 0.3s ease;
+}
+
+.logo-minimal:hover {
+  box-shadow: 0 4px 8px rgba(29, 78, 216, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Market data ticker - minimal */
+.market-ticker-minimal {
+  background: #f0f9ff;
+  border-bottom: 1px solid #bae6fd;
+}
+
+.ticker-item {
+  white-space: nowrap;
+  animation: scroll 40s linear infinite;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none;
+  }
+
+  .mobile-nav {
+    display: flex;
+  }
+
+  .dropdown-minimal {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    z-index: 1000;
+  }
+}
+
+@media (min-width: 769px) {
+  .desktop-nav {
+    display: flex;
+  }
+
+  .mobile-nav {
+    display: none;
+  }
+}
+
+/* Hover effects for better UX */
+.nav-item-minimal button:hover {
+  color: #3b82f6;
+}
+
+.nav-item-minimal button:focus {
+  outline: none;
+  color: #3b82f6;
+}
+
+/* Smooth transitions */
+* {
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+/* Clean scrollbar for dropdown */
+.dropdown-minimal::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dropdown-minimal::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.dropdown-minimal::-webkit-scrollbar-thumb {
+  background: #bfdbfe;
+  border-radius: 2px;
+}
+
+.dropdown-minimal::-webkit-scrollbar-thumb:hover {
+  background: #93c5fd;
+}

@@ -1,13 +1,11 @@
-import { useAppSelector } from '@/app/hook'
+import ChatAssistantButton from '@/components/common/ChatAssistantButton'
 import MobileHeader from '@/components/layouts/MobileHeader'
 import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
-import ChatAssistantButton from '@/components/common/ChatAssistantButton'
 import UserNavigator from '@/navigators/user.routes'
 import { useEffect, useState, type JSX } from 'react'
 import { FaBookOpen, FaHome, FaWallet } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
-import { MdOutlineMonitorHeart } from 'react-icons/md'
 
 export interface RouteItem {
   id: string
@@ -20,7 +18,6 @@ const UserLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false)
   const [isMobile, setIsMobile] = useState<boolean>(false)
-  const user = useAppSelector((state) => state.auth.user)
 
   // Detect mobile screen size
   useEffect(() => {
@@ -61,8 +58,8 @@ const UserLayout = () => {
     },
     {
       id: 'portfolio',
-      title: 'Danh mục đầu tư',
-      icon: <MdOutlineMonitorHeart className='w-4 h-4' />,
+      title: 'Ví của tôi',
+      icon: <FaWallet className='w-4 h-4' />,
       href: '/portfolio'
     },
     {
@@ -105,12 +102,6 @@ const UserLayout = () => {
     }
   ]
 
-  const sampleUser = {
-    name: user?.full_name || 'User Name',
-    role: user?.role || 'Viewer',
-    avatar: '/avatars/eva-murphy.jpg'
-  }
-
   return (
     <SidebarProvider>
       {/* Mobile Header - fixed trên mobile */}
@@ -123,7 +114,6 @@ const UserLayout = () => {
       {/* Sidebar - sẽ tự động fixed trên cả desktop và mobile */}
       <Sidebar
         items={sidebarItems}
-        user={sampleUser}
         onMobileMenuToggle={setIsMobileMenuOpen}
         isMobileMenuOpen={isMobileMenuOpen}
         onCollapsedChange={handleSidebarToggle}
