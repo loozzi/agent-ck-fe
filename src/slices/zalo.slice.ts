@@ -17,13 +17,12 @@ export const fetchZaloAuthUrl = createAsyncThunk('zalo/fetchZaloAuthUrl', async 
       toast.error((response as any).response.data.detail || 'Không thể lấy URL xác thực zalo')
       return rejectWithValue('Không thể lấy URL xác thực zalo')
     }
-    return response.data
 
     const { authorization_url, state } = response.data
 
     // Modify the redirect_uri in the authorization_url
     const url = new URL(authorization_url)
-    url.searchParams.set('redirect_uri', 'https://localhost:3000/auth/zalo/callback')
+    url.searchParams.set('redirect_uri', 'https://agent-ck-fe.vercel.app/auth/zalo/callback')
 
     console.log('Zalo authorization URL:', url.toString())
 
