@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 const ZaloCallback = () => {
   const searchParams = new URLSearchParams(window.location.search)
   const { zaloResponse, userData } = useAppSelector((state) => state.zalo)
+  const { isAuthenticated } = useAppSelector((state) => state.auth)
   const dispatch = useAppDispatch()
   const code = searchParams.get('code')
   const state = searchParams.get('state')
@@ -47,6 +48,12 @@ const ZaloCallback = () => {
       )
     }
   }, [userData])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      window.location.href = '/'
+    }
+  }, [isAuthenticated])
 
   return <div>ZaloCallback</div>
 }
