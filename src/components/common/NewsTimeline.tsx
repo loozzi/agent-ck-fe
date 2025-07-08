@@ -100,17 +100,44 @@ const NewsTimeline = ({ news, isLoading }: NewsTimelineProps) => {
 
                       {/* News Content */}
                       <div className='group cursor-pointer' onClick={() => window.open(item.url, '_blank')}>
-                        <div className='flex items-start justify-between gap-2'>
-                          <div className='flex-1 min-w-0'>
-                            <h4 className='text-sm font-medium line-clamp-2 group-hover:text-blue-600 leading-tight'>
-                              {item.title}
-                            </h4>
-                            <p className='text-xs text-muted-foreground mt-1 line-clamp-2'>{item.summary}</p>
+                        <div className='flex items-start gap-3'>
+                          {/* Image */}
+                          <div className='w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0'>
+                            {item.image_url ? (
+                              <img
+                                src={item.image_url}
+                                alt={item.title}
+                                className='w-full h-full object-cover rounded-md'
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement
+                                  target.style.display = 'none'
+                                  const parent = target.parentElement
+                                  if (parent) {
+                                    parent.innerHTML =
+                                      '<div class="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 rounded-md flex items-center justify-center"><svg class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></div>'
+                                  }
+                                }}
+                              />
+                            ) : (
+                              <div className='w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 rounded-md flex items-center justify-center'>
+                                <Clock className='h-4 w-4 text-blue-500' />
+                              </div>
+                            )}
                           </div>
-                          <ExternalLink className='h-3 w-3 text-muted-foreground group-hover:text-blue-500 flex-shrink-0' />
+
+                          {/* Content */}
+                          <div className='flex items-start justify-between gap-2 flex-1 min-w-0'>
+                            <div className='flex-1 min-w-0'>
+                              <h4 className='text-sm font-medium line-clamp-2 group-hover:text-blue-600 leading-tight'>
+                                {item.title}
+                              </h4>
+                              <p className='text-xs text-muted-foreground mt-1 line-clamp-2'>{item.summary}</p>
+                            </div>
+                            <ExternalLink className='h-3 w-3 text-muted-foreground group-hover:text-blue-500 flex-shrink-0' />
+                          </div>
                         </div>
 
-                        <div className='flex flex-wrap items-center gap-1 sm:gap-2 mt-2'>
+                        <div className='flex flex-wrap items-center gap-1 sm:gap-2 mt-2 ml-15 sm:ml-19'>
                           <Badge variant='outline' className='text-xs'>
                             {item.source}
                           </Badge>

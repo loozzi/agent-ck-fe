@@ -32,46 +32,8 @@ const NewsSection = () => {
     })
   }
 
-  // Fallback data when no news available
-  const fallbackNews: News[] = [
-    {
-      id: '1',
-      title: 'VN-Index tăng mạnh phiên đầu tuần, vượt mốc 1,240 điểm',
-      summary:
-        'Thị trường chứng khoán Việt Nam khởi sắc với thanh khoản cải thiện đáng kể. Các cổ phiếu ngân hàng và bất động sản dẫn dắt đà tăng.',
-      content:
-        'Thị trường chứng khoán Việt Nam khởi sắc với thanh khoản cải thiện đáng kể. Các cổ phiếu ngân hàng và bất động sản dẫn dắt đà tăng.',
-      url: '#',
-      publish_time: '2025-01-06T10:30:00Z',
-      source: 'VnExpress',
-      language: 'vi',
-      importance: 'high' as const,
-      status: 'sent' as const,
-      created_at: '2025-01-06T10:30:00Z',
-      updated_at: '2025-01-06T10:30:00Z',
-      sent_at: '2025-01-06T10:30:00Z'
-    },
-    {
-      id: '2',
-      title: 'FED có thể hạ lãi suất, cơ hội cho thị trường mới nổi',
-      summary:
-        'Các chuyên gia dự báo FED sẽ cắt giảm lãi suất trong quý 2, tạo điều kiện thuận lợi cho dòng vốn đầu tư vào các thị trường mới nổi.',
-      content:
-        'Các chuyên gia dự báo FED sẽ cắt giảm lãi suất trong quý 2, tạo điều kiện thuận lợi cho dòng vốn đầu tư vào các thị trường mới nổi.',
-      url: '#',
-      publish_time: '2025-01-06T08:15:00Z',
-      source: 'CafeF',
-      language: 'vi',
-      importance: 'medium' as const,
-      status: 'sent' as const,
-      created_at: '2025-01-06T08:15:00Z',
-      updated_at: '2025-01-06T08:15:00Z',
-      sent_at: '2025-01-06T08:15:00Z'
-    }
-  ]
-
   // Use data from Redux or fallback
-  const displayNews = latestNews.length > 0 ? latestNews : fallbackNews
+  const displayNews = latestNews.length > 0 ? latestNews : []
 
   if (isLoading) {
     return (
@@ -112,9 +74,31 @@ const NewsSection = () => {
                 href={article.url}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='flex h-48 bg-gradient-to-br from-blue-100 to-blue-200 items-center justify-center hover:from-blue-200 hover:to-blue-300 transition-colors duration-200'
+                className='block h-48 overflow-hidden hover:opacity-90 transition-opacity duration-200'
               >
-                <TrendingUp className='h-12 w-12 text-blue-600' />
+                {article.image_url ? (
+                  <img
+                    src={article.image_url}
+                    alt={article.title}
+                    className='w-full h-full object-cover'
+                    onError={(e) => {
+                      // Fallback to default gradient background with icon if image fails to load
+                      const target = e.target as HTMLImageElement
+                      target.style.display = 'none'
+                      const parent = target.parentElement
+                      if (parent) {
+                        parent.className =
+                          'flex h-48 bg-gradient-to-br from-blue-100 to-blue-200 items-center justify-center hover:from-blue-200 hover:to-blue-300 transition-colors duration-200'
+                        parent.innerHTML =
+                          '<svg class="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>'
+                      }
+                    }}
+                  />
+                ) : (
+                  <div className='flex h-48 bg-gradient-to-br from-blue-100 to-blue-200 items-center justify-center hover:from-blue-200 hover:to-blue-300 transition-colors duration-200'>
+                    <TrendingUp className='h-12 w-12 text-blue-600' />
+                  </div>
+                )}
               </a>
 
               <div className='p-4'>

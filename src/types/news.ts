@@ -28,6 +28,7 @@ export interface News {
   url: string
   summary: string
   content: string
+  image_url: string
   source: string
   language: string
   importance: NewsImportance
