@@ -1,4 +1,5 @@
 import type { UserSubscription } from './subscription'
+import type { OauthData, ZaloDataResponse } from './zalo'
 
 export interface SignInResponse {
   access_token: string
@@ -60,3 +61,10 @@ export interface AuthState {
   signUpSuccess?: boolean
   subscription?: UserSubscription
 }
+
+export interface ZaloCompleteLoginPayload {
+  oauth_data: OauthData
+  user_info: ZaloDataResponse
+}
+
+export interface ZaloCompleteLoginResponse {}

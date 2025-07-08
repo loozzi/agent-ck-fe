@@ -1,7 +1,7 @@
 import authService from '@/services/auth.service'
 import subscriptionService from '@/services/subscription.service'
 import userService from '@/services/user.service'
-import type { AuthState } from '@/types/auth'
+import type { AuthState, ZaloCompleteLoginPayload } from '@/types/auth'
 import type { SignInPayload, SignUpPayload } from '@/types/payload'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
@@ -109,6 +109,25 @@ export const signOutAction = createAsyncThunk('auth/signOut', async (_, { reject
   }
 })
 
+export const zaloCompleteLogin = createAsyncThunk(
+  'auth/zaloCompleteLogin',
+  async (payload: ZaloCompleteLoginPayload, { rejectWithValue }) => {
+    try {
+      const response = await authService.completeLogin(payload)
+      if (response.status === 200) {
+        toast.success('Đăng nhập Zalo thành công')
+        return response.data
+      } else {
+        toast.error((response as any).response.data.detail || 'Đăng nhập Zalo không thành công')
+        return rejectWithValue('Đăng nhập Zalo không thành công')
+      }
+    } catch (error) {
+      toast.error('Đã xảy ra lỗi khi đăng nhập Zalo')
+      return rejectWithValue(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi đăng nhập Zalo')
+    }
+  }
+)
+
 const userSlice = createSlice({
   name: 'auth',
   initialState: initialState,
@@ -208,6 +227,23 @@ const userSlice = createSlice({
       })
       .addCase(signOutAction.rejected, (state) => {
         state.loading = false
+      })
+      .addCase(zaloCompleteLogin.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(zaloCompleteLogin.fulfilled, (state, action) => {
+        state.isAuthenticated = true
+        state.user = action.payload.user_info
+        state.token = action.payload.access_token
+        state.refreshToken = action.payload.refresh_token
+        state.loading = false
+      })
+      .addCase(zaloCompleteLogin.rejected, (state) => {
+        state.loading = false
+        state.isAuthenticated = false
+        state.user = null
+        state.token = null
+        state.refreshToken = null
       })
   }
 })

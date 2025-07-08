@@ -20,14 +20,43 @@ export interface GetZaloDataParams {
   access_token: string
 }
 
-export interface GetAccessTokenPayload {
-  [key: string]: any
+export interface ZaloSendCodeResponse {
+  requires_client_side_call: boolean
+  client_api_info: ClientApiInfo
+  oauth_data: OauthData
+  message: string
+}
+
+export interface ClientApiInfo {
+  access_token: string
+  api_endpoint: string
+  fields: string
+  method: string
+}
+
+export interface OauthData {
+  authorization_code: string
+  state: string
+}
+
+export interface ZaloDataResponse {
+  is_sensitive: boolean
+  name: string
+  id: string
+  error: number
+  message: string
+  picture: {
+    data: {
+      url: string
+    }
+  }
 }
 
 export interface ZaloState {
   state: string
   code: string
   authorization_url: string
-  userData?: GetAccessTokenPayload
+  zaloResponse?: ZaloSendCodeResponse
+  userData?: ZaloDataResponse
   error?: string
 }

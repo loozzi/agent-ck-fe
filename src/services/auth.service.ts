@@ -1,7 +1,7 @@
-import type { SessionResponse, SignInResponse, SignUpResponse } from '@/types/auth'
-import apiInstance from './axios.config'
+import type { SessionResponse, SignInResponse, SignUpResponse, ZaloCompleteLoginPayload } from '@/types/auth'
 import type { RefreshTokenPayload, SignInPayload, SignUpPayload } from '@/types/payload'
 import type { AxiosResponse } from 'axios'
+import apiInstance from './axios.config'
 
 const authService = {
   signIn: async (data: SignInPayload): Promise<AxiosResponse<SignInResponse>> => {
@@ -14,7 +14,9 @@ const authService = {
     return apiInstance.post('/auth/token/refresh', data)
   },
   getSessions: (): Promise<AxiosResponse<SessionResponse>> => apiInstance.get('/auth/sessions'),
-  signOut: (): Promise<AxiosResponse<void>> => apiInstance.post('/auth/logout')
+  signOut: (): Promise<AxiosResponse<void>> => apiInstance.post('/auth/logout'),
+  completeLogin: (data: ZaloCompleteLoginPayload): Promise<AxiosResponse<SignInResponse>> =>
+    apiInstance.post('/auth/zalo/complete-login', data)
 }
 
 export default authService
