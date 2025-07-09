@@ -2,11 +2,12 @@ import { useAppDispatch, useAppSelector } from '@/app/hook'
 import AddTransactionDialog from '@/components/common/AddTransactionDialog'
 import DeleteConfirmationDialog from '@/components/common/DeleteConfirmationDialog'
 import EditTransactionDialog from '@/components/common/EditTransactionDialog'
+import StockChart from '@/components/common/StockChart'
 import TransactionHistory from '@/components/common/TransactionHistory'
 import WalletCard from '@/components/common/WalletCard'
 import { Button } from '@/components/ui/button'
 import { deleteTransaction, fetchTransactions, fetchWallet } from '@/slices/portfolio.slice'
-import { Receipt, RefreshCw, Wallet } from 'lucide-react'
+import { Receipt, RefreshCw, Wallet, ChartLine } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 const Portfolio = () => {
@@ -26,6 +27,8 @@ const Portfolio = () => {
   const [showAddTransactionDialog, setShowAddTransactionDialog] = useState(false)
   const [prefilledTicker, setPrefilledTicker] = useState<string>('')
   const [prefilledAction, setPrefilledAction] = useState<'buy' | 'sell' | ''>('')
+  const [selectedTickerForChart, setSelectedTickerForChart] = useState<string>('')
+  const [showStockChart, setShowStockChart] = useState(false)
 
   const handleTransactionSuccess = () => {
     dispatch(fetchWallet())
@@ -89,6 +92,11 @@ const Portfolio = () => {
     dispatch(fetchTransactions())
   }
 
+  const handleViewChart = (ticker: string) => {
+    setSelectedTickerForChart(ticker)
+    setShowStockChart(true)
+  }
+
   useEffect(() => {
     dispatch(fetchWallet())
     dispatch(fetchTransactions())
@@ -137,7 +145,13 @@ const Portfolio = () => {
         {wallet && wallet.length > 0 ? (
           <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
             {wallet.map((item) => (
-              <WalletCard key={item.id} item={item} onBuy={handleBuyStock} onSell={handleSellStock} />
+              <WalletCard
+                key={item.id}
+                item={item}
+                onBuy={handleBuyStock}
+                onSell={handleSellStock}
+                onViewChart={handleViewChart}
+              />
             ))}
           </div>
         ) : (
@@ -147,6 +161,76 @@ const Portfolio = () => {
           </div>
         )}
       </div>
+
+      {/* Stock Chart Section */}
+      {showStockChart && selectedTickerForChart && (
+        <div className='mb-8'>
+          <div className='flex items-center justify-between mb-4'>
+            <h2 className='text-2xl font-semibold text-gray-900 dark:text-gray-100 flex items-center'>
+              <ChartLine className='w-6 h-6 mr-2 text-indigo-600' />
+              Biểu đồ giá - {selectedTickerForChart}
+            </h2>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => setShowStockChart(false)}
+              className='text-gray-600 hover:text-gray-800'
+            >
+              Đóng
+            </Button>
+          </div>
+          <StockChart ticker={selectedTickerForChart} />
+        </div>
+      )}
+
+      {/* Quick Chart Access for stocks not in wallet */}
+      {!showStockChart && (
+        <div className='mb-8'>
+          <h2 className='text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center'>
+            <ChartLine className='w-6 h-6 mr-2 text-indigo-600' />
+            Xem biểu đồ cổ phiếu
+          </h2>
+          {!selectedTickerForChart ? (
+            <div className='text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-lg'>
+              <ChartLine className='w-12 h-12 mx-auto text-gray-400 mb-4' />
+              <p className='text-gray-600 dark:text-gray-400 mb-4'>
+                Chọn cổ phiếu từ danh mục để xem biểu đồ hoặc nhập mã cổ phiếu
+              </p>
+              <div className='flex gap-2 justify-center'>
+                <input
+                  type='text'
+                  placeholder='Nhập mã cổ phiếu (VD: VCB, FPT)'
+                  className='px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      const value = (e.target as HTMLInputElement).value.trim().toUpperCase()
+                      if (value) {
+                        setSelectedTickerForChart(value)
+                        setShowStockChart(true)
+                      }
+                    }
+                  }}
+                />
+                <Button
+                  onClick={() => {
+                    const input = document.querySelector('input[placeholder*="mã cổ phiếu"]') as HTMLInputElement
+                    const value = input?.value.trim().toUpperCase()
+                    if (value) {
+                      setSelectedTickerForChart(value)
+                      setShowStockChart(true)
+                    }
+                  }}
+                  className='bg-blue-600 hover:bg-blue-700'
+                >
+                  Xem biểu đồ
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <StockChart ticker={selectedTickerForChart} />
+          )}
+        </div>
+      )}
 
       {/* Transactions Section */}
       <div>
@@ -159,6 +243,28 @@ const Portfolio = () => {
           onEdit={handleEditTransaction}
           onDelete={handleDeleteTransaction}
         />
+      </div>
+
+      {/* Stock Chart Section */}
+      <div className='mt-8'>
+        <h2 className='text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center'>
+          <ChartLine className='w-6 h-6 mr-2 text-indigo-600' />
+          Biểu đồ cổ phiếu
+        </h2>
+        {wallet && wallet.length > 0 ? (
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+            {wallet.map((item) => (
+              <div key={item.id} className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
+                <StockChart ticker={item.ticker} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className='text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-lg'>
+            <ChartLine className='w-12 h-12 mx-auto text-gray-400 mb-4' />
+            <p className='text-gray-600 dark:text-gray-400'>Chưa có dữ liệu biểu đồ cho cổ phiếu nào</p>
+          </div>
+        )}
       </div>
 
       {/* Delete Confirmation Dialog */}

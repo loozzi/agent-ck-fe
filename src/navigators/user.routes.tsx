@@ -5,6 +5,7 @@ import Planning from '@/pages/user/Planning'
 import Portfolio from '@/pages/user/Portfolio'
 import Setting from '@/pages/user/Setting'
 import TransactionHistory from '@/pages/user/TransactionHistory'
+import StockChartDemo from '@/pages/demo/StockChartDemo'
 import type { RouteBrowser } from '@/types/routes'
 import { Route, Routes } from 'react-router'
 
@@ -49,6 +50,12 @@ export const userRoutesConfig: RouteBrowser[] = [
     name: 'History',
     route: 'transaction-history',
     element: <TransactionHistory />,
+    exact: true
+  },
+  {
+    name: 'Chart Demo',
+    route: 'chart-demo',
+    element: <StockChartDemo />,
     exact: true
   }
 ]

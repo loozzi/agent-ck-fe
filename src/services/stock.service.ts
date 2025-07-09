@@ -1,4 +1,11 @@
-import type { Stock, StockFilter, StockResponse, StockSearchParams } from '@/types/stock'
+import type {
+  Stock,
+  StockFilter,
+  StockHistory,
+  StockHistoryParams,
+  StockResponse,
+  StockSearchParams
+} from '@/types/stock'
 import type { AxiosResponse } from 'axios'
 import apiInstance from './axios.config'
 
@@ -11,6 +18,9 @@ const stockService = {
   },
   search: (params: StockSearchParams): Promise<AxiosResponse<StockResponse>> => {
     return apiInstance.get<StockResponse>('/stocks/search', { params })
+  },
+  getHistory: async (params: StockHistoryParams): Promise<AxiosResponse<StockHistory>> => {
+    return apiInstance.get<StockHistory>(`/stocks/${params.ticker}/history`, { params })
   }
 }
 

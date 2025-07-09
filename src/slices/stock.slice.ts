@@ -1,6 +1,6 @@
 import stockService from '@/services/stock.service'
 import type { StockState } from '@/types/slices/stock'
-import type { StockFilter, StockSearchParams } from '@/types/stock'
+import type { StockFilter, StockHistoryParams, StockSearchParams } from '@/types/stock'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
 
@@ -9,6 +9,7 @@ const initialState: StockState = {
   total: 0,
   limit: 10,
   offset: 0,
+  stockHistory: undefined,
   loading: false,
   error: null
 }
@@ -64,6 +65,23 @@ export const fetchListStocksByName = createAsyncThunk(
   }
 )
 
+export const fetchStockHistory = createAsyncThunk(
+  'stock/fetchStockHistory',
+  async (params: StockHistoryParams, { rejectWithValue }) => {
+    try {
+      const response = await stockService.getHistory(params)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể lấy lịch sử cổ phiếu'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+      return response.data
+    } catch (error) {
+      return rejectWithValue('Không thể lấy lịch sử cổ phiếu. Vui lòng thử lại sau.')
+    }
+  }
+)
+
 const stockSlice = createSlice({
   name: 'stock',
   initialState,
@@ -99,6 +117,33 @@ const stockSlice = createSlice({
         state.loading = false
       })
       .addCase(fetchStockByTicker.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
+      .addCase(fetchAllStocks.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchAllStocks.fulfilled, (state, action) => {
+        state.stocks = action.payload.stocks
+        state.total = action.payload.total
+        state.limit = action.payload.limit
+        state.offset = action.payload.offset
+        state.loading = false
+      })
+      .addCase(fetchAllStocks.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
+      .addCase(fetchStockHistory.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchStockHistory.fulfilled, (state, action) => {
+        state.stockHistory = action.payload
+        state.loading = false
+      })
+      .addCase(fetchStockHistory.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })

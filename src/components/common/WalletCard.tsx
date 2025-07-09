@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Minus, Plus, Sparkles, TrendingDown, TrendingUp } from 'lucide-react'
+import { Minus, Plus, Sparkles, TrendingDown, TrendingUp, ChartLine } from 'lucide-react'
 import { formatCurrency } from '@/utils/currency'
 
 interface WalletItem {
@@ -17,9 +17,10 @@ interface WalletCardProps {
   item: WalletItem
   onBuy?: (ticker: string) => void
   onSell?: (ticker: string) => void
+  onViewChart?: (ticker: string) => void
 }
 
-const WalletCard = ({ item, onBuy, onSell }: WalletCardProps) => {
+const WalletCard = ({ item, onBuy, onSell, onViewChart }: WalletCardProps) => {
   const quantity = item.quantity || 0
   const avgPrice = item.avg_price || 0
   const currentPrice = item.current_price || 0
@@ -116,25 +117,35 @@ const WalletCard = ({ item, onBuy, onSell }: WalletCardProps) => {
         </div>
 
         {/* Actions */}
-        <div className='grid grid-cols-2 gap-2'>
+        <div className='grid grid-cols-3 gap-1'>
           <Button
             size='sm'
             variant='outline'
             onClick={() => onBuy?.(item.ticker)}
-            className='cursor-pointer bg-green-100 hover:bg-green-200 dark:bg-green-900/40 dark:hover:bg-green-800/60 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700 hover:border-green-400 dark:hover:border-green-600 transition-all duration-200 flex items-center justify-center gap-0.5 h-6 px-1.5 rounded-md'
+            className='cursor-pointer bg-green-100 hover:bg-green-200 dark:bg-green-900/40 dark:hover:bg-green-800/60 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700 hover:border-green-400 dark:hover:border-green-600 transition-all duration-200 flex items-center justify-center gap-0.5 h-6 px-1 rounded-md'
           >
             <Plus className='w-2.5 h-2.5' />
-            <span className='text-[10px] font-medium'>Mua</span>
+            <span className='text-[9px] font-medium'>Mua</span>
           </Button>
 
           <Button
             size='sm'
             variant='outline'
             onClick={() => onSell?.(item.ticker)}
-            className='cursor-pointer bg-orange-100 hover:bg-orange-200 dark:bg-orange-900/40 dark:hover:bg-orange-800/60 text-orange-700 dark:text-orange-300 border-orange-300 dark:border-orange-700 hover:border-orange-400 dark:hover:border-orange-600 transition-all duration-200 flex items-center justify-center gap-0.5 h-6 px-1.5 rounded-md'
+            className='cursor-pointer bg-orange-100 hover:bg-orange-200 dark:bg-orange-900/40 dark:hover:bg-orange-800/60 text-orange-700 dark:text-orange-300 border-orange-300 dark:border-orange-700 hover:border-orange-400 dark:hover:border-orange-600 transition-all duration-200 flex items-center justify-center gap-0.5 h-6 px-1 rounded-md'
           >
             <Minus className='w-2.5 h-2.5' />
-            <span className='text-[10px] font-medium'>Bán</span>
+            <span className='text-[9px] font-medium'>Bán</span>
+          </Button>
+
+          <Button
+            size='sm'
+            variant='outline'
+            onClick={() => onViewChart?.(item.ticker)}
+            className='cursor-pointer bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/40 dark:hover:bg-blue-800/60 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700 hover:border-blue-400 dark:hover:border-blue-600 transition-all duration-200 flex items-center justify-center gap-0.5 h-6 px-1 rounded-md'
+          >
+            <ChartLine className='w-2.5 h-2.5' />
+            <span className='text-[9px] font-medium'>Chart</span>
           </Button>
         </div>
       </CardContent>
