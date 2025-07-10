@@ -45,3 +45,6 @@
 [ ] ADMIN: Màn hình xem chi tiết người dùng: hiển thị tất cả thông tin cơ bản, thông tin các mã đang theo dõi, ví của người dùng...
 
 [ ] ADMIN & TRAINER: Thêm màn hình feedback logger (đang đợi logic và API)
+
+URGENT: Fix auth flow + Home Header -> Add Header to watchlist
+URGENT: Add watchlist detail trong màn hình Portfolio
