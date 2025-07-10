@@ -9,6 +9,7 @@ import stockReducer from '@/slices/stock.slice'
 import subscriptionReducer from '@/slices/subscription.slice'
 import surveyReducer from '@/slices/survey.slice'
 import zaloReducer from '@/slices/zalo.slice'
+import watchlistReducer from '@/slices/watchlist.slice'
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { persistReducer, persistStore } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
@@ -24,7 +25,8 @@ const rootReducer = combineReducers({
   news: newsReducer,
   prompt: promptReducer,
   logicRule: logicRuleReducer,
-  zalo: zaloReducer
+  zalo: zaloReducer,
+  watchlist: watchlistReducer
 })
 
 const persistConfig = {
