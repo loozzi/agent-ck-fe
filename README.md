@@ -22,7 +22,7 @@
 
 [O] GUEST: Tạo landing page trang chủ: Hiển thị news, một số mã gợi ý trong ngày, list subscription...
 
-[ ] USER: Sửa lại dasboard user (hiển thị thông tin các mã đang theo dõi, news...)
+[X] USER: Sửa lại dasboard user (hiển thị thông tin các mã đang theo dõi, news...)
 
 [X] USER: Tự động reload portfolio sau khi người dùng thêm giao dịch mới
 
@@ -45,3 +45,6 @@
 [ ] ADMIN: Màn hình xem chi tiết người dùng: hiển thị tất cả thông tin cơ bản, thông tin các mã đang theo dõi, ví của người dùng...
 
 [ ] ADMIN & TRAINER: Thêm màn hình feedback logger (đang đợi logic và API)
+
+<!-- URGENT: Fix auth flow + Home Header -> Add Header to watchlist -->
+URGENT: Add watchlist detail trong màn hình Portfolio

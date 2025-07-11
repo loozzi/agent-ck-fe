@@ -14,7 +14,7 @@ interface NewsSearchProps {
 
 const NewsSearch = ({ onSearch, isLoading }: NewsSearchProps) => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [importance, setImportance] = useState<NewsImportance | ''>('')
+  const [importance, setImportance] = useState<NewsImportance | 'all'>('all')
   const [source, setSource] = useState('')
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
@@ -27,7 +27,7 @@ const NewsSearch = ({ onSearch, isLoading }: NewsSearchProps) => {
       from_date: fromDate || format(lastWeek, 'yyyy-MM-dd'),
       to_date: toDate || format(today, 'yyyy-MM-dd'),
       search: searchTerm || undefined,
-      importance: importance || undefined,
+      importance: importance === 'all' ? undefined : importance,
       source: source || undefined,
       per_page: 20
     }
@@ -37,7 +37,7 @@ const NewsSearch = ({ onSearch, isLoading }: NewsSearchProps) => {
 
   const handleReset = () => {
     setSearchTerm('')
-    setImportance('')
+    setImportance('all')
     setSource('')
     setFromDate('')
     setToDate('')
@@ -78,12 +78,12 @@ const NewsSearch = ({ onSearch, isLoading }: NewsSearchProps) => {
           <Label htmlFor='importance' className='text-sm'>
             Mức độ quan trọng
           </Label>
-          <Select value={importance} onValueChange={(value) => setImportance(value as NewsImportance)}>
+          <Select value={importance} onValueChange={(value) => setImportance(value as NewsImportance | 'all')}>
             <SelectTrigger className='text-sm'>
               <SelectValue placeholder='Chọn mức độ' />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value=''>Tất cả</SelectItem>
+              <SelectItem value='all'>Tất cả</SelectItem>
               <SelectItem value='high'>Quan trọng</SelectItem>
               <SelectItem value='medium'>Trung bình</SelectItem>
               <SelectItem value='low'>Thấp</SelectItem>

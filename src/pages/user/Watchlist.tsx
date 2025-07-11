@@ -1,412 +1,100 @@
 import type { RootState } from '@/app/store'
 import '@/components/common/mobile-fixes.css'
-import StockCard from '@/components/common/StockCard'
 import StockChart from '@/components/common/StockChart'
-import { Badge } from '@/components/ui/badge'
+import Header from '@/components/layouts/Header'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
+import { Card, CardContent } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useIsMobile } from '@/hooks/use-mobile'
+import { fetchWallet } from '@/slices/portfolio.slice'
 import { fetchListStocksByName } from '@/slices/stock.slice'
+import { addToWatchlist, deleteWatchlistItem, fetchWatchlistDetail } from '@/slices/watchlist.slice'
+import type { WalletItem } from '@/types/portfolio'
+import type { WatchlistItem } from '@/types/watchlist'
 import {
-  addToWatchlist,
-  deleteWatchlistItem,
-  fetchWatchlistDetail,
-  updateWatchlist,
-  updateWatchlistItem
-} from '@/slices/watchlist.slice'
-import type { AddToWatchlistPayload, UpdateWatchlistItemPayload, WatchlistItem } from '@/types/watchlist'
-import {
-  BarChart2,
-  Calendar,
-  ChevronsUpDown,
+  Activity,
+  ArrowDownRight,
+  ArrowUpRight,
+  BarChart3,
   DollarSign,
-  Edit,
+  Filter,
   Loader2,
+  PieChart,
   Plus,
+  Search,
   Star,
   Target,
-  Trash2,
   TrendingDown,
-  TrendingUp
+  TrendingUp,
+  Wallet
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { toast } from 'react-toastify'
-
-// --- Dialog form thêm mã cổ phiếu ---
-function AddWatchlistItemDialog({
-  open,
-  onOpenChange,
-  onSubmit,
-  loading
-}: {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSubmit: (data: AddToWatchlistPayload) => void
-  loading?: boolean
-}) {
-  const dispatch = useDispatch()
-  const { stocks, loading: stockLoading } = useSelector((state: RootState) => state.stock)
-  const [form, setForm] = useState<AddToWatchlistPayload>({
-    ticker: '',
-    notes: '',
-    tags: [],
-    category: '',
-    target_price: 0
-  })
-  const [openCombobox, setOpenCombobox] = useState(false)
-  const [searchValue, setSearchValue] = useState('')
-  // Debounce search
-  useEffect(() => {
-    if (!openCombobox || !searchValue.trim()) return
-    const timeoutId = setTimeout(() => {
-      dispatch(fetchListStocksByName({ q: searchValue.trim(), limit: 50 }) as any)
-    }, 300)
-    return () => clearTimeout(timeoutId)
-  }, [searchValue, openCombobox, dispatch])
-  useEffect(() => {
-    if (!open) setForm({ ticker: '', notes: '', tags: [], category: '', target_price: 0 })
-  }, [open])
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-[600px] max-h-[90vh] overflow-y-auto'>
-        <DialogHeader>
-          <DialogTitle>Thêm mã theo dõi</DialogTitle>
-          <DialogDescription>Nhập thông tin mã cổ phiếu để thêm vào watchlist.</DialogDescription>
-        </DialogHeader>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            onSubmit(form)
-          }}
-          className='space-y-4'
-        >
-          {/* Autocomplete mã cổ phiếu */}
-          <div>
-            <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block'>Mã cổ phiếu *</label>
-            <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant='outline'
-                  role='combobox'
-                  aria-expanded={openCombobox}
-                  className='w-full justify-between cursor-pointer h-10'
-                  type='button'
-                >
-                  <span className='truncate text-left'>
-                    {form.ticker
-                      ? `${form.ticker} - ${stocks?.find((stock) => stock.ticker === form.ticker)?.name || form.ticker}`
-                      : 'Chọn mã cổ phiếu...'}
-                  </span>
-                  <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className='w-[550px] p-0' align='start' sideOffset={4}>
-                <Command>
-                  <CommandInput
-                    placeholder='Tìm kiếm mã cổ phiếu...'
-                    value={searchValue}
-                    onValueChange={setSearchValue}
-                  />
-                  <CommandList className='max-h-60'>
-                    {stockLoading ? (
-                      <div className='flex items-center justify-center p-4'>
-                        <Loader2 className='h-4 w-4 animate-spin' />
-                        <span className='ml-2 text-sm text-gray-500'>Đang tìm kiếm...</span>
-                      </div>
-                    ) : (
-                      <>
-                        <CommandEmpty>
-                          {searchValue.trim() ? 'Không tìm thấy mã cổ phiếu nào.' : 'Nhập để tìm kiếm mã cổ phiếu...'}
-                        </CommandEmpty>
-                        <CommandGroup>
-                          {stocks?.map((stock) => (
-                            <CommandItem
-                              key={stock.ticker}
-                              value={`${stock.ticker} ${stock.name}`.toLowerCase()}
-                              className='cursor-pointer px-3 py-3'
-                              onSelect={() => {
-                                setForm((f) => ({ ...f, ticker: stock.ticker }))
-                                setOpenCombobox(false)
-                              }}
-                            >
-                              <div className='flex flex-col'>
-                                <span className='font-semibold text-blue-600'>{stock.ticker}</span>
-                                <span className='text-sm text-gray-500'>{stock.name}</span>
-                              </div>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </>
-                    )}
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* Các trường còn lại */}
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div>
-              <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block'>Ghi chú</label>
-              <Input
-                placeholder='Nhập ghi chú...'
-                value={form.notes}
-                onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-              />
-            </div>
-            <div>
-              <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block'>Nhóm/Category</label>
-              <Input
-                placeholder='Nhập nhóm...'
-                value={form.category}
-                onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-              />
-            </div>
-          </div>
-
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div>
-              <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block'>Tags</label>
-              <Input
-                placeholder='Tag (cách nhau bằng dấu phẩy)'
-                value={form.tags.join(', ')}
-                onChange={(e) =>
-                  setForm((f) => ({
-                    ...f,
-                    tags: e.target.value
-                      .split(',')
-                      .map((t) => t.trim())
-                      .filter(Boolean)
-                  }))
-                }
-              />
-            </div>
-            <div>
-              <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block'>Giá mục tiêu</label>
-              <Input
-                placeholder='Nhập giá mục tiêu...'
-                type='number'
-                value={form.target_price || ''}
-                onChange={(e) => setForm((f) => ({ ...f, target_price: Number(e.target.value) }))}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type='submit' disabled={loading}>
-              {loading ? <Loader2 className='animate-spin w-4 h-4' /> : 'Lưu'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-// --- Dialog form sửa mã cổ phiếu ---
-function EditWatchlistItemDialog({
-  open,
-  onOpenChange,
-  onSubmit,
-  initial,
-  loading
-}: {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSubmit: (data: UpdateWatchlistItemPayload) => void
-  initial?: WatchlistItem
-  loading?: boolean
-}) {
-  const [form, setForm] = useState<UpdateWatchlistItemPayload>({
-    notes: initial?.notes || '',
-    tags: initial?.tags || [],
-    category: initial?.category || '',
-    target_price: initial?.target_price || 0,
-    is_favorite: initial?.is_favorite || false
-  })
-  useEffect(() => {
-    setForm({
-      notes: initial?.notes || '',
-      tags: initial?.tags || [],
-      category: initial?.category || '',
-      target_price: initial?.target_price || 0,
-      is_favorite: initial?.is_favorite || false
-    })
-  }, [initial, open])
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-[600px]'>
-        <DialogHeader>
-          <DialogTitle>Chỉnh sửa mã theo dõi</DialogTitle>
-          <DialogDescription>Cập nhật thông tin mã cổ phiếu trong watchlist.</DialogDescription>
-        </DialogHeader>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            onSubmit(form)
-          }}
-          className='space-y-4'
-        >
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div>
-              <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block'>Ghi chú</label>
-              <Input
-                placeholder='Nhập ghi chú...'
-                value={form.notes}
-                onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-              />
-            </div>
-            <div>
-              <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block'>Nhóm/Category</label>
-              <Input
-                placeholder='Nhập nhóm...'
-                value={form.category}
-                onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-              />
-            </div>
-          </div>
-
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div>
-              <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block'>Tags</label>
-              <Input
-                placeholder='Tag (cách nhau bằng dấu phẩy)'
-                value={form.tags.join(', ')}
-                onChange={(e) =>
-                  setForm((f) => ({
-                    ...f,
-                    tags: e.target.value
-                      .split(',')
-                      .map((t) => t.trim())
-                      .filter(Boolean)
-                  }))
-                }
-              />
-            </div>
-            <div>
-              <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block'>Giá mục tiêu</label>
-              <Input
-                placeholder='Nhập giá mục tiêu...'
-                type='number'
-                value={form.target_price || ''}
-                onChange={(e) => setForm((f) => ({ ...f, target_price: Number(e.target.value) }))}
-              />
-            </div>
-          </div>
-
-          <div className='flex items-center gap-2 pt-2'>
-            <input
-              type='checkbox'
-              checked={form.is_favorite}
-              onChange={(e) => setForm((f) => ({ ...f, is_favorite: e.target.checked }))}
-              id='is_favorite'
-              className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
-            />
-            <label htmlFor='is_favorite' className='text-sm font-medium text-gray-700 dark:text-gray-300'>
-              Đánh dấu là yêu thích
-            </label>
-          </div>
-          <DialogFooter>
-            <Button type='submit' disabled={loading}>
-              {loading ? <Loader2 className='animate-spin w-4 h-4' /> : 'Lưu'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-// --- Dialog xác nhận xoá ---
-function ConfirmDeleteDialog({
-  open,
-  onOpenChange,
-  onConfirm,
-  loading,
-  item
-}: {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onConfirm: () => void
-  loading?: boolean
-  item?: WatchlistItem | null
-}) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-[500px]'>
-        <DialogHeader>
-          <DialogTitle className='flex items-center gap-2'>
-            <Trash2 className='w-5 h-5 text-red-500' />
-            Xác nhận xoá mã cổ phiếu
-          </DialogTitle>
-          <DialogDescription>Hành động này không thể hoàn tác.</DialogDescription>
-        </DialogHeader>
-        <div className='py-4'>
-          {item && (
-            <div className='bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-4'>
-              <div className='flex items-center gap-3'>
-                <div className='text-lg font-bold text-blue-600'>{item.ticker}</div>
-                <div className='text-gray-600 dark:text-gray-400'>{item.company_name}</div>
-              </div>
-              {item.notes && <p className='text-sm text-gray-500 mt-1'>Ghi chú: {item.notes}</p>}
-            </div>
-          )}
-          <p className='text-gray-700 dark:text-gray-300'>
-            Bạn chắc chắn muốn xoá mã cổ phiếu này khỏi watchlist không?
-          </p>
-        </div>
-        <DialogFooter>
-          <Button variant='outline' onClick={() => onOpenChange(false)} disabled={loading}>
-            Huỷ
-          </Button>
-          <Button variant='destructive' onClick={onConfirm} disabled={loading}>
-            {loading ? <Loader2 className='animate-spin w-4 h-4 mr-2' /> : <Trash2 className='w-4 h-4 mr-2' />}
-            Xoá khỏi watchlist
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
 
 const Watchlist = () => {
   const dispatch = useDispatch()
-  const isMobile = useIsMobile()
-  // Lấy state từ slice watchlist
-  const { watchlistDetail, isLoading } = useSelector((state: RootState) => state.watchlist)
+
+  // Lấy state từ portfolio slice
+  const { wallet, loading } = useSelector((state: RootState) => state.portfolio)
+  const { stocks, loading: stockLoading } = useSelector((state: RootState) => state.stock)
+  // Lấy state từ watchlist slice
+  const { watchlistDetail, isLoading: watchlistLoading } = useSelector((state: RootState) => state.watchlist)
+
   const [search, setSearch] = useState('')
-  const [showAdd, setShowAdd] = useState(false)
-  const [editItem, setEditItem] = useState<WatchlistItem | null>(null)
-  const [deleteItem, setDeleteItem] = useState<WatchlistItem | null>(null)
-  const [editWL, setEditWL] = useState(false)
-  const [wlInfo, setWLInfo] = useState({ name: '', description: '' })
-  const [chartTicker, setChartTicker] = useState<string | null>(null)
-  const [categoryFilter, setCategoryFilter] = useState<string>('all')
-  const [sortBy, setSortBy] = useState<string>('performance')
-  const [activeTab, setActiveTab] = useState('overview')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [addToWatchlistQuery, setAddToWatchlistQuery] = useState('')
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(null)
+  const [showChart, setShowChart] = useState(false)
+  const sortBy = 'performance'
 
   useEffect(() => {
+    dispatch(fetchWallet() as any)
     dispatch(fetchWatchlistDetail() as any)
   }, [dispatch])
-  useEffect(() => {
-    if (watchlistDetail) setWLInfo({ name: watchlistDetail.name, description: watchlistDetail.description })
-  }, [watchlistDetail])
 
-  const filteredItems = useMemo(() => {
+  // Debounce search for stocks
+  useEffect(() => {
+    if (!searchQuery.trim()) return
+    const timeoutId = setTimeout(() => {
+      dispatch(fetchListStocksByName({ q: searchQuery.trim(), limit: 10 }) as any)
+    }, 300)
+    return () => clearTimeout(timeoutId)
+  }, [searchQuery, dispatch])
+
+  // Debounce search for add to watchlist
+  useEffect(() => {
+    if (!addToWatchlistQuery.trim()) return
+    const timeoutId = setTimeout(() => {
+      dispatch(fetchListStocksByName({ q: addToWatchlistQuery.trim(), limit: 5 }) as any)
+    }, 300)
+    return () => clearTimeout(timeoutId)
+  }, [addToWatchlistQuery, dispatch])
+
+  // Filter và sort wallet items
+  const filteredWallet = useMemo(() => {
+    if (!wallet) return []
+    let filtered = wallet
+
+    // Filter by search
+    if (search.trim()) {
+      filtered = filtered.filter((item: WalletItem) => item.ticker.toLowerCase().includes(search.toLowerCase()))
+    }
+
+    // Sort
+    filtered = [...filtered].sort((a, b) => {
+      const aPerformance = ((a.current_price - a.avg_price) / a.avg_price) * 100
+      const bPerformance = ((b.current_price - b.avg_price) / b.avg_price) * 100
+
+      return bPerformance - aPerformance
+    })
+
+    return filtered
+  }, [wallet, search, sortBy])
+
+  // Filter watchlist items based on search
+  const filteredWatchlistItems = useMemo(() => {
     if (!watchlistDetail?.items) return []
+
     let filtered = watchlistDetail.items
 
     // Filter by search
@@ -414,529 +102,527 @@ const Watchlist = () => {
       filtered = filtered.filter(
         (item: WatchlistItem) =>
           item.ticker.toLowerCase().includes(search.toLowerCase()) ||
-          item.company_name?.toLowerCase().includes(search.toLowerCase())
+          item.company_name.toLowerCase().includes(search.toLowerCase())
       )
     }
 
-    // Filter by category
-    if (categoryFilter !== 'all') {
-      if (categoryFilter === 'favorites') {
-        filtered = filtered.filter((item: WatchlistItem) => item.is_favorite)
-      } else {
-        filtered = filtered.filter((item: WatchlistItem) => item.category === categoryFilter)
-      }
-    }
-
-    // Sort
-    filtered = [...filtered].sort((a, b) => {
-      switch (sortBy) {
-        case 'performance':
-          return (b.price_info.change_percent || 0) - (a.price_info.change_percent || 0)
-        case 'alphabetical':
-          return a.ticker.localeCompare(b.ticker)
-        case 'price':
-          return (b.price_info.current_price || 0) - (a.price_info.current_price || 0)
-        case 'volume':
-          return (b.price_info.volume || 0) - (a.price_info.volume || 0)
-        default:
-          return 0
-      }
-    })
-
     return filtered
-  }, [watchlistDetail, search, categoryFilter, sortBy])
+  }, [watchlistDetail?.items, search])
 
-  // Calculate summary statistics
-  const summaryStats = useMemo(() => {
-    if (!watchlistDetail?.items) return null
+  // Handle remove watchlist item
+  const handleRemoveWatchlistItem = async (itemId: string) => {
+    try {
+      await dispatch(deleteWatchlistItem(itemId) as any)
+    } catch (error) {
+      console.error('Error removing watchlist item:', error)
+    }
+  }
 
-    const items = watchlistDetail.items
-    const totalValue = items.reduce((sum, item) => sum + item.price_info.current_price * 100, 0) // Assuming 100 shares each
-    const totalGainLoss = items.reduce((sum, item) => sum + item.price_info.change_amount * 100, 0)
-    const avgPerformance =
-      items.length > 0 ? items.reduce((sum, item) => sum + item.price_info.change_percent, 0) / items.length : 0
-    const winnersCount = items.filter((item) => item.price_info.change_percent > 0).length
-    const losersCount = items.filter((item) => item.price_info.change_percent < 0).length
+  // Handle add to watchlist
+  const handleAddToWatchlist = async (ticker: string) => {
+    if (!ticker.trim()) return
+
+    try {
+      await dispatch(
+        addToWatchlist({
+          ticker: ticker.toUpperCase(),
+          notes: '',
+          tags: [],
+          category: 'General',
+          target_price: 0
+        }) as any
+      )
+      setAddToWatchlistQuery('')
+      // Refresh watchlist data
+      dispatch(fetchWatchlistDetail() as any)
+    } catch (error) {
+      console.error('Error adding to watchlist:', error)
+    }
+  }
+
+  // Calculate portfolio summary
+  const portfolioSummary = useMemo(() => {
+    if (!wallet || wallet.length === 0) return null
+
+    const totalValue = wallet.reduce((sum, item) => sum + item.current_value, 0)
+    const totalCost = wallet.reduce((sum, item) => sum + item.avg_price * item.quantity, 0)
+    const totalGainLoss = totalValue - totalCost
+    const totalGainLossPercent = totalCost > 0 ? (totalGainLoss / totalCost) * 100 : 0
+
+    const winnersCount = wallet.filter((item) => {
+      const performance = ((item.current_price - item.avg_price) / item.avg_price) * 100
+      return performance > 0
+    }).length
+
+    const losersCount = wallet.filter((item) => {
+      const performance = ((item.current_price - item.avg_price) / item.avg_price) * 100
+      return performance < 0
+    }).length
 
     return {
       totalValue,
+      totalCost,
       totalGainLoss,
-      avgPerformance,
+      totalGainLossPercent,
       winnersCount,
       losersCount,
-      totalItems: items.length
+      totalItems: wallet.length
     }
-  }, [watchlistDetail])
+  }, [wallet])
 
-  const handleAdd = (data: AddToWatchlistPayload) => {
-    dispatch(addToWatchlist(data) as any).then((res: any) => {
-      if (!res.error) {
-        setShowAdd(false)
-        toast.success('Đã thêm mã vào watchlist!')
-      }
-    })
-  }
-  const handleEdit = (data: UpdateWatchlistItemPayload) => {
-    if (!editItem) return
-    dispatch(updateWatchlistItem({ itemId: editItem.id, payload: data }) as any).then((res: any) => {
-      if (!res.error) {
-        setEditItem(null)
-        toast.success('Đã cập nhật mã!')
-      }
-    })
-  }
-  const handleDelete = () => {
-    if (!deleteItem) return
-    dispatch(deleteWatchlistItem(deleteItem.id) as any).then((res: any) => {
-      if (!res.error) {
-        setDeleteItem(null)
-        toast.success('Đã xoá mã khỏi watchlist!')
-      }
-    })
-  }
-  const handleEditWL = () => {
-    dispatch(updateWatchlist(wlInfo) as any).then((res: any) => {
-      if (!res.error) {
-        setEditWL(false)
-        toast.success('Đã cập nhật thông tin watchlist!')
-      }
-    })
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value)
   }
 
-  if (isLoading || !watchlistDetail)
+  const formatNumber = (value: number) => {
+    return new Intl.NumberFormat('vi-VN').format(value)
+  }
+
+  const handleTickerClick = (ticker: string) => {
+    setSelectedTicker(ticker)
+    setShowChart(true)
+  }
+
+  const handleCloseChart = () => {
+    setShowChart(false)
+    setSelectedTicker(null)
+  }
+
+  const handleDialogOpenChange = (open: boolean) => {
+    if (!open) {
+      handleCloseChart()
+    }
+  }
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showChart) {
+        handleCloseChart()
+      }
+    }
+
+    if (showChart) {
+      document.addEventListener('keydown', handleKeyDown)
+      return () => document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [showChart])
+
+  if (loading) {
     return (
       <div className='flex items-center justify-center h-64'>
         <Loader2 className='animate-spin w-8 h-8' />
       </div>
     )
+  }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800'>
-      <div className='max-w-7xl mx-auto px-4 py-6'>
-        {/* Header Section */}
-        <div className='mb-8'>
-          <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4'>
-            <div>
+    <div className='h-screen w-screen bg-gray-50 overflow-hidden'>
+      <Header />
+      <div className='h-full w-full mt-14'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-0 h-full'>
+          {/* Left Panel - Portfolio & Watchlist (White Background) */}
+          <div className='lg:col-span-1 bg-white p-6 overflow-y-auto h-full'>
+            {/* Header */}
+            <div className='flex items-center justify-between mb-4'>
               <div className='flex items-center gap-3'>
                 <div className='p-2 bg-blue-500 rounded-lg'>
-                  <BarChart2 className='w-6 h-6 text-white' />
+                  <Wallet className='w-5 h-5 text-white' />
                 </div>
                 <div>
-                  <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>{watchlistDetail.name}</h1>
-                  <p className='text-gray-600 dark:text-gray-300 mt-1'>{watchlistDetail.description}</p>
+                  <h1 className='text-xl font-bold text-gray-900'>Your Portfolio & Watchlist</h1>
+                  <p className='text-sm text-gray-600'>
+                    Portfolio Value: {portfolioSummary ? formatCurrency(portfolioSummary.totalValue) : '₫142,830,750'}
+                    <span className='text-green-600 ml-2'>(+15.2%)</span>
+                  </p>
                 </div>
-                <Button size='icon' variant='ghost' onClick={() => setEditWL(true)} className='ml-2'>
-                  <Edit className='w-4 h-4' />
-                </Button>
               </div>
             </div>
-            <Button
-              onClick={() => setShowAdd(true)}
-              className='bg-blue-600 hover:bg-blue-700 text-white shadow-lg'
-              size={isMobile ? 'lg' : 'default'}
-            >
-              <Plus className='w-4 h-4 mr-2' />
-              Thêm mã theo dõi
-            </Button>
+
+            {/* Portfolio Summary Cards */}
+            {portfolioSummary && (
+              <div className='grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6'>
+                <Card className='border-0 shadow-sm'>
+                  <CardContent className='p-3'>
+                    <div className='flex items-center justify-between'>
+                      <div>
+                        <p className='text-xs text-gray-500'>Total Value</p>
+                        <p className='text-sm font-bold'>{formatCurrency(portfolioSummary.totalValue)}</p>
+                      </div>
+                      <DollarSign className='w-4 h-4 text-blue-500' />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className='border-0 shadow-sm'>
+                  <CardContent className='p-3'>
+                    <div className='flex items-center justify-between'>
+                      <div>
+                        <p className='text-xs text-gray-500'>Total P&L</p>
+                        <p
+                          className={`text-sm font-bold ${portfolioSummary.totalGainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                        >
+                          {portfolioSummary.totalGainLoss >= 0 ? '+' : ''}
+                          {formatCurrency(portfolioSummary.totalGainLoss)}
+                        </p>
+                      </div>
+                      {portfolioSummary.totalGainLoss >= 0 ? (
+                        <TrendingUp className='w-4 h-4 text-green-500' />
+                      ) : (
+                        <TrendingDown className='w-4 h-4 text-red-500' />
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className='border-0 shadow-sm'>
+                  <CardContent className='p-3'>
+                    <div className='flex items-center justify-between'>
+                      <div>
+                        <p className='text-xs text-gray-500'>P&L %</p>
+                        <p
+                          className={`text-sm font-bold ${portfolioSummary.totalGainLossPercent >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                        >
+                          {portfolioSummary.totalGainLossPercent >= 0 ? '+' : ''}
+                          {portfolioSummary.totalGainLossPercent.toFixed(2)}%
+                        </p>
+                      </div>
+                      <Target className='w-4 h-4 text-purple-500' />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className='border-0 shadow-sm'>
+                  <CardContent className='p-3'>
+                    <div className='flex items-center justify-between'>
+                      <div>
+                        <p className='text-xs text-gray-500'>Positions</p>
+                        <p className='text-sm font-bold'>{portfolioSummary.totalItems}</p>
+                      </div>
+                      <PieChart className='w-4 h-4 text-orange-500' />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Portfolio Section */}
+            <div className='mb-6'>
+              <div className='flex items-center justify-between mb-3'>
+                <h2 className='text-base font-semibold flex items-center gap-2'>
+                  <Activity className='w-4 h-4' />
+                  Your Portfolio
+                </h2>
+                <Button size='sm' className='bg-blue-600 hover:bg-blue-700'>
+                  <Plus className='w-3 h-3 mr-1' />
+                  Add
+                </Button>
+              </div>
+
+              {/* Portfolio Stock List */}
+              <div className='space-y-2'>
+                {filteredWallet.map((stock: WalletItem) => {
+                  const performance = ((stock.current_price - stock.avg_price) / stock.avg_price) * 100
+                  const gainLoss = stock.current_value - stock.avg_price * stock.quantity
+
+                  return (
+                    <div
+                      key={stock.id}
+                      className='flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg border border-gray-100'
+                    >
+                      <div className='flex-1'>
+                        <div className='flex items-center gap-2'>
+                          <div>
+                            <button
+                              onClick={() => handleTickerClick(stock.ticker)}
+                              className='font-bold text-blue-600 text-sm hover:text-blue-800 hover:underline cursor-pointer'
+                            >
+                              {stock.ticker}
+                            </button>
+                            <p className='text-xs text-gray-500'>{formatNumber(stock.quantity)} shares</p>
+                          </div>
+                          <Button
+                            size='sm'
+                            variant='ghost'
+                            onClick={() => handleTickerClick(stock.ticker)}
+                            className='ml-2 p-1 h-6 w-6'
+                          >
+                            <BarChart3 className='w-3 h-3' />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className='text-right'>
+                        <p className='font-bold text-sm'>{formatCurrency(stock.current_price)}</p>
+                        <p
+                          className={`text-xs flex items-center gap-1 ${performance >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                        >
+                          {performance >= 0 ? (
+                            <ArrowUpRight className='w-3 h-3' />
+                          ) : (
+                            <ArrowDownRight className='w-3 h-3' />
+                          )}
+                          {performance >= 0 ? '+' : ''}
+                          {performance.toFixed(2)}%
+                        </p>
+                      </div>
+
+                      <div className='text-right ml-3'>
+                        <p className='font-bold text-sm'>{formatCurrency(stock.current_value)}</p>
+                        <p className={`text-xs ${gainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {gainLoss >= 0 ? '+' : ''}
+                          {formatCurrency(gainLoss)}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Watchlist Section */}
+            <div>
+              <div className='flex items-center justify-between mb-3'>
+                <h2 className='text-base font-semibold flex items-center gap-2'>
+                  <Star className='w-4 h-4' />
+                  Your Watchlist
+                </h2>
+
+                <div className='flex gap-2'>
+                  <div className='relative'>
+                    <Search className='w-3 h-3 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400' />
+                    <Input
+                      placeholder='Search stocks...'
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className='pl-7 w-48 h-8 text-sm'
+                    />
+                  </div>
+                  <Button variant='outline' size='sm'>
+                    <Filter className='w-3 h-3' />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Watchlist Items */}
+              <div className='space-y-1'>
+                {watchlistLoading ? (
+                  <div className='flex items-center justify-center py-8'>
+                    <Loader2 className='w-4 h-4 animate-spin mr-2' />
+                    <span className='text-sm text-gray-500'>Loading watchlist...</span>
+                  </div>
+                ) : filteredWatchlistItems.length === 0 ? (
+                  <div className='text-center py-8 text-gray-500'>
+                    <Star className='w-8 h-8 mx-auto mb-2 opacity-50' />
+                    <p className='text-sm'>
+                      {search.trim() ? 'No stocks found matching your search.' : 'Your watchlist is empty.'}
+                    </p>
+                    {!search.trim() && <p className='text-xs mt-1'>Add stocks below to start tracking them.</p>}
+                  </div>
+                ) : (
+                  filteredWatchlistItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className='flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg border border-gray-100'
+                    >
+                      <div className='flex items-center gap-2'>
+                        <div>
+                          <button
+                            onClick={() => handleTickerClick(item.ticker)}
+                            className='font-bold text-blue-600 text-sm hover:text-blue-800 hover:underline cursor-pointer'
+                          >
+                            {item.ticker}
+                          </button>
+                          <p className='text-xs text-gray-500'>{item.company_name}</p>
+                        </div>
+                        <Button
+                          size='sm'
+                          variant='ghost'
+                          onClick={() => handleTickerClick(item.ticker)}
+                          className='ml-2 p-1 h-6 w-6'
+                        >
+                          <BarChart3 className='w-3 h-3' />
+                        </Button>
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          className='text-red-500 hover:text-red-700 text-xs'
+                          onClick={() => handleRemoveWatchlistItem(item.id)}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+
+                      <div className='text-right'>
+                        <p className='font-bold text-sm'>{formatCurrency(item.price_info.current_price)}</p>
+                        <p
+                          className={`text-xs flex items-center gap-1 ${item.price_info.change_percent >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                        >
+                          {item.price_info.change_percent >= 0 ? (
+                            <ArrowUpRight className='w-3 h-3' />
+                          ) : (
+                            <ArrowDownRight className='w-3 h-3' />
+                          )}
+                          {item.price_info.change_percent >= 0 ? '+' : ''}
+                          {item.price_info.change_percent.toFixed(2)}%
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Add to Watchlist */}
+              <div className='mt-3'>
+                <div className='space-y-2'>
+                  <div className='flex gap-2'>
+                    <Input
+                      placeholder='Search stocks by symbol or name...'
+                      className='flex-1 h-8 text-sm'
+                      value={addToWatchlistQuery}
+                      onChange={(e) => setAddToWatchlistQuery(e.target.value)}
+                    />
+                    <Button
+                      className='bg-green-600 hover:bg-green-700 text-sm'
+                      onClick={() => handleAddToWatchlist(addToWatchlistQuery)}
+                      disabled={!addToWatchlistQuery.trim()}
+                    >
+                      Add
+                    </Button>
+                  </div>
+
+                  {/* Add to Watchlist Search Suggestions */}
+                  {addToWatchlistQuery && stocks && stocks.length > 0 && (
+                    <div className='space-y-1 max-h-32 overflow-y-auto border border-gray-200 rounded-lg bg-white'>
+                      {stocks.slice(0, 3).map((stock) => (
+                        <button
+                          key={stock.ticker}
+                          onClick={() => handleAddToWatchlist(stock.ticker)}
+                          className='w-full text-left p-2 hover:bg-gray-50 transition-colors border-b last:border-b-0'
+                        >
+                          <div className='flex justify-between items-center'>
+                            <div>
+                              <p className='font-semibold text-gray-900 text-sm'>{stock.ticker}</p>
+                              <p className='text-xs text-gray-600 truncate'>{stock.name}</p>
+                            </div>
+                            <Plus className='w-4 h-4 text-green-600' />
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Panel - AI Recommendations (Purple Background) */}
+          <div className='lg:col-span-1 bg-gradient-to-br from-purple-600 to-indigo-700 p-6 text-white overflow-y-auto h-full'>
+            <div className='flex items-center gap-2 mb-4'>
+              <div className='p-2 bg-white/20 rounded-lg'>
+                <Activity className='w-4 h-4' />
+              </div>
+              <div>
+                <h2 className='text-lg font-bold'>AI Stock Recommendations</h2>
+                <p className='text-purple-100 text-xs'>AI-Powered Analysis</p>
+              </div>
+            </div>
+
+            {/* Stock Chart Search */}
+            <div className='space-y-3 mb-6'>
+              <div className='bg-white/10 rounded-lg p-4 backdrop-blur-sm'>
+                <h3 className='text-white font-semibold mb-3 flex items-center gap-2'>
+                  <BarChart3 className='w-4 h-4' />
+                  Search Stock Charts
+                </h3>
+
+                <div className='space-y-3'>
+                  <Input
+                    placeholder='Search stocks by symbol or name...'
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className='bg-white/20 border-white/30 text-white placeholder:text-white/70 h-8 text-sm'
+                  />
+
+                  {/* Search Results */}
+                  {searchQuery && stocks && stocks.length > 0 && (
+                    <div className='space-y-1 max-h-40 overflow-y-auto'>
+                      {stocks.slice(0, 5).map((stock) => (
+                        <button
+                          key={stock.ticker}
+                          onClick={() => handleTickerClick(stock.ticker)}
+                          className='w-full text-left p-2 rounded bg-white/10 hover:bg-white/20 transition-colors'
+                        >
+                          <div className='flex justify-between items-center'>
+                            <div>
+                              <p className='font-semibold text-white text-sm'>{stock.ticker}</p>
+                              <p className='text-xs text-white/80 truncate'>{stock.name}</p>
+                            </div>
+                            <BarChart3 className='w-4 h-4 text-white/60' />
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {searchQuery && stockLoading && (
+                    <div className='flex items-center justify-center p-4'>
+                      <Loader2 className='w-4 h-4 animate-spin text-white' />
+                      <span className='ml-2 text-sm text-white'>Searching...</span>
+                    </div>
+                  )}
+
+                  {searchQuery && !stockLoading && stocks && stocks.length === 0 && (
+                    <p className='text-center text-white/70 text-sm p-4'>No stocks found for "{searchQuery}"</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Placeholder for AI content - will be filled later */}
+            <div className='space-y-3'>
+              <div className='bg-white/10 rounded-lg p-4 backdrop-blur-sm'>
+                <p className='text-purple-100 text-center py-8 text-sm'>
+                  AI Recommendations
+                  <br />
+                  Coming Soon...
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Summary Statistics Cards */}
-        {summaryStats && (
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8'>
-            <Card className='bg-white dark:bg-gray-800 shadow-lg border-0'>
-              <CardContent className='p-6'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-sm font-medium text-gray-600 dark:text-gray-400'>Tổng giá trị</p>
-                    <p className='text-2xl font-bold text-gray-900 dark:text-white'>
-                      {(summaryStats.totalValue / 1000000).toFixed(1)}M
-                    </p>
-                  </div>
-                  <DollarSign className='w-8 h-8 text-blue-500' />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className='bg-white dark:bg-gray-800 shadow-lg border-0'>
-              <CardContent className='p-6'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-sm font-medium text-gray-600 dark:text-gray-400'>Lãi/Lỗ hôm nay</p>
-                    <p
-                      className={`text-2xl font-bold ${summaryStats.totalGainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}
-                    >
-                      {summaryStats.totalGainLoss >= 0 ? '+' : ''}
-                      {(summaryStats.totalGainLoss / 1000).toFixed(0)}K
-                    </p>
-                  </div>
-                  {summaryStats.totalGainLoss >= 0 ? (
-                    <TrendingUp className='w-8 h-8 text-green-500' />
-                  ) : (
-                    <TrendingDown className='w-8 h-8 text-red-500' />
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className='bg-white dark:bg-gray-800 shadow-lg border-0'>
-              <CardContent className='p-6'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-sm font-medium text-gray-600 dark:text-gray-400'>Hiệu suất TB</p>
-                    <p
-                      className={`text-2xl font-bold ${summaryStats.avgPerformance >= 0 ? 'text-green-600' : 'text-red-600'}`}
-                    >
-                      {summaryStats.avgPerformance >= 0 ? '+' : ''}
-                      {summaryStats.avgPerformance.toFixed(2)}%
-                    </p>
-                  </div>
-                  <Target className='w-8 h-8 text-purple-500' />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className='bg-white dark:bg-gray-800 shadow-lg border-0'>
-              <CardContent className='p-6'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-sm font-medium text-gray-600 dark:text-gray-400'>Tăng/Giảm</p>
-                    <p className='text-2xl font-bold text-gray-900 dark:text-white'>
-                      <span className='text-green-600'>{summaryStats.winnersCount}</span>/
-                      <span className='text-red-600'>{summaryStats.losersCount}</span>
-                    </p>
-                  </div>
-                  <Calendar className='w-8 h-8 text-orange-500' />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Tabs Navigation */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className='mb-6'>
-          <TabsList className='grid w-full grid-cols-3 lg:w-auto lg:grid-cols-3'>
-            <TabsTrigger value='overview'>Tổng quan</TabsTrigger>
-            <TabsTrigger value='performance'>Hiệu suất</TabsTrigger>
-            <TabsTrigger value='watchlist'>Danh sách</TabsTrigger>
-          </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value='overview' className='space-y-6'>
-            {/* Top Performers Section */}
-            <div>
-              <div className='flex items-center gap-2 mb-4'>
-                <Star className='w-5 h-5 text-yellow-500' />
-                <h2 className='text-xl font-semibold text-gray-900 dark:text-white'>Mã tăng mạnh nhất</h2>
-              </div>
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-                {watchlistDetail.top_performers?.map((item: WatchlistItem) => (
-                  <div
-                    key={item.id}
-                    className='cursor-pointer transform hover:scale-105 transition-transform'
-                    onClick={() => setChartTicker(item.ticker)}
-                  >
-                    <StockCard
-                      data={{
-                        ticker: item.ticker,
-                        name: item.company_name,
-                        exchange: item.exchange,
-                        open: item.price_info.open_price,
-                        close: item.price_info.current_price,
-                        high: item.price_info.high_price,
-                        low: item.price_info.low_price,
-                        volume: item.price_info.volume,
-                        time: item.price_info.last_updated,
-                        sectors: [item.sector]
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Worst Performers Section */}
-            <div>
-              <div className='flex items-center gap-2 mb-4'>
-                <TrendingDown className='w-5 h-5 text-red-500' />
-                <h2 className='text-xl font-semibold text-gray-900 dark:text-white'>Mã giảm mạnh nhất</h2>
-              </div>
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-                {watchlistDetail.worst_performers?.map((item: WatchlistItem) => (
-                  <div
-                    key={item.id}
-                    className='cursor-pointer transform hover:scale-105 transition-transform'
-                    onClick={() => setChartTicker(item.ticker)}
-                  >
-                    <StockCard
-                      data={{
-                        ticker: item.ticker,
-                        name: item.company_name,
-                        exchange: item.exchange,
-                        open: item.price_info.open_price,
-                        close: item.price_info.current_price,
-                        high: item.price_info.high_price,
-                        low: item.price_info.low_price,
-                        volume: item.price_info.volume,
-                        time: item.price_info.last_updated,
-                        sectors: [item.sector]
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Performance Tab */}
-          <TabsContent value='performance' className='space-y-6'>
-            <Card className='bg-white dark:bg-gray-800 shadow-lg border-0'>
-              <CardHeader>
-                <CardTitle className='flex items-center gap-2'>
-                  <BarChart2 className='w-5 h-5' />
-                  Phân tích hiệu suất
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='space-y-4'>
-                  <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                    <div className='text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg'>
-                      <p className='text-2xl font-bold text-green-600'>{summaryStats?.winnersCount || 0}</p>
-                      <p className='text-sm text-gray-600 dark:text-gray-400'>Mã tăng giá</p>
-                    </div>
-                    <div className='text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg'>
-                      <p className='text-2xl font-bold text-red-600'>{summaryStats?.losersCount || 0}</p>
-                      <p className='text-sm text-gray-600 dark:text-gray-400'>Mã giảm giá</p>
-                    </div>
-                    <div className='text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg'>
-                      <p className='text-2xl font-bold text-blue-600'>{summaryStats?.totalItems || 0}</p>
-                      <p className='text-sm text-gray-600 dark:text-gray-400'>Tổng số mã</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Watchlist Tab */}
-          <TabsContent value='watchlist' className='space-y-6'>
-            {/* Filters and Search */}
-            <Card className='bg-white dark:bg-gray-800 shadow-lg border-0'>
-              <CardContent className='p-6'>
-                <div className='flex flex-col lg:flex-row gap-4'>
-                  <div className='flex-1'>
-                    <Input
-                      placeholder='Tìm kiếm mã hoặc tên công ty...'
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      className='w-full'
-                    />
-                  </div>
-                  <div className='flex gap-2'>
-                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                      <SelectTrigger className='w-40'>
-                        <SelectValue placeholder='Danh mục' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value='all'>Tất cả</SelectItem>
-                        <SelectItem value='favorites'>Yêu thích</SelectItem>
-                        {watchlistDetail.categories?.map((cat) => (
-                          <SelectItem key={cat} value={cat}>
-                            {cat}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select value={sortBy} onValueChange={setSortBy}>
-                      <SelectTrigger className='w-40'>
-                        <SelectValue placeholder='Sắp xếp' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value='performance'>Hiệu suất</SelectItem>
-                        <SelectItem value='alphabetical'>A-Z</SelectItem>
-                        <SelectItem value='price'>Giá</SelectItem>
-                        <SelectItem value='volume'>Khối lượng</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className='flex gap-2 mt-4'>
-                  <Badge variant='outline' className='text-blue-600'>
-                    Tổng: {watchlistDetail.total_items}
-                  </Badge>
-                  <Badge variant='outline' className='text-yellow-600'>
-                    Yêu thích: {watchlistDetail.favorites_count}
-                  </Badge>
-                  <Badge variant='outline' className='text-green-600'>
-                    Đang xem: {filteredItems.length}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Watchlist Items */}
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-              {filteredItems.map((item: WatchlistItem) => (
-                <div key={item.id} className='relative group'>
-                  <div
-                    onClick={() => setChartTicker(item.ticker)}
-                    className='cursor-pointer transform hover:scale-105 transition-all duration-200'
-                  >
-                    <StockCard
-                      data={{
-                        ticker: item.ticker,
-                        name: item.company_name,
-                        exchange: item.exchange,
-                        open: item.price_info.open_price,
-                        close: item.price_info.current_price,
-                        high: item.price_info.high_price,
-                        low: item.price_info.low_price,
-                        volume: item.price_info.volume,
-                        time: item.price_info.last_updated,
-                        sectors: [item.sector]
-                      }}
-                    />
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className='absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity'>
-                    {item.is_favorite && <Star className='w-4 h-4 text-yellow-500 fill-current' />}
-                    <Button
-                      size='icon'
-                      variant='ghost'
-                      className='h-8 w-8 bg-white/80 hover:bg-white'
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setChartTicker(item.ticker)
-                      }}
-                      title='Xem biểu đồ'
-                    >
-                      <BarChart2 className='w-4 h-4' />
-                    </Button>
-                    <Button
-                      size='icon'
-                      variant='ghost'
-                      className='h-8 w-8 bg-white/80 hover:bg-white'
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setEditItem(item)
-                      }}
-                      title='Chỉnh sửa'
-                    >
-                      <Edit className='w-4 h-4' />
-                    </Button>
-                    <Button
-                      size='icon'
-                      variant='ghost'
-                      className='h-8 w-8 bg-white/80 hover:bg-white'
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setDeleteItem(item)
-                      }}
-                      title='Xoá'
-                    >
-                      <Trash2 className='w-4 h-4' />
-                    </Button>
-                  </div>
-
-                  {/* Additional Info */}
-                  <div className='absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity'>
-                    <div className='bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg p-2 text-xs'>
-                      {item.category && (
-                        <Badge variant='secondary' className='text-xs mr-1'>
-                          {item.category}
-                        </Badge>
-                      )}
-                      {item.target_price > 0 && (
-                        <span className='text-gray-600 dark:text-gray-400'>
-                          Mục tiêu: {item.target_price.toLocaleString()}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        {/* Dialogs */}
-        <AddWatchlistItemDialog open={showAdd} onOpenChange={setShowAdd} onSubmit={handleAdd} loading={isLoading} />
-        <EditWatchlistItemDialog
-          open={!!editItem}
-          onOpenChange={(v) => {
-            if (!v) setEditItem(null)
-          }}
-          onSubmit={handleEdit}
-          initial={editItem || undefined}
-          loading={isLoading}
-        />
-        <ConfirmDeleteDialog
-          open={!!deleteItem}
-          onOpenChange={(v) => {
-            if (!v) setDeleteItem(null)
-          }}
-          onConfirm={handleDelete}
-          loading={isLoading}
-          item={deleteItem}
-        />
-
-        {/* Edit Watchlist Dialog */}
-        <Dialog open={editWL} onOpenChange={setEditWL}>
-          <DialogContent className='sm:max-w-[500px]'>
-            <DialogHeader>
-              <DialogTitle>Chỉnh sửa thông tin watchlist</DialogTitle>
-              <DialogDescription>Cập nhật tên và mô tả cho watchlist của bạn</DialogDescription>
-            </DialogHeader>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                handleEditWL()
-              }}
-              className='space-y-4'
-            >
-              <div>
-                <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block'>Tên watchlist</label>
-                <Input
-                  placeholder='Nhập tên watchlist'
-                  value={wlInfo.name}
-                  onChange={(e) => setWLInfo((info) => ({ ...info, name: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block'>Mô tả</label>
-                <Input
-                  placeholder='Nhập mô tả'
-                  value={wlInfo.description}
-                  onChange={(e) => setWLInfo((info) => ({ ...info, description: e.target.value }))}
-                />
-              </div>
-              <DialogFooter>
-                <Button type='button' variant='outline' onClick={() => setEditWL(false)}>
-                  Huỷ
-                </Button>
-                <Button type='submit' disabled={isLoading}>
-                  {isLoading ? <Loader2 className='animate-spin w-4 h-4 mr-2' /> : null}
-                  Lưu thay đổi
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-
         {/* Stock Chart Dialog */}
-        <Dialog
-          open={!!chartTicker}
-          onOpenChange={(v) => {
-            if (!v) setChartTicker(null)
-          }}
-        >
-          <DialogContent className='max-w-6xl w-full max-h-[90vh] overflow-y-auto'>
-            <DialogHeader>
-              <DialogTitle>Biểu đồ giá - {chartTicker}</DialogTitle>
+        <Dialog open={showChart} onOpenChange={handleDialogOpenChange}>
+          <DialogContent className='max-w-7xl max-h-[95vh] w-[95vw] sm:w-[90vw] md:w-[85vw] p-0 m-4'>
+            <DialogHeader className='p-4 sm:p-6 pb-0'>
+              <DialogTitle className='flex items-center gap-2 text-sm sm:text-base'>
+                <BarChart3 className='w-4 h-4 sm:w-5 sm:h-5' />
+                {selectedTicker} - Stock Chart
+              </DialogTitle>
             </DialogHeader>
-            {chartTicker && <StockChart ticker={chartTicker} />}
+            <div className='px-4 sm:px-6 pb-4 sm:pb-6'>
+              {selectedTicker ? (
+                <div className='w-full'>
+                  <StockChart
+                    ticker={selectedTicker}
+                    className='w-full h-[50vh] sm:h-[60vh] min-h-[300px] sm:min-h-[400px]'
+                  />
+                </div>
+              ) : (
+                <div className='flex items-center justify-center h-64 sm:h-96'>
+                  <div className='text-center'>
+                    <Loader2 className='w-6 h-6 sm:w-8 sm:h-8 animate-spin mx-auto mb-2' />
+                    <p className='text-sm text-gray-500'>Loading chart...</p>
+                  </div>
+                </div>
+              )}
+            </div>
           </DialogContent>
         </Dialog>
       </div>
