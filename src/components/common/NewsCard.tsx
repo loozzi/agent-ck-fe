@@ -35,7 +35,7 @@ const NewsCard = ({ news, variant = 'default' }: NewsCardProps) => {
         <CardContent className='p-3 sm:p-4'>
           <div className='flex items-start space-x-2 sm:space-x-3'>
             {/* Image for compact variant */}
-            <div className='flex-shrink-0'>
+            <div className='flex-shrink-0 p-1'>
               {news.image_url ? (
                 <img
                   src={news.image_url}
@@ -82,24 +82,24 @@ const NewsCard = ({ news, variant = 'default' }: NewsCardProps) => {
       <Card className='hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-blue-500'>
         <div className='flex'>
           {/* Image for featured variant */}
-          <div className='w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 flex-shrink-0'>
+          <div className='w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 flex-shrink-0 p-2'>
             {news.image_url ? (
               <img
                 src={news.image_url}
                 alt={news.title}
-                className='w-full h-full object-cover rounded-l-lg'
+                className='w-full h-full object-cover rounded-lg'
                 onError={(e) => {
                   const target = e.target as HTMLImageElement
                   target.style.display = 'none'
                   const parent = target.parentElement
                   if (parent) {
                     parent.innerHTML =
-                      '<div class="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 rounded-l-lg flex items-center justify-center"><svg class="h-6 w-6 sm:h-8 sm:w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></div>'
+                      '<div class="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center"><svg class="h-6 w-6 sm:h-8 sm:w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></div>'
                   }
                 }}
               />
             ) : (
-              <div className='w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 rounded-l-lg flex items-center justify-center'>
+              <div className='w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center'>
                 <TrendingUp className='h-6 w-6 sm:h-8 sm:w-8 text-blue-500' />
               </div>
             )}
@@ -139,24 +139,24 @@ const NewsCard = ({ news, variant = 'default' }: NewsCardProps) => {
     <Card className='hover:shadow-md transition-shadow cursor-pointer'>
       <div className='flex'>
         {/* Image for default variant */}
-        <div className='w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0'>
+        <div className='w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 p-2'>
           {news.image_url ? (
             <img
               src={news.image_url}
               alt={news.title}
-              className='w-full h-full object-cover rounded-l-lg'
+              className='w-full h-full object-cover rounded-lg'
               onError={(e) => {
                 const target = e.target as HTMLImageElement
                 target.style.display = 'none'
                 const parent = target.parentElement
                 if (parent) {
                   parent.innerHTML =
-                    '<div class="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 rounded-l-lg flex items-center justify-center"><svg class="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></div>'
+                    '<div class="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center"><svg class="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></div>'
                 }
               }}
             />
           ) : (
-            <div className='w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 rounded-l-lg flex items-center justify-center'>
+            <div className='w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center'>
               <TrendingUp className='h-5 w-5 sm:h-6 sm:w-6 text-blue-500' />
             </div>
           )}

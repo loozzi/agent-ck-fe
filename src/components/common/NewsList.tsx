@@ -12,6 +12,7 @@ interface NewsListProps {
   variant?: 'default' | 'compact' | 'featured'
   showViewMore?: boolean
   isLoading?: boolean
+  onViewMore?: () => void
 }
 
 const NewsList = ({
@@ -20,7 +21,8 @@ const NewsList = ({
   description,
   variant = 'default',
   showViewMore = false,
-  isLoading = false
+  isLoading = false,
+  onViewMore
 }: NewsListProps) => {
   if (isLoading) {
     return (
@@ -94,7 +96,12 @@ const NewsList = ({
         </ScrollArea>
         {showViewMore && (
           <div className='mt-4 text-center'>
-            <button className='text-blue-600 hover:text-blue-800 text-sm font-medium'>Xem thêm tin tức →</button>
+            <button
+              className='text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors'
+              onClick={onViewMore}
+            >
+              Xem thêm tin tức →
+            </button>
           </div>
         )}
       </CardContent>

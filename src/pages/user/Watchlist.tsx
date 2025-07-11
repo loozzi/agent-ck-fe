@@ -1,6 +1,7 @@
 import type { RootState } from '@/app/store'
 import '@/components/common/mobile-fixes.css'
 import StockChart from '@/components/common/StockChart'
+import Header from '@/components/layouts/Header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -222,7 +223,8 @@ const Watchlist = () => {
 
   return (
     <div className='h-screen w-screen bg-gray-50 overflow-hidden'>
-      <div className='h-full w-full'>
+      <Header />
+      <div className='h-full w-full mt-14'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-0 h-full'>
           {/* Left Panel - Portfolio & Watchlist (White Background) */}
           <div className='lg:col-span-1 bg-white p-6 overflow-y-auto h-full'>
