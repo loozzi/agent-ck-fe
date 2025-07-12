@@ -13,6 +13,7 @@ export type CategoryEnum =
   | 'learning_mode'
   | 'low_time'
   | 'active'
+  | 'general'
 
 export interface CreatePromptPayload {
   name: string

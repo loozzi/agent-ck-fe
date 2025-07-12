@@ -96,7 +96,7 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
     timeframe: '1d',
     priority: 1,
     is_active: true,
-    category: 'long_term'
+    category: 'general'
   })
 
   useEffect(() => {
@@ -116,7 +116,7 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
         timeframe: rule.timeframe,
         priority: rule.priority,
         is_active: rule.is_active,
-        category: rule.category || 'long_term'
+        category: rule.category || 'general'
       })
     } else {
       setFormData({
@@ -127,7 +127,7 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
         timeframe: '1d',
         priority: 1,
         is_active: true,
-        category: 'long_term'
+        category: 'general'
       })
     }
   }, [rule])
@@ -224,6 +224,7 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
                   <SelectValue placeholder='Chọn danh mục' />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value='general'>Chung</SelectItem>
                   <SelectItem value='long_term'>Dài hạn</SelectItem>
                   <SelectItem value='short_term'>Ngắn hạn</SelectItem>
                   <SelectItem value='value_style'>Đầu tư giá trị</SelectItem>

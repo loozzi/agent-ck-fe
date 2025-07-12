@@ -29,7 +29,7 @@ interface LogicRuleFormData {
   action: LogicRuleAction
   timeframe: string
   priority: number
-  category: CategoryEnum | 'learning_mode'
+  category: CategoryEnum | 'general'
   is_active: boolean
 }
 
@@ -352,6 +352,7 @@ const RuleController = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='all'>Tất cả danh mục</SelectItem>
+                  <SelectItem value='general'>Chung</SelectItem>
                   <SelectItem value='long_term'>Dài hạn</SelectItem>
                   <SelectItem value='short_term'>Ngắn hạn</SelectItem>
                   <SelectItem value='value_style'>Đầu tư giá trị</SelectItem>
