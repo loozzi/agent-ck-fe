@@ -55,12 +55,12 @@ const AdminLayout = () => {
       icon: <FaUsers className='w-4 h-4' />,
       href: '/admin/user-management'
     },
-    {
-      id: 'subscription',
-      title: 'Quản lý code',
-      icon: <FaWallet className='w-4 h-4' />,
-      href: '/admin/subscription'
-    },
+    // {
+    //   id: 'subscription',
+    //   title: 'Quản lý code',
+    //   icon: <FaWallet className='w-4 h-4' />,
+    //   href: '/admin/subscription'
+    // },
     {
       id: 'settings',
       title: 'Cài đặt',

@@ -18,8 +18,8 @@ export interface SubscriptionCode {
 export interface SubscriptionStatus {
   id: string
   user_id: string
-  status: string
-  subscription_type: string
+  status: SubscriptionStatus
+  subscription_type: SubscriptionType
   start_date: string
   end_date: string
   is_active: boolean
@@ -73,4 +73,12 @@ export interface UserSubscriptionStatus {
 
 export interface SubscriptionCodeParams {
   user_email?: string
+}
+
+export type SubscriptionType = 'premium'
+
+export interface SubscriptionDirectActivePayload {
+  user_email: string
+  durations_days: number
+  subcription_type: SubscriptionType
 }
