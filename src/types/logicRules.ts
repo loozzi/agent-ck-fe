@@ -1,3 +1,5 @@
+import type { CategoryEnum } from './prompts'
+
 export type LogicRuleTimeFrame = '1m' | '5m' | '15m' | '1h' | '4h' | '1d' | string
 export type LogicRuleIndicator = 'RSI' | 'MACD' | 'SMA' | 'EMA' | 'BOLLINGER_BANDS' | string
 export type LogicRuleAction = 'BUY' | 'SELL' | 'HOLD' | 'ALERT'
@@ -12,6 +14,7 @@ export interface CreateLogicRulePayload {
   action: LogicRuleAction
   timeframe: LogicRuleTimeFrame
   priority: number
+  category: CategoryEnum
   is_active: boolean
 }
 
@@ -37,5 +40,6 @@ export interface UpdateLogicRulePayload {
   action?: LogicRuleAction
   timeframe?: LogicRuleTimeFrame
   priority?: number
+  category?: CategoryEnum
   is_active?: boolean
 }

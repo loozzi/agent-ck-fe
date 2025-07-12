@@ -75,7 +75,7 @@ export const LogicRuleDetailDialog: React.FC<LogicRuleDetailDialogProps> = ({ op
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-w-6xl w-[95vw] max-h-[95vh] overflow-y-auto'>
+      <DialogContent className='max-w-6xl w-[95vw] max-h-[95vh] overflow-y-auto' style={{ overflowX: 'hidden' }}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-3'>
             <div className='flex items-center gap-2'>
@@ -253,7 +253,9 @@ export const LogicRuleDetailDialog: React.FC<LogicRuleDetailDialogProps> = ({ op
                 </div>
                 <div className='flex items-center gap-2'>
                   <span className='text-gray-600'>Trainer ID:</span>
-                  <code className='bg-gray-100 px-2 py-1 rounded text-xs'>{rule.trainer_id}</code>
+                  <code className='bg-gray-100 px-2 py-1 rounded text-xs max-w-[120px] truncate block'>
+                    {rule.trainer_id}
+                  </code>
                 </div>
               </div>
             </CardContent>

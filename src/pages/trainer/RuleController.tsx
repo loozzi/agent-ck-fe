@@ -13,6 +13,7 @@ import { LogicRuleDetailDialog } from '@/components/common/LogicRuleDetailDialog
 import { DeleteLogicRuleDialog } from '@/components/common/DeleteLogicRuleDialog'
 import { createLogicRule, getLogicRules, updateLogicRule, deleteLogicRule } from '@/slices/logicRule.slice'
 import type { LogicRule, LogicRuleIndicator, LogicRuleAction } from '@/types/logicRules'
+import type { CategoryEnum } from '@/types/prompts'
 import { toast } from 'react-toastify'
 import '@/components/common/LogicRuleController.css'
 
@@ -28,6 +29,7 @@ interface LogicRuleFormData {
   action: LogicRuleAction
   timeframe: string
   priority: number
+  category: CategoryEnum | 'learning_mode'
   is_active: boolean
 }
 
@@ -47,6 +49,7 @@ const RuleController = () => {
   const [filterIndicator, setFilterIndicator] = useState<string>('all')
   const [filterAction, setFilterAction] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [filterCategory, setFilterCategory] = useState<CategoryEnum | 'all'>('all')
   const [activeTab, setActiveTab] = useState('all')
 
   // Loading states
@@ -66,10 +69,11 @@ const RuleController = () => {
     const matchesAction = !filterAction || filterAction === 'all' || rule.action === filterAction
     const matchesStatus =
       !filterStatus || filterStatus === 'all' || (filterStatus === 'active' ? rule.is_active : !rule.is_active)
+    const matchesCategory = filterCategory === 'all' || rule.category === filterCategory
     const matchesTab =
       activeTab === 'all' || (activeTab === 'active' && rule.is_active) || (activeTab === 'inactive' && !rule.is_active)
 
-    return matchesSearch && matchesIndicator && matchesAction && matchesStatus && matchesTab
+    return matchesSearch && matchesIndicator && matchesAction && matchesStatus && matchesCategory && matchesTab
   })
 
   // Get statistics
@@ -102,6 +106,7 @@ const RuleController = () => {
         action: data.action,
         timeframe: data.timeframe,
         priority: data.priority,
+        category: data.category,
         is_active: data.is_active
       }
 
@@ -131,6 +136,7 @@ const RuleController = () => {
         action: data.action,
         timeframe: data.timeframe,
         priority: data.priority,
+        category: data.category,
         is_active: data.is_active
       }
 
@@ -196,6 +202,7 @@ const RuleController = () => {
     setFilterIndicator('all')
     setFilterAction('all')
     setFilterStatus('all')
+    setFilterCategory('all')
   }
 
   return (
@@ -295,7 +302,7 @@ const RuleController = () => {
               />
             </div>
 
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-4'>
               <Select value={filterIndicator} onValueChange={setFilterIndicator}>
                 <SelectTrigger>
                   <SelectValue placeholder='Tất cả chỉ báo' />
@@ -333,6 +340,32 @@ const RuleController = () => {
                   <SelectItem value='all'>Tất cả trạng thái</SelectItem>
                   <SelectItem value='active'>Đang hoạt động</SelectItem>
                   <SelectItem value='inactive'>Tạm dừng</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={filterCategory}
+                onValueChange={(value) => setFilterCategory(value as CategoryEnum | 'all')}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder='Tất cả danh mục' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>Tất cả danh mục</SelectItem>
+                  <SelectItem value='long_term'>Dài hạn</SelectItem>
+                  <SelectItem value='short_term'>Ngắn hạn</SelectItem>
+                  <SelectItem value='value_style'>Đầu tư giá trị</SelectItem>
+                  <SelectItem value='high_risk'>Rủi ro cao</SelectItem>
+                  <SelectItem value='moderate_risk'>Rủi ro vừa</SelectItem>
+                  <SelectItem value='low_risk'>Rủi ro thấp</SelectItem>
+                  <SelectItem value='goal_>10%'>Mục tiêu {'>'}10%</SelectItem>
+                  <SelectItem value='goal_learning'>Mục tiêu học hỏi</SelectItem>
+                  <SelectItem value='f0'>F0</SelectItem>
+                  <SelectItem value='advance'>Nâng cao</SelectItem>
+                  <SelectItem value='passive'>Thụ động</SelectItem>
+                  <SelectItem value='learning_mode'>Chế độ học</SelectItem>
+                  <SelectItem value='low_time'>Ít thời gian</SelectItem>
+                  <SelectItem value='active'>Chủ động</SelectItem>
                 </SelectContent>
               </Select>
               <Button variant='outline' onClick={clearFilters}>
