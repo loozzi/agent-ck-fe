@@ -4,7 +4,7 @@ import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
 import UserNavigator from '@/navigators/user.routes'
 import { useEffect, useState, type JSX } from 'react'
-import { FaBookOpen, FaHome, FaWallet } from 'react-icons/fa'
+import { FaBookOpen, FaBookReader, FaHome, FaWallet } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
 
 export interface RouteItem {
@@ -61,6 +61,12 @@ const UserLayout = () => {
       title: 'Ví của tôi',
       icon: <FaWallet className='w-4 h-4' />,
       href: '/portfolio'
+    },
+    {
+      id: 'strategy',
+      title: 'Chiến lược',
+      icon: <FaBookReader className='w-4 h-4' />,
+      href: '/strategy'
     },
     {
       id: 'learning',

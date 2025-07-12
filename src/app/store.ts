@@ -15,6 +15,7 @@ import { persistReducer, persistStore } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import portfolioNewsReducer from '@/slices/portfolioNews.slice'
 import adminReducer from '@/slices/admin.slice'
+import strategyReducer from '@/slices/strategy.slice'
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -30,7 +31,8 @@ const rootReducer = combineReducers({
   zalo: zaloReducer,
   watchlist: watchlistReducer,
   portfolioNews: portfolioNewsReducer,
-  admin: adminReducer
+  admin: adminReducer,
+  strategy: strategyReducer
 })
 
 const persistConfig = {
@@ -47,7 +49,8 @@ const persistConfig = {
     'zalo',
     'watchlist',
     'portfolioNews',
-    'admin'
+    'admin',
+    'strategy'
   ], // reducers that you do not want to persist
   whiteList: ['auth'] // reducers that you want to persist
 }
