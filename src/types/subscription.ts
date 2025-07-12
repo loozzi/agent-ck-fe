@@ -1,3 +1,5 @@
+import type { UserStatus } from './admin.types'
+
 export interface CreateSupscriptionPayload {
   user_email: string
   duration_days: number
@@ -18,7 +20,7 @@ export interface SubscriptionCode {
 export interface SubscriptionStatus {
   id: string
   user_id: string
-  status: SubscriptionStatus
+  status: UserStatus
   subscription_type: SubscriptionType
   start_date: string
   end_date: string
@@ -53,7 +55,7 @@ export interface SubscriptionUpdateRoleResponse {
 }
 
 export interface UserSubscription {
-  status: SubscriptionStatus
+  status: UserStatus
   subscription_type: string
   start_date: string
   end_date: string
@@ -66,7 +68,7 @@ export interface UserSubscriptionStatus {
   email: string
   full_name: string
   role: string
-  status: SubscriptionStatus
+  status: UserStatus
   zalo_id: string
   onboarding_completed: boolean
 }

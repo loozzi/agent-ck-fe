@@ -31,11 +31,11 @@ import {
 } from '@/components/ui/pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { createSubscriptionCode, fetchSubScriptionCodes, revorkCode } from '@/slices/subscription.slice'
 import {
   deleteSubscriptionCode as adminDeleteSubscriptionCode,
   revokeSubscriptionCode as adminRevokeSubscriptionCode
 } from '@/slices/admin.slice'
+import { createSubscriptionCode, fetchSubScriptionCodes } from '@/slices/subscription.slice'
 import { ArrowUpDown, Check, ChevronDown, ChevronUp, Copy, Plus, Trash2, UserX } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
