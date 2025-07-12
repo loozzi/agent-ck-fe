@@ -17,7 +17,7 @@ import type { CategoryEnum } from '@/types/prompts'
 import { toast } from 'react-toastify'
 import '@/components/common/LogicRuleController.css'
 
-interface LogicRuleFormData {
+export interface LogicRuleFormData {
   name: string
   description: string
   conditions: Array<{

@@ -1,4 +1,10 @@
-import type { CreatePromptPayload, GetMyPromptParams, Prompt, UpdatePromtPayload } from '@/types/prompts'
+import type {
+  CategorizedContentResponse,
+  CreatePromptPayload,
+  GetMyPromptParams,
+  Prompt,
+  UpdatePromtPayload
+} from '@/types/prompts'
 import type { TrainerStats } from '@/types/response'
 import type { AxiosResponse } from 'axios'
 import apiInstance from './axios.config'
@@ -18,7 +24,9 @@ const promtService = {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
-    })
+    }),
+  getCategorizedContent: (): Promise<AxiosResponse<CategorizedContentResponse>> =>
+    apiInstance.get<CategorizedContentResponse>('/trainer/categorized-content')
 }
 
 export default promtService

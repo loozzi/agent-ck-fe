@@ -1,3 +1,4 @@
+import CategoryManagement from '@/pages/trainer/CategoryManagement'
 import FeedbackLogger from '@/pages/trainer/FeedbackLogger'
 import PromtDetail from '@/pages/trainer/PromtDetail'
 import PromtManagement from '@/pages/trainer/PromtManagement'
@@ -36,6 +37,12 @@ export const trainerRouterConfig: RouteBrowser[] = [
     element: <PromtDetail />,
     exact: true,
     name: 'Chi tiết prompt'
+  },
+  {
+    route: '/category-management',
+    element: <CategoryManagement />, // Placeholder for CategoryManagement component
+    exact: true,
+    name: 'Quản lý danh mục'
   }
 ]
 

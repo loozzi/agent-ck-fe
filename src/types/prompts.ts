@@ -1,3 +1,5 @@
+import type { LogicRule } from './logicRules'
+
 export type CategoryEnum =
   | 'long_term'
   | 'short_term'
@@ -48,4 +50,27 @@ export interface DocumentUploadPayload {
   title: string
   description?: string
   category?: CategoryEnum
+}
+
+export interface CategoryContent {
+  prompts: Prompt[]
+  logic_rules: LogicRule[]
+}
+
+export interface CategorizedContentResponse {
+  f0: CategoryContent
+  short_term: CategoryContent
+  goal_learning: CategoryContent
+  moderate_risk: CategoryContent
+  high_risk: CategoryContent
+  learning_mode: CategoryContent
+  advance: CategoryContent
+  low_risk: CategoryContent
+  passive: CategoryContent
+  low_time: CategoryContent
+  long_term: CategoryContent
+  value_style: CategoryContent
+  active: CategoryContent
+  'goal_>10%': CategoryContent
+  general: CategoryContent
 }

@@ -46,7 +46,7 @@ const CreatePromptDialog = ({ onCreated }: CreatePromptDialogProps) => {
         name: '',
         description: '',
         prompt_text: '',
-        category: 'learning_mode',
+        category: 'general',
         is_active: true
       })
       onCreated?.()
@@ -72,7 +72,7 @@ const CreatePromptDialog = ({ onCreated }: CreatePromptDialogProps) => {
           Tạo prompt mới
         </Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[600px]'>
+      <DialogContent className='sm:max-w-[600px] max-h[80vh] overflow-y-auto'>
         <DialogHeader>
           <DialogTitle>Tạo prompt mới</DialogTitle>
           <DialogDescription>Tạo một prompt mới để sử dụng trong hệ thống</DialogDescription>

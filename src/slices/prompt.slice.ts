@@ -8,6 +8,7 @@ const initialState: PromptState = {
   prompts: [],
   promptDetail: null,
   stats: null,
+  categorizedContent: null,
   isLoading: false,
   error: null
 }
@@ -139,6 +140,24 @@ export const uploadDocument = createAsyncThunk(
   }
 )
 
+export const getCategorizedContent = createAsyncThunk(
+  'prompt/getCategorizedContent',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await promtService.getCategorizedContent()
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response.data.detail || 'Không thể lấy nội dung phân loại'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+
+      return response.data
+    } catch (error) {
+      return rejectWithValue('Không thể lấy nội dung phân loại')
+    }
+  }
+)
+
 const promptSlice = createSlice({
   name: 'prompt',
   initialState,
@@ -241,6 +260,18 @@ const promptSlice = createSlice({
         toast.success('Tải lên tài liệu thành công')
       })
       .addCase(uploadDocument.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(getCategorizedContent.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(getCategorizedContent.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.categorizedContent = action.payload
+      })
+      .addCase(getCategorizedContent.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload as string
       })

@@ -190,8 +190,8 @@ const PromtDetail = () => {
               <div className='flex items-center space-x-3'>
                 <User className='h-4 w-4 text-gray-500' />
                 <div>
-                  <p className='text-sm font-medium'>Trainer ID</p>
-                  <p className='text-sm text-gray-600'>{promptDetail.trainer_id}</p>
+                  <p className='text-sm font-medium'>Trainer</p>
+                  <p className='text-sm text-gray-600'>ID: {promptDetail.trainer_id.slice(0, 8)}...</p>
                 </div>
               </div>
 
