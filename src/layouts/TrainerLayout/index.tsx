@@ -4,7 +4,7 @@ import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
 import TrainerNavigator from '@/navigators/trainer.routes'
 import { useEffect, useState } from 'react'
-import { FaBookOpen, FaChartLine } from 'react-icons/fa'
+import { FaBookOpen, FaChartLine, FaList } from 'react-icons/fa'
 import { MdDashboard, MdOutlineMonitorHeart } from 'react-icons/md'
 import type { RouteItem } from '../UserLayout'
 
@@ -61,6 +61,12 @@ const TrainerLayout = () => {
       title: 'Quản lý rules logic',
       icon: <FaBookOpen className='w-4 h-4' />,
       href: '/trainer/rules-management'
+    },
+    {
+      id: 'category-management',
+      title: 'Quản lý danh mục',
+      icon: <FaList className='w-4 h-4' />,
+      href: '/trainer/category-management'
     },
     {
       id: 'feedback',

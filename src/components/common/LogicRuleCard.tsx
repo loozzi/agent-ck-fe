@@ -111,12 +111,54 @@ export const LogicRuleCard: React.FC<LogicRuleCardProps> = ({
               <Target className='h-4 w-4 text-blue-600' />
               {rule.name}
             </CardTitle>
-            <div className='flex items-center gap-2 mt-1'>
-              <Badge variant={rule.is_active ? 'default' : 'secondary'} className='text-xs'>
+            <div className='flex flex-wrap items-center gap-2 mt-2'>
+              <Badge
+                variant={rule.is_active ? 'default' : 'secondary'}
+                className='text-xs px-3 py-1 rounded-full font-semibold'
+              >
                 {rule.is_active ? 'Hoạt động' : 'Tạm dừng'}
               </Badge>
-              <Badge variant='outline' className='text-xs'>
+              <Badge variant='outline' className='text-xs px-3 py-1 rounded-full font-semibold border-gray-300'>
                 Độ ưu tiên: {rule.priority}
+              </Badge>
+              <Badge
+                variant='outline'
+                className='text-xs px-3 py-1 rounded-full font-semibold border-gray-300 bg-gray-50 text-gray-700'
+              >
+                {(() => {
+                  switch (rule.category) {
+                    case 'long_term':
+                      return 'Dài hạn'
+                    case 'short_term':
+                      return 'Ngắn hạn'
+                    case 'value_style':
+                      return 'Đầu tư giá trị'
+                    case 'high_risk':
+                      return 'Rủi ro cao'
+                    case 'moderate_risk':
+                      return 'Rủi ro vừa'
+                    case 'low_risk':
+                      return 'Rủi ro thấp'
+                    case 'goal_>10%':
+                      return 'Mục tiêu >10%'
+                    case 'goal_learning':
+                      return 'Mục tiêu học hỏi'
+                    case 'f0':
+                      return 'F0'
+                    case 'advance':
+                      return 'Nâng cao'
+                    case 'passive':
+                      return 'Thụ động'
+                    case 'learning_mode':
+                      return 'Chế độ học'
+                    case 'low_time':
+                      return 'Ít thời gian'
+                    case 'active':
+                      return 'Chủ động'
+                    default:
+                      return rule.category
+                  }
+                })()}
               </Badge>
             </div>
           </div>

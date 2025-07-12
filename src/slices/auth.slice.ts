@@ -215,7 +215,12 @@ const userSlice = createSlice({
         state.active_sessions = 0
       })
       .addCase(signOutAction.pending, (state) => {
-        state.loading = true
+        state.isAuthenticated = false
+        state.user = null
+        state.token = null
+        state.refreshToken = null
+        state.loading = false
+        state.signUpSuccess = false
       })
       .addCase(signOutAction.fulfilled, (state) => {
         state.isAuthenticated = false
@@ -226,7 +231,12 @@ const userSlice = createSlice({
         state.signUpSuccess = false
       })
       .addCase(signOutAction.rejected, (state) => {
+        state.isAuthenticated = false
+        state.user = null
+        state.token = null
+        state.refreshToken = null
         state.loading = false
+        state.signUpSuccess = false
       })
       .addCase(zaloCompleteLogin.pending, (state) => {
         state.loading = true

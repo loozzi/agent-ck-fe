@@ -5,7 +5,8 @@ import type {
   SubscriptionStatus,
   SubscriptionUpdateRolePayload,
   SubscriptionCodeParams,
-  SubscriptionUpdateRoleResponse
+  SubscriptionUpdateRoleResponse,
+  SubscriptionDirectActivePayload
 } from '@/types/subscription'
 import apiInstance from './axios.config'
 import type { AxiosResponse } from 'axios'
@@ -36,7 +37,9 @@ const subscriptionService = {
   },
   revorkCode: (userId: string): Promise<AxiosResponse<void>> => {
     return apiInstance.delete<void>(`/admin/users/subscription`, { params: { user_id: userId } })
-  }
+  },
+  directActiveSubscription: (data: SubscriptionDirectActivePayload): Promise<AxiosResponse<SubscriptionStatus>> =>
+    apiInstance.post<SubscriptionStatus>('/subscription/direct-activate', data)
 }
 
 export default subscriptionService

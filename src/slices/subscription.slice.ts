@@ -26,7 +26,7 @@ export const fetchUserSubscriptionStatus = createAsyncThunk(
         toast.error(errorMessage)
         return rejectWithValue(errorMessage)
       }
-      const { data } = await response
+      const { data } = response
       if (!data || !Array.isArray(data)) {
         toast.error('Không thể lấy trạng thái đăng ký người dùng')
         return rejectWithValue('Không thể lấy trạng thái đăng ký người dùng')

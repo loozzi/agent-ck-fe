@@ -4,11 +4,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { fetchUserSubscriptionStatus, updateUserRole } from '@/slices/subscription.slice'
+import { updateUserRole, fetchUsers, directActiveSubscription } from '@/slices/admin.slice'
+import type { User } from '@/types/admin.types'
 import { useEffect, useState } from 'react'
 
 const UserManagement = () => {
-  const { userSubscriptionStatus = [], isLoading } = useAppSelector((state) => state.subscription)
+  const { users = [], isLoading } = useAppSelector((state) => state.admin)
   const dispatch = useAppDispatch()
 
   // Filter states
@@ -16,6 +17,29 @@ const UserManagement = () => {
   const [filterOnboarding, setFilterOnboarding] = useState('')
   const [filterNameEmail, setFilterNameEmail] = useState('')
   const [filterZaloId, setFilterZaloId] = useState('')
+
+  // Badge background for status
+  const getStatusCellClass = (status: string) => {
+    if (status === 'subscriber') {
+      return 'bg-green-100' // Tailwind: light green background
+    }
+    return ''
+  }
+
+  // Quick action: Direct activate user
+  const handleDirectActivate = async (user: any) => {
+    try {
+      await dispatch(
+        directActiveSubscription({
+          user_email: user.email,
+          durations_days: 30, // default 30 days, adjust as needed
+          subcription_type: 'premium'
+        })
+      )
+    } catch (error) {
+      console.error('Error activating user:', error)
+    }
+  }
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role?.toLowerCase()) {
@@ -31,7 +55,7 @@ const UserManagement = () => {
   }
 
   // Filter function
-  const filteredUsers = userSubscriptionStatus.filter((user) => {
+  const filteredUsers: User[] = users.filter((user) => {
     // Role filter
     if (filterRole && user.role.toLowerCase() !== filterRole.toLowerCase()) {
       return false
@@ -78,7 +102,7 @@ const UserManagement = () => {
   }
 
   useEffect(() => {
-    dispatch(fetchUserSubscriptionStatus())
+    dispatch(fetchUsers())
   }, [])
 
   return (
@@ -136,7 +160,7 @@ const UserManagement = () => {
         </div>
       </div>
 
-      {isLoading && userSubscriptionStatus.length === 0 ? (
+      {isLoading && users.length === 0 ? (
         <div className='flex justify-center items-center h-32'>
           <div className='text-muted-foreground'>Đang tải dữ liệu...</div>
         </div>
@@ -147,7 +171,7 @@ const UserManagement = () => {
               Xóa bộ lọc
             </Button>
             <span className='text-sm text-muted-foreground self-center'>
-              Hiển thị {filteredUsers.length} / {userSubscriptionStatus.length} người dùng
+              Hiển thị {filteredUsers.length} / {users.length} người dùng
             </span>
           </div>
           <Table>
@@ -164,22 +188,26 @@ const UserManagement = () => {
             </TableHeader>
             <TableBody>
               {filteredUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className='font-medium'>{user.email}</TableCell>
+                <TableRow key={user.id} className={getStatusCellClass(user.status)}>
+                  <TableCell className='font-medium max-w-[160px] truncate' title={user.email}>
+                    {user.email}
+                  </TableCell>
                   <TableCell>{user.full_name}</TableCell>
                   {/* <TableCell>
                     <Badge variant={getStatusBadgeVariant(user.status)}>{user.status}</Badge>
                   </TableCell> */}
-                  <TableCell>{user.zalo_id || 'Chưa có'}</TableCell>
+                  <TableCell className='max-w-[120px] truncate' title={user.zalo_id || 'Chưa có'}>
+                    {user.zalo_id || 'Chưa có'}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={user.onboarding_completed ? 'default' : 'destructive'}>
-                      {user.onboarding_completed ? 'Hoàn thành' : 'Chưa hoàn thành'}
+                      {user.onboarding_completed ? 'Đã làm' : 'Chưa làm'}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className='flex flex-col gap-2'>
                     <Select onValueChange={(newRole) => handleRoleUpdate(user.id, newRole)}>
                       <SelectTrigger className='w-32'>
                         <SelectValue placeholder='Đổi vai trò' />
@@ -196,6 +224,12 @@ const UserManagement = () => {
                         </SelectItem>
                       </SelectContent>
                     </Select>
+                    {/* Quick action: Direct activate */}
+                    {user.status !== 'subscriber' && (
+                      <Button size='sm' className='bg-blue-400' onClick={() => handleDirectActivate(user)}>
+                        Kích hoạt nhanh
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}

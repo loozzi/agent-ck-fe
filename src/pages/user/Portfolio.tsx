@@ -2,12 +2,15 @@ import { useAppDispatch, useAppSelector } from '@/app/hook'
 import AddTransactionDialog from '@/components/common/AddTransactionDialog'
 import DeleteConfirmationDialog from '@/components/common/DeleteConfirmationDialog'
 import EditTransactionDialog from '@/components/common/EditTransactionDialog'
+// import StockChart from '@/components/common/StockChart'
+import NewsTimeline from '@/components/common/NewsTimeline'
 import StockChart from '@/components/common/StockChart'
 import TransactionHistory from '@/components/common/TransactionHistory'
 import WalletCard from '@/components/common/WalletCard'
 import { Button } from '@/components/ui/button'
 import { deleteTransaction, fetchTransactions, fetchWallet } from '@/slices/portfolio.slice'
-import { Receipt, RefreshCw, Wallet, ChartLine } from 'lucide-react'
+import { fetchPortfolioNewsCurrentUser } from '@/slices/portfolioNews.slice'
+import { ChartLine, Receipt, RefreshCw, Wallet } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 const Portfolio = () => {
@@ -27,8 +30,11 @@ const Portfolio = () => {
   const [showAddTransactionDialog, setShowAddTransactionDialog] = useState(false)
   const [prefilledTicker, setPrefilledTicker] = useState<string>('')
   const [prefilledAction, setPrefilledAction] = useState<'buy' | 'sell' | ''>('')
-  const [selectedTickerForChart, setSelectedTickerForChart] = useState<string>('')
-  const [showStockChart, setShowStockChart] = useState(false)
+
+  // Portfolio News
+  const news = useAppSelector((state) => state.portfolioNews.news)
+  const newsLoading = useAppSelector((state) => state.portfolioNews.loading)
+  const newsError = useAppSelector((state) => state.portfolioNews.error)
 
   const handleTransactionSuccess = () => {
     dispatch(fetchWallet())
@@ -92,14 +98,19 @@ const Portfolio = () => {
     dispatch(fetchTransactions())
   }
 
-  const handleViewChart = (ticker: string) => {
-    setSelectedTickerForChart(ticker)
-    setShowStockChart(true)
+  const handleViewChart = () => {
+    setTimeout(() => {
+      const chartSection = document.getElementById('portfolio-chart-section')
+      if (chartSection) {
+        chartSection.scrollIntoView({ behavior: 'smooth' })
+      }
+    }, 100)
   }
 
   useEffect(() => {
     dispatch(fetchWallet())
     dispatch(fetchTransactions())
+    dispatch(fetchPortfolioNewsCurrentUser({ page: 1, per_page: 20 }))
   }, [dispatch])
 
   return (
@@ -162,75 +173,53 @@ const Portfolio = () => {
         )}
       </div>
 
-      {/* Stock Chart Section */}
-      {showStockChart && selectedTickerForChart && (
-        <div className='mb-8'>
-          <div className='flex items-center justify-between mb-4'>
-            <h2 className='text-2xl font-semibold text-gray-900 dark:text-gray-100 flex items-center'>
-              <ChartLine className='w-6 h-6 mr-2 text-indigo-600' />
-              Biểu đồ giá - {selectedTickerForChart}
-            </h2>
+      {/* Portfolio News Section */}
+      <div className='mb-8'>
+        <h2 className='text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center'>
+          <ChartLine className='w-6 h-6 mr-2 text-indigo-600' />
+          Tin tức danh mục đầu tư
+        </h2>
+        {newsError ? (
+          <div className='mb-4 p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center justify-between'>
+            <p className='text-red-600 dark:text-red-400'>Lỗi: {newsError}</p>
             <Button
               variant='outline'
               size='sm'
-              onClick={() => setShowStockChart(false)}
-              className='text-gray-600 hover:text-gray-800'
+              onClick={() => dispatch(fetchPortfolioNewsCurrentUser({ page: 1, per_page: 20 }))}
+              className='ml-4 text-blue-600 border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950'
             >
-              Đóng
+              Tải lại
             </Button>
           </div>
-          <StockChart ticker={selectedTickerForChart} />
-        </div>
-      )}
-
-      {/* Quick Chart Access for stocks not in wallet */}
-      {!showStockChart && (
-        <div className='mb-8'>
-          <h2 className='text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center'>
-            <ChartLine className='w-6 h-6 mr-2 text-indigo-600' />
-            Xem biểu đồ cổ phiếu
-          </h2>
-          {!selectedTickerForChart ? (
-            <div className='text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-lg'>
-              <ChartLine className='w-12 h-12 mx-auto text-gray-400 mb-4' />
-              <p className='text-gray-600 dark:text-gray-400 mb-4'>
-                Chọn cổ phiếu từ danh mục để xem biểu đồ hoặc nhập mã cổ phiếu
-              </p>
-              <div className='flex gap-2 justify-center'>
-                <input
-                  type='text'
-                  placeholder='Nhập mã cổ phiếu (VD: VCB, FPT)'
-                  className='px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      const value = (e.target as HTMLInputElement).value.trim().toUpperCase()
-                      if (value) {
-                        setSelectedTickerForChart(value)
-                        setShowStockChart(true)
-                      }
-                    }
-                  }}
-                />
-                <Button
-                  onClick={() => {
-                    const input = document.querySelector('input[placeholder*="mã cổ phiếu"]') as HTMLInputElement
-                    const value = input?.value.trim().toUpperCase()
-                    if (value) {
-                      setSelectedTickerForChart(value)
-                      setShowStockChart(true)
-                    }
-                  }}
-                  className='bg-blue-600 hover:bg-blue-700'
-                >
-                  Xem biểu đồ
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <StockChart ticker={selectedTickerForChart} />
-          )}
-        </div>
-      )}
+        ) : news.length === 0 ? (
+          <div className='bg-white dark:bg-gray-900 rounded-lg p-6 text-center min-h-[120px] flex flex-col items-center justify-center'>
+            <ChartLine className='w-8 h-8 mx-auto text-indigo-300 mb-2' />
+            <p className='text-gray-600 dark:text-gray-400'>Không có tin tức mới cho danh mục đầu tư</p>
+          </div>
+        ) : (
+          <div className='bg-white dark:bg-gray-900 rounded-lg p-6'>
+            <NewsTimeline
+              news={news.map((item) => ({
+                id: item.id,
+                title: item.name || 'Tin tức danh mục',
+                url: item.url,
+                summary: '',
+                content: '',
+                image_url: '',
+                source: item.related_stocks?.join(', ') || '',
+                language: '',
+                importance: 'low',
+                publish_time: item.released_time || item.created_at,
+                status: item.status || 'sent',
+                created_at: item.created_at,
+                updated_at: item.updated_at,
+                sent_at: item.updated_at
+              }))}
+              isLoading={newsLoading}
+            />
+          </div>
+        )}
+      </div>
 
       {/* Transactions Section */}
       <div>
@@ -245,8 +234,9 @@ const Portfolio = () => {
         />
       </div>
 
+      {/* (Biểu đồ cổ phiếu section đã bị loại bỏ) */}
       {/* Stock Chart Section */}
-      <div className='mt-8'>
+      <div id='portfolio-chart-section' className='mt-8'>
         <h2 className='text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center'>
           <ChartLine className='w-6 h-6 mr-2 text-indigo-600' />
           Biểu đồ cổ phiếu

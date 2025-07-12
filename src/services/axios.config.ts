@@ -63,7 +63,7 @@ apiInstance.interceptors.response.use(
     return response
   },
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean }
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean; _refreshTried?: boolean }
     const status = error.response?.status
     const responseData = error.response?.data as Record<string, unknown>
 
@@ -75,15 +75,18 @@ apiInstance.interceptors.response.use(
     }
 
     // Handle 401 Unauthorized
-    if (status === 401 && originalRequest && !originalRequest._retry) {
+    if (status === 401 && originalRequest) {
+      // Prevent infinite loop: only retry once
+      if (originalRequest._refreshTried) {
+        logoutUser('Token refresh failed (loop prevention)')
+        return Promise.reject(error)
+      }
+
       // Check if it's a refresh token endpoint failure
       if (originalRequest.url?.includes('/auth/token/refresh')) {
         logoutUser('Refresh token expired')
         return Promise.reject(error)
       }
-
-      // Mark request as retried to avoid infinite loops
-      originalRequest._retry = true
 
       // If already refreshing, queue this request
       if (isRefreshing) {
@@ -93,6 +96,7 @@ apiInstance.interceptors.response.use(
           .then((token) => {
             if (token) {
               originalRequest.headers['Authorization'] = `Bearer ${token}`
+              originalRequest._refreshTried = true
               return apiInstance(originalRequest)
             }
             return Promise.reject(error)
@@ -110,8 +114,8 @@ apiInstance.interceptors.response.use(
         return Promise.reject(error)
       }
 
-      // Start refresh process
       isRefreshing = true
+      originalRequest._refreshTried = true
 
       try {
         const response = await apiInstance.post('/auth/token/refresh', {

@@ -178,25 +178,6 @@ const PromtDetail = () => {
               </div>
             </CardContent>
           </Card>
-
-          {/* Logic Rules */}
-          {promptDetail.logic_rules && promptDetail.logic_rules.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Logic Rules</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='space-y-3'>
-                  {promptDetail.logic_rules.map((rule, index) => (
-                    <div key={index} className='bg-blue-50 p-3 rounded-lg'>
-                      <p className='font-medium text-blue-900'>{rule.name}</p>
-                      <p className='text-sm text-blue-700 mt-1'>{rule.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
         </div>
 
         {/* Sidebar */}
@@ -209,8 +190,8 @@ const PromtDetail = () => {
               <div className='flex items-center space-x-3'>
                 <User className='h-4 w-4 text-gray-500' />
                 <div>
-                  <p className='text-sm font-medium'>Trainer ID</p>
-                  <p className='text-sm text-gray-600'>{promptDetail.trainer_id}</p>
+                  <p className='text-sm font-medium'>Trainer</p>
+                  <p className='text-sm text-gray-600'>ID: {promptDetail.trainer_id.slice(0, 8)}...</p>
                 </div>
               </div>
 
@@ -232,25 +213,6 @@ const PromtDetail = () => {
                   <p className='text-sm font-medium'>Cập nhật lần cuối</p>
                   <p className='text-sm text-gray-600'>{formatDate(promptDetail.updated_at)}</p>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Thống kê</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-4'>
-              <div className='text-center'>
-                <p className='text-2xl font-bold text-blue-600'>{promptDetail.logic_rules?.length || 0}</p>
-                <p className='text-sm text-gray-600'>Logic Rules</p>
-              </div>
-
-              <Separator />
-
-              <div className='text-center'>
-                <p className='text-2xl font-bold text-green-600'>{promptDetail.prompt_text.length}</p>
-                <p className='text-sm text-gray-600'>Ký tự</p>
               </div>
             </CardContent>
           </Card>

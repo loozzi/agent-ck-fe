@@ -17,6 +17,7 @@ import type {
   LogicRuleAction,
   LogicRuleTimeFrame
 } from '@/types/logicRules'
+import type { CategoryEnum } from '@/types/prompts'
 
 interface LogicCondition {
   id: string
@@ -33,6 +34,7 @@ interface LogicRuleFormData {
   timeframe: LogicRuleTimeFrame
   priority: number
   is_active: boolean
+  category: CategoryEnum
 }
 
 interface LogicRuleDialogProps {
@@ -93,7 +95,8 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
     action: 'BUY',
     timeframe: '1d',
     priority: 1,
-    is_active: true
+    is_active: true,
+    category: 'general'
   })
 
   useEffect(() => {
@@ -112,7 +115,8 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
         action: rule.action,
         timeframe: rule.timeframe,
         priority: rule.priority,
-        is_active: rule.is_active
+        is_active: rule.is_active,
+        category: rule.category || 'general'
       })
     } else {
       setFormData({
@@ -122,7 +126,8 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
         action: 'BUY',
         timeframe: '1d',
         priority: 1,
-        is_active: true
+        is_active: true,
+        category: 'general'
       })
     }
   }, [rule])
@@ -188,7 +193,7 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
 
         <div className='space-y-6'>
           {/* Basic Info */}
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-4'>
             <div className='space-y-2'>
               <Label htmlFor='name'>Tên quy tắc *</Label>
               <Input
@@ -208,6 +213,34 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
                 value={formData.priority}
                 onChange={(e) => setFormData((prev) => ({ ...prev, priority: parseInt(e.target.value) || 1 }))}
               />
+            </div>
+            <div className='space-y-2'>
+              <Label htmlFor='category'>Danh mục</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value) => setFormData((prev) => ({ ...prev, category: value as CategoryEnum }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder='Chọn danh mục' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='general'>Chung</SelectItem>
+                  <SelectItem value='long_term'>Dài hạn</SelectItem>
+                  <SelectItem value='short_term'>Ngắn hạn</SelectItem>
+                  <SelectItem value='value_style'>Đầu tư giá trị</SelectItem>
+                  <SelectItem value='high_risk'>Rủi ro cao</SelectItem>
+                  <SelectItem value='moderate_risk'>Rủi ro vừa</SelectItem>
+                  <SelectItem value='low_risk'>Rủi ro thấp</SelectItem>
+                  <SelectItem value='goal_>10%'>Mục tiêu {'>'}10%</SelectItem>
+                  <SelectItem value='goal_learning'>Mục tiêu học hỏi</SelectItem>
+                  <SelectItem value='f0'>F0</SelectItem>
+                  <SelectItem value='advance'>Nâng cao</SelectItem>
+                  <SelectItem value='passive'>Thụ động</SelectItem>
+                  <SelectItem value='learning_mode'>Chế độ học</SelectItem>
+                  <SelectItem value='low_time'>Ít thời gian</SelectItem>
+                  <SelectItem value='active'>Chủ động</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

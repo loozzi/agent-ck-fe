@@ -12,11 +12,13 @@ import { LogicRuleDialog } from '@/components/common/LogicRuleDialog'
 import { LogicRuleDetailDialog } from '@/components/common/LogicRuleDetailDialog'
 import { DeleteLogicRuleDialog } from '@/components/common/DeleteLogicRuleDialog'
 import { createLogicRule, getLogicRules, updateLogicRule, deleteLogicRule } from '@/slices/logicRule.slice'
+import { fetchLogicRules as fetchAdminLogicRules } from '@/slices/admin.slice'
 import type { LogicRule, LogicRuleIndicator, LogicRuleAction } from '@/types/logicRules'
+import type { CategoryEnum } from '@/types/prompts'
 import { toast } from 'react-toastify'
 import '@/components/common/LogicRuleController.css'
 
-interface LogicRuleFormData {
+export interface LogicRuleFormData {
   name: string
   description: string
   conditions: Array<{
@@ -28,12 +30,15 @@ interface LogicRuleFormData {
   action: LogicRuleAction
   timeframe: string
   priority: number
+  category: CategoryEnum | 'general'
   is_active: boolean
 }
 
 const RuleController = () => {
   const dispatch = useAppDispatch()
-  const { logicRules, isLoading } = useAppSelector((state) => state.logicRule)
+  const user = useAppSelector((state) => state.auth.user)
+  const logicRuleState = useAppSelector((state) => (user?.role === 'admin' ? state.admin : state.logicRule))
+  const { logicRules, isLoading } = logicRuleState
 
   // Dialog states
   const [showCreateDialog, setShowCreateDialog] = useState(false)
@@ -47,6 +52,7 @@ const RuleController = () => {
   const [filterIndicator, setFilterIndicator] = useState<string>('all')
   const [filterAction, setFilterAction] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [filterCategory, setFilterCategory] = useState<CategoryEnum | 'all'>('all')
   const [activeTab, setActiveTab] = useState('all')
 
   // Loading states
@@ -54,8 +60,12 @@ const RuleController = () => {
   const [isToggling, setIsToggling] = useState(false)
 
   useEffect(() => {
-    dispatch(getLogicRules({}))
-  }, [dispatch])
+    if (user?.role === 'admin') {
+      dispatch(fetchAdminLogicRules({}))
+    } else {
+      dispatch(getLogicRules({}))
+    }
+  }, [dispatch, user?.role])
 
   // Filter logic rules
   const filteredRules = logicRules.filter((rule) => {
@@ -66,10 +76,11 @@ const RuleController = () => {
     const matchesAction = !filterAction || filterAction === 'all' || rule.action === filterAction
     const matchesStatus =
       !filterStatus || filterStatus === 'all' || (filterStatus === 'active' ? rule.is_active : !rule.is_active)
+    const matchesCategory = filterCategory === 'all' || rule.category === filterCategory
     const matchesTab =
       activeTab === 'all' || (activeTab === 'active' && rule.is_active) || (activeTab === 'inactive' && !rule.is_active)
 
-    return matchesSearch && matchesIndicator && matchesAction && matchesStatus && matchesTab
+    return matchesSearch && matchesIndicator && matchesAction && matchesStatus && matchesCategory && matchesTab
   })
 
   // Get statistics
@@ -102,15 +113,13 @@ const RuleController = () => {
         action: data.action,
         timeframe: data.timeframe,
         priority: data.priority,
+        category: data.category,
         is_active: data.is_active
       }
 
       await dispatch(createLogicRule(payload)).unwrap()
       setShowCreateDialog(false)
-      toast.success('Tạo quy tắc logic thành công!')
-    } catch (error) {
-      toast.error('Không thể tạo quy tắc logic')
-    }
+    } catch (error) {}
   }
 
   const handleEditRule = async (data: LogicRuleFormData) => {
@@ -131,16 +140,14 @@ const RuleController = () => {
         action: data.action,
         timeframe: data.timeframe,
         priority: data.priority,
+        category: data.category,
         is_active: data.is_active
       }
 
       await dispatch(updateLogicRule({ id: selectedRule.id, data: payload })).unwrap()
       setShowEditDialog(false)
       setSelectedRule(null)
-      toast.success('Cập nhật quy tắc logic thành công!')
-    } catch (error) {
-      toast.error('Không thể cập nhật quy tắc logic')
-    }
+    } catch (error) {}
   }
 
   const handleDeleteRule = async () => {
@@ -151,9 +158,7 @@ const RuleController = () => {
       await dispatch(deleteLogicRule(selectedRule.id)).unwrap()
       setShowDeleteDialog(false)
       setSelectedRule(null)
-      toast.success('Xóa quy tắc logic thành công!')
     } catch (error) {
-      toast.error('Không thể xóa quy tắc logic')
     } finally {
       setIsDeleting(false)
     }
@@ -170,7 +175,6 @@ const RuleController = () => {
       ).unwrap()
       toast.success(`${isActive ? 'Kích hoạt' : 'Tạm dừng'} quy tắc thành công!`)
     } catch (error) {
-      toast.error('Không thể cập nhật trạng thái quy tắc')
     } finally {
       setIsToggling(false)
     }
@@ -196,6 +200,7 @@ const RuleController = () => {
     setFilterIndicator('all')
     setFilterAction('all')
     setFilterStatus('all')
+    setFilterCategory('all')
   }
 
   return (
@@ -295,7 +300,7 @@ const RuleController = () => {
               />
             </div>
 
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-4'>
               <Select value={filterIndicator} onValueChange={setFilterIndicator}>
                 <SelectTrigger>
                   <SelectValue placeholder='Tất cả chỉ báo' />
@@ -333,6 +338,33 @@ const RuleController = () => {
                   <SelectItem value='all'>Tất cả trạng thái</SelectItem>
                   <SelectItem value='active'>Đang hoạt động</SelectItem>
                   <SelectItem value='inactive'>Tạm dừng</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={filterCategory}
+                onValueChange={(value) => setFilterCategory(value as CategoryEnum | 'all')}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder='Tất cả danh mục' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>Tất cả danh mục</SelectItem>
+                  <SelectItem value='general'>Chung</SelectItem>
+                  <SelectItem value='long_term'>Dài hạn</SelectItem>
+                  <SelectItem value='short_term'>Ngắn hạn</SelectItem>
+                  <SelectItem value='value_style'>Đầu tư giá trị</SelectItem>
+                  <SelectItem value='high_risk'>Rủi ro cao</SelectItem>
+                  <SelectItem value='moderate_risk'>Rủi ro vừa</SelectItem>
+                  <SelectItem value='low_risk'>Rủi ro thấp</SelectItem>
+                  <SelectItem value='goal_>10%'>Mục tiêu {'>'}10%</SelectItem>
+                  <SelectItem value='goal_learning'>Mục tiêu học hỏi</SelectItem>
+                  <SelectItem value='f0'>F0</SelectItem>
+                  <SelectItem value='advance'>Nâng cao</SelectItem>
+                  <SelectItem value='passive'>Thụ động</SelectItem>
+                  <SelectItem value='learning_mode'>Chế độ học</SelectItem>
+                  <SelectItem value='low_time'>Ít thời gian</SelectItem>
+                  <SelectItem value='active'>Chủ động</SelectItem>
                 </SelectContent>
               </Select>
               <Button variant='outline' onClick={clearFilters}>

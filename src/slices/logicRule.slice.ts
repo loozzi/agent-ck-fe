@@ -77,6 +77,8 @@ export const updateLogicRule = createAsyncThunk(
 
       return response.data
     } catch (error) {
+      const errorMessage = (error as any).response.data.detail || 'Không thể cập nhật quy tắc logic'
+      toast.error(errorMessage)
       return rejectWithValue('Không thể cập nhật quy tắc logic')
     }
   }

@@ -149,7 +149,8 @@ const UserDashboard = () => {
           <div className='flex-1'>
             <h1 className='text-xl sm:text-2xl font-bold tracking-tight'>Thị trường chứng khoán</h1>
             <p className='text-muted-foreground text-sm'>
-              Chào mừng {user?.full_name || 'User'} - Trạng thái: {subscription?.status || 'Inactive'}
+              Chào mừng {user?.full_name || 'User'} - Trạng thái:{' '}
+              {subscription?.status === 'subscriber' ? 'Đã đăng ký' : 'Chưa đăng ký'}
             </p>
           </div>
 

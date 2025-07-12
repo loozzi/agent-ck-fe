@@ -1,5 +1,5 @@
 import promtService from '@/services/prompt.service'
-import type { CreatePromptPayload, UpdatePromtPayload } from '@/types/prompts'
+import type { CreatePromptPayload, DocumentUploadPayload, UpdatePromtPayload } from '@/types/prompts'
 import type { PromptState } from '@/types/slices/prompt.type'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
@@ -8,6 +8,7 @@ const initialState: PromptState = {
   prompts: [],
   promptDetail: null,
   stats: null,
+  categorizedContent: null,
   isLoading: false,
   error: null
 }
@@ -111,6 +112,52 @@ export const getStats = createAsyncThunk('prompt/getStats', async (_, { rejectWi
   }
 })
 
+export const uploadDocument = createAsyncThunk(
+  'prompt/uploadDocument',
+  async (payload: DocumentUploadPayload, { rejectWithValue }) => {
+    try {
+      const formData = new FormData()
+      formData.append('file', payload.file)
+      formData.append('title', payload.title)
+      if (payload.description) {
+        formData.append('description', payload.description)
+      }
+      if (payload.category) {
+        formData.append('category', payload.category)
+      }
+
+      const response = await promtService.uploadDocument(formData)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response.data.detail || 'Không thể tải lên tài liệu'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+
+      return response.data
+    } catch (error) {
+      return rejectWithValue('Không thể tải lên tài liệu')
+    }
+  }
+)
+
+export const getCategorizedContent = createAsyncThunk(
+  'prompt/getCategorizedContent',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await promtService.getCategorizedContent()
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response.data.detail || 'Không thể lấy nội dung phân loại'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+
+      return response.data
+    } catch (error) {
+      return rejectWithValue('Không thể lấy nội dung phân loại')
+    }
+  }
+)
+
 const promptSlice = createSlice({
   name: 'prompt',
   initialState,
@@ -200,6 +247,31 @@ const promptSlice = createSlice({
         state.stats = action.payload
       })
       .addCase(getStats.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(uploadDocument.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(uploadDocument.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.prompts.push(action.payload)
+        toast.success('Tải lên tài liệu thành công')
+      })
+      .addCase(uploadDocument.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(getCategorizedContent.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(getCategorizedContent.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.categorizedContent = action.payload
+      })
+      .addCase(getCategorizedContent.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload as string
       })
