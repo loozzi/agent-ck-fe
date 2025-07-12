@@ -3,13 +3,14 @@ import AddTransactionDialog from '@/components/common/AddTransactionDialog'
 import DeleteConfirmationDialog from '@/components/common/DeleteConfirmationDialog'
 import EditTransactionDialog from '@/components/common/EditTransactionDialog'
 // import StockChart from '@/components/common/StockChart'
+import NewsTimeline from '@/components/common/NewsTimeline'
+import StockChart from '@/components/common/StockChart'
 import TransactionHistory from '@/components/common/TransactionHistory'
 import WalletCard from '@/components/common/WalletCard'
-import NewsTimeline from '@/components/common/NewsTimeline'
 import { Button } from '@/components/ui/button'
 import { deleteTransaction, fetchTransactions, fetchWallet } from '@/slices/portfolio.slice'
 import { fetchPortfolioNewsCurrentUser } from '@/slices/portfolioNews.slice'
-import { Receipt, RefreshCw, Wallet, ChartLine } from 'lucide-react'
+import { ChartLine, Receipt, RefreshCw, Wallet } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 const Portfolio = () => {
@@ -29,8 +30,6 @@ const Portfolio = () => {
   const [showAddTransactionDialog, setShowAddTransactionDialog] = useState(false)
   const [prefilledTicker, setPrefilledTicker] = useState<string>('')
   const [prefilledAction, setPrefilledAction] = useState<'buy' | 'sell' | ''>('')
-  // const [selectedTickerForChart, setSelectedTickerForChart] = useState<string>('')
-  // const [showStockChart, setShowStockChart] = useState(false)
 
   // Portfolio News
   const news = useAppSelector((state) => state.portfolioNews.news)
@@ -99,7 +98,14 @@ const Portfolio = () => {
     dispatch(fetchTransactions())
   }
 
-  // Remove handleViewChart
+  const handleViewChart = () => {
+    setTimeout(() => {
+      const chartSection = document.getElementById('portfolio-chart-section')
+      if (chartSection) {
+        chartSection.scrollIntoView({ behavior: 'smooth' })
+      }
+    }, 100)
+  }
 
   useEffect(() => {
     dispatch(fetchWallet())
@@ -173,12 +179,46 @@ const Portfolio = () => {
           <ChartLine className='w-6 h-6 mr-2 text-indigo-600' />
           Tin tức danh mục đầu tư
         </h2>
-        {newsError && (
-          <div className='mb-4 p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg'>
+        {newsError ? (
+          <div className='mb-4 p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center justify-between'>
             <p className='text-red-600 dark:text-red-400'>Lỗi: {newsError}</p>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => dispatch(fetchPortfolioNewsCurrentUser({ page: 1, per_page: 20 }))}
+              className='ml-4 text-blue-600 border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950'
+            >
+              Tải lại
+            </Button>
+          </div>
+        ) : news.length === 0 ? (
+          <div className='bg-white dark:bg-gray-900 rounded-lg p-6 text-center min-h-[120px] flex flex-col items-center justify-center'>
+            <ChartLine className='w-8 h-8 mx-auto text-indigo-300 mb-2' />
+            <p className='text-gray-600 dark:text-gray-400'>Không có tin tức mới cho danh mục đầu tư</p>
+          </div>
+        ) : (
+          <div className='bg-white dark:bg-gray-900 rounded-lg p-6'>
+            <NewsTimeline
+              news={news.map((item) => ({
+                id: item.id,
+                title: item.name || 'Tin tức danh mục',
+                url: item.url,
+                summary: '',
+                content: '',
+                image_url: '',
+                source: item.related_stocks?.join(', ') || '',
+                language: '',
+                importance: 'low',
+                publish_time: item.released_time || item.created_at,
+                status: item.status || 'sent',
+                created_at: item.created_at,
+                updated_at: item.updated_at,
+                sent_at: item.updated_at
+              }))}
+              isLoading={newsLoading}
+            />
           </div>
         )}
-        <NewsTimeline news={news} isLoading={newsLoading} />
       </div>
 
       {/* Transactions Section */}
@@ -195,6 +235,27 @@ const Portfolio = () => {
       </div>
 
       {/* (Biểu đồ cổ phiếu section đã bị loại bỏ) */}
+      {/* Stock Chart Section */}
+      <div id='portfolio-chart-section' className='mt-8'>
+        <h2 className='text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center'>
+          <ChartLine className='w-6 h-6 mr-2 text-indigo-600' />
+          Biểu đồ cổ phiếu
+        </h2>
+        {wallet && wallet.length > 0 ? (
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+            {wallet.map((item) => (
+              <div key={item.id} className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
+                <StockChart ticker={item.ticker} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className='text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-lg'>
+            <ChartLine className='w-12 h-12 mx-auto text-gray-400 mb-4' />
+            <p className='text-gray-600 dark:text-gray-400'>Chưa có dữ liệu biểu đồ cho cổ phiếu nào</p>
+          </div>
+        )}
+      </div>
 
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmationDialog
