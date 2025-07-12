@@ -11,9 +11,10 @@ interface PromptCardProps {
   prompt: Prompt
   onUpdated?: () => void
   onDeleted?: () => void
+  showActions?: boolean
 }
 
-const PromptCard = ({ prompt, onUpdated, onDeleted }: PromptCardProps) => {
+const PromptCard = ({ prompt, onUpdated, onDeleted, showActions = true }: PromptCardProps) => {
   const navigate = useNavigate()
 
   const handleViewDetail = () => {
@@ -77,22 +78,24 @@ const PromptCard = ({ prompt, onUpdated, onDeleted }: PromptCardProps) => {
             </div>
           </div>
 
-          <div className='flex items-center justify-between pt-2 border-t'>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={handleViewDetail}
-              className='flex items-center space-x-1 cursor-pointer'
-            >
-              <Eye className='h-4 w-4' />
-              <span>Chi tiết</span>
-            </Button>
+          {showActions && (
+            <div className='flex items-center justify-between pt-2 border-t'>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={handleViewDetail}
+                className='flex items-center space-x-1 cursor-pointer'
+              >
+                <Eye className='h-4 w-4' />
+                <span>Chi tiết</span>
+              </Button>
 
-            <div className='flex items-center space-x-2'>
-              <EditPromptDialog prompt={prompt} onUpdated={onUpdated} />
-              <DeletePromptDialog promptId={prompt.id} promptName={prompt.name} onDeleted={onDeleted} />
+              <div className='flex items-center space-x-2'>
+                <EditPromptDialog prompt={prompt} onUpdated={onUpdated} />
+                <DeletePromptDialog promptId={prompt.id} promptName={prompt.name} onDeleted={onDeleted} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </CardContent>
     </Card>

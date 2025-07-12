@@ -8,6 +8,7 @@ import TransactionHistory from '@/pages/user/TransactionHistory'
 import StockChartDemo from '@/pages/demo/StockChartDemo'
 import type { RouteBrowser } from '@/types/routes'
 import { Route, Routes } from 'react-router'
+import Strategy from '@/pages/user/Strategy'
 
 export const userRoutesConfig: RouteBrowser[] = [
   {
@@ -56,6 +57,12 @@ export const userRoutesConfig: RouteBrowser[] = [
     name: 'Chart Demo',
     route: 'chart-demo',
     element: <StockChartDemo />,
+    exact: true
+  },
+  {
+    name: 'strategy',
+    route: 'strategy',
+    element: <Strategy />,
     exact: true
   }
 ]
