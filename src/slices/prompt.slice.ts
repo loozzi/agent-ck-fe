@@ -1,5 +1,5 @@
 import promtService from '@/services/prompt.service'
-import type { CreatePromptPayload, UpdatePromtPayload } from '@/types/prompts'
+import type { CreatePromptPayload, DocumentUploadPayload, UpdatePromtPayload } from '@/types/prompts'
 import type { PromptState } from '@/types/slices/prompt.type'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
@@ -111,6 +111,34 @@ export const getStats = createAsyncThunk('prompt/getStats', async (_, { rejectWi
   }
 })
 
+export const uploadDocument = createAsyncThunk(
+  'prompt/uploadDocument',
+  async (payload: DocumentUploadPayload, { rejectWithValue }) => {
+    try {
+      const formData = new FormData()
+      formData.append('file', payload.file)
+      formData.append('title', payload.title)
+      if (payload.description) {
+        formData.append('description', payload.description)
+      }
+      if (payload.category) {
+        formData.append('category', payload.category)
+      }
+
+      const response = await promtService.uploadDocument(formData)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response.data.detail || 'Không thể tải lên tài liệu'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+
+      return response.data
+    } catch (error) {
+      return rejectWithValue('Không thể tải lên tài liệu')
+    }
+  }
+)
+
 const promptSlice = createSlice({
   name: 'prompt',
   initialState,
@@ -200,6 +228,19 @@ const promptSlice = createSlice({
         state.stats = action.payload
       })
       .addCase(getStats.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(uploadDocument.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(uploadDocument.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.prompts.push(action.payload)
+        toast.success('Tải lên tài liệu thành công')
+      })
+      .addCase(uploadDocument.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload as string
       })

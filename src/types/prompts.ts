@@ -1,10 +1,24 @@
-import type { LogicRule } from './logicRules'
+export type CategoryEnum =
+  | 'long_term'
+  | 'short_term'
+  | 'value_style'
+  | 'high_risk'
+  | 'moderate_risk'
+  | 'low_risk'
+  | 'goal_>10%'
+  | 'goal_learning'
+  | 'f0'
+  | 'advance'
+  | 'passive'
+  | 'learning_mode'
+  | 'low_time'
+  | 'active'
 
 export interface CreatePromptPayload {
   name: string
   description: string
   prompt_text: string
-  category: string
+  category: CategoryEnum
   is_active: boolean
 }
 
@@ -12,7 +26,7 @@ export interface UpdatePromtPayload {
   name?: string
   description?: string
   prompt_text?: string
-  category?: string
+  category?: CategoryEnum
   is_active?: boolean
 }
 
@@ -23,11 +37,14 @@ export interface Prompt extends CreatePromptPayload {
   updated_at: string
 }
 
-export interface PromptDetail extends Prompt {
-  logic_rules: LogicRule[]
-}
-
 export interface GetMyPromptParams {
   category?: string
   is_active?: boolean
+}
+
+export interface DocumentUploadPayload {
+  file: File
+  title: string
+  description?: string
+  category?: CategoryEnum
 }

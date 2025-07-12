@@ -31,7 +31,7 @@ const CreatePromptDialog = ({ onCreated }: CreatePromptDialogProps) => {
     name: '',
     description: '',
     prompt_text: '',
-    category: '',
+    category: 'learning_mode',
     is_active: true
   })
 
@@ -46,7 +46,7 @@ const CreatePromptDialog = ({ onCreated }: CreatePromptDialogProps) => {
         name: '',
         description: '',
         prompt_text: '',
-        category: '',
+        category: 'learning_mode',
         is_active: true
       })
       onCreated?.()
@@ -103,13 +103,31 @@ const CreatePromptDialog = ({ onCreated }: CreatePromptDialogProps) => {
 
           <div className='space-y-2'>
             <Label htmlFor='category'>Danh mục</Label>
-            <Input
+            <select
               id='category'
-              placeholder='Nhập danh mục (vd: trading, analysis, education...)'
+              className='w-full border rounded px-3 py-2'
               value={formData.category}
               onChange={(e) => handleInputChange('category', e.target.value)}
               required
-            />
+            >
+              <option value='' disabled>
+                Chọn danh mục
+              </option>
+              <option value='long_term'>Dài hạn</option>
+              <option value='short_term'>Ngắn hạn</option>
+              <option value='value_style'>Đầu tư giá trị</option>
+              <option value='high_risk'>Rủi ro cao</option>
+              <option value='moderate_risk'>Rủi ro vừa</option>
+              <option value='low_risk'>Rủi ro thấp</option>
+              <option value='goal_>10%'>Mục tiêu {'>'}10%</option>
+              <option value='goal_learning'>Mục tiêu học hỏi</option>
+              <option value='f0'>F0</option>
+              <option value='advance'>Nâng cao</option>
+              <option value='passive'>Thụ động</option>
+              <option value='learning_mode'>Chế độ học</option>
+              <option value='low_time'>Ít thời gian</option>
+              <option value='active'>Chủ động</option>
+            </select>
           </div>
 
           <div className='space-y-2'>

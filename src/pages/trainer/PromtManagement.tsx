@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge'
 import { Search, Filter, BarChart3, FileText, Activity, TrendingUp } from 'lucide-react'
 import CreatePromptDialog from '@/components/common/CreatePromptDialog'
+import UploadDocumentDialog from '@/components/common/UploadDocumentDialog'
 import PromptCard from '@/components/common/PromptCard'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -80,7 +81,10 @@ const PromtManagement = () => {
           <h1 className='text-3xl font-bold'>Quản lý Prompt</h1>
           <p className='text-gray-600 mt-1'>Tạo và quản lý các prompt cho hệ thống AI</p>
         </div>
-        <CreatePromptDialog onCreated={loadData} />
+        <div className='flex gap-2'>
+          <CreatePromptDialog onCreated={loadData} />
+          <UploadDocumentDialog onUploaded={loadData} />
+        </div>
       </div>
 
       {/* Stats Cards */}
