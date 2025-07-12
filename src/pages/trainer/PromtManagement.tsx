@@ -1,21 +1,25 @@
-import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import type { AppDispatch, RootState } from '@/app/store'
-import { getPrompts, getStats } from '@/slices/prompt.slice'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAppDispatch, useAppSelector } from '@/app/hook'
+import CreatePromptDialog from '@/components/common/CreatePromptDialog'
+import PromptCard from '@/components/common/PromptCard'
+import UploadDocumentDialog from '@/components/common/UploadDocumentDialog'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { Search, Filter, BarChart3, FileText, Activity, TrendingUp } from 'lucide-react'
-import CreatePromptDialog from '@/components/common/CreatePromptDialog'
-import UploadDocumentDialog from '@/components/common/UploadDocumentDialog'
-import PromptCard from '@/components/common/PromptCard'
 import { Skeleton } from '@/components/ui/skeleton'
+import { fetchPrompts as fetchAdminPrompts } from '@/slices/admin.slice'
+import { getPrompts, getStats } from '@/slices/prompt.slice'
+import { Activity, BarChart3, FileText, Filter, Search, TrendingUp } from 'lucide-react'
+import { useEffect, useState } from 'react'
+// import { useDispatch } from 'react-redux'
 
 const PromtManagement = () => {
-  const dispatch = useDispatch<AppDispatch>()
-  const { prompts, isLoading } = useSelector((state: RootState) => state.prompt)
+  const dispatch = useAppDispatch()
+  const user = useAppSelector((state) => state.auth.user)
+  const promptState = useAppSelector((state) => (user?.role === 'admin' ? state.admin : state.prompt))
+  const { prompts, isLoading } = promptState
+  // const adminState = useReduxSelector((state: RootState) => state.admin)
 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
@@ -23,11 +27,16 @@ const PromtManagement = () => {
 
   useEffect(() => {
     loadData()
-  }, [])
+    // eslint-disable-next-line
+  }, [user?.role])
 
   const loadData = async () => {
     try {
-      await Promise.all([dispatch(getPrompts({})).unwrap(), dispatch(getStats()).unwrap()])
+      if (user?.role === 'admin') {
+        await dispatch(fetchAdminPrompts({})).unwrap()
+      } else {
+        await Promise.all([dispatch(getPrompts({})).unwrap(), dispatch(getStats()).unwrap()])
+      }
     } catch (error) {
       console.error('Failed to load data:', error)
     }
@@ -44,7 +53,11 @@ const PromtManagement = () => {
       params.is_active = selectedStatus === 'active'
     }
 
-    dispatch(getPrompts(params))
+    if (user?.role === 'admin') {
+      dispatch(fetchAdminPrompts(params))
+    } else {
+      dispatch(getPrompts(params))
+    }
   }
 
   const filteredPrompts = prompts.filter((prompt) => {

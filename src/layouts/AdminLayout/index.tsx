@@ -4,8 +4,9 @@ import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
 import AdminNavigator from '@/navigators/admin.routes'
 import { useEffect, useState } from 'react'
-import { FaHome, FaUsers, FaWallet } from 'react-icons/fa'
+import { FaBookOpen, FaHome, FaList, FaUsers } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
+import { MdOutlineMonitorHeart } from 'react-icons/md'
 import type { RouteItem } from '../UserLayout'
 const AdminLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false)
@@ -61,6 +62,24 @@ const AdminLayout = () => {
     //   icon: <FaWallet className='w-4 h-4' />,
     //   href: '/admin/subscription'
     // },
+    {
+      id: 'prompt-management',
+      title: 'Quản lý prompts',
+      icon: <MdOutlineMonitorHeart className='w-4 h-4' />,
+      href: '/admin/prompts'
+    },
+    {
+      id: 'logic-rules',
+      title: 'Quản lý quy tắc logic',
+      icon: <FaBookOpen className='w-4 h-4' />,
+      href: '/admin/rules-management'
+    },
+    {
+      id: 'category-management',
+      title: 'Quản lý danh mục',
+      icon: <FaList className='w-4 h-4' />,
+      href: '/admin/category-management'
+    },
     {
       id: 'settings',
       title: 'Cài đặt',

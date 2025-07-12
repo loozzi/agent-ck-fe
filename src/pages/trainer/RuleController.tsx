@@ -12,6 +12,7 @@ import { LogicRuleDialog } from '@/components/common/LogicRuleDialog'
 import { LogicRuleDetailDialog } from '@/components/common/LogicRuleDetailDialog'
 import { DeleteLogicRuleDialog } from '@/components/common/DeleteLogicRuleDialog'
 import { createLogicRule, getLogicRules, updateLogicRule, deleteLogicRule } from '@/slices/logicRule.slice'
+import { fetchLogicRules as fetchAdminLogicRules } from '@/slices/admin.slice'
 import type { LogicRule, LogicRuleIndicator, LogicRuleAction } from '@/types/logicRules'
 import type { CategoryEnum } from '@/types/prompts'
 import { toast } from 'react-toastify'
@@ -35,7 +36,9 @@ export interface LogicRuleFormData {
 
 const RuleController = () => {
   const dispatch = useAppDispatch()
-  const { logicRules, isLoading } = useAppSelector((state) => state.logicRule)
+  const user = useAppSelector((state) => state.auth.user)
+  const logicRuleState = useAppSelector((state) => (user?.role === 'admin' ? state.admin : state.logicRule))
+  const { logicRules, isLoading } = logicRuleState
 
   // Dialog states
   const [showCreateDialog, setShowCreateDialog] = useState(false)
@@ -57,8 +60,12 @@ const RuleController = () => {
   const [isToggling, setIsToggling] = useState(false)
 
   useEffect(() => {
-    dispatch(getLogicRules({}))
-  }, [dispatch])
+    if (user?.role === 'admin') {
+      dispatch(fetchAdminLogicRules({}))
+    } else {
+      dispatch(getLogicRules({}))
+    }
+  }, [dispatch, user?.role])
 
   // Filter logic rules
   const filteredRules = logicRules.filter((rule) => {
@@ -112,10 +119,7 @@ const RuleController = () => {
 
       await dispatch(createLogicRule(payload)).unwrap()
       setShowCreateDialog(false)
-      toast.success('Tạo quy tắc logic thành công!')
-    } catch (error) {
-      toast.error('Không thể tạo quy tắc logic')
-    }
+    } catch (error) {}
   }
 
   const handleEditRule = async (data: LogicRuleFormData) => {
@@ -143,10 +147,7 @@ const RuleController = () => {
       await dispatch(updateLogicRule({ id: selectedRule.id, data: payload })).unwrap()
       setShowEditDialog(false)
       setSelectedRule(null)
-      toast.success('Cập nhật quy tắc logic thành công!')
-    } catch (error) {
-      toast.error('Không thể cập nhật quy tắc logic')
-    }
+    } catch (error) {}
   }
 
   const handleDeleteRule = async () => {
@@ -157,9 +158,7 @@ const RuleController = () => {
       await dispatch(deleteLogicRule(selectedRule.id)).unwrap()
       setShowDeleteDialog(false)
       setSelectedRule(null)
-      toast.success('Xóa quy tắc logic thành công!')
     } catch (error) {
-      toast.error('Không thể xóa quy tắc logic')
     } finally {
       setIsDeleting(false)
     }
@@ -176,7 +175,6 @@ const RuleController = () => {
       ).unwrap()
       toast.success(`${isActive ? 'Kích hoạt' : 'Tạm dừng'} quy tắc thành công!`)
     } catch (error) {
-      toast.error('Không thể cập nhật trạng thái quy tắc')
     } finally {
       setIsToggling(false)
     }

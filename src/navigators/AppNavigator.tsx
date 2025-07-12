@@ -87,7 +87,7 @@ const AppNavigator = () => {
         <Route
           path='/trainer/*'
           element={
-            <ProtectedRoute requiredRoles={['trainer']}>
+            <ProtectedRoute requiredRoles={['trainer', 'admin']}>
               <TrainerLayout />
             </ProtectedRoute>
           }

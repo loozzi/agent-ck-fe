@@ -124,8 +124,9 @@ const EditPromptDialog = ({ prompt, onUpdated }: EditPromptDialogProps) => {
               placeholder='Nhập nội dung prompt'
               value={formData.prompt_text || ''}
               onChange={(e) => handleInputChange('prompt_text', e.target.value)}
-              rows={6}
+              rows={16}
               required
+              style={{ maxHeight: '400px', overflowY: 'auto' }}
             />
           </div>
 

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { updateUserRole, fetchUsers, directActiveSubscription } from '@/slices/admin.slice'
+import type { User } from '@/types/admin.types'
 import { useEffect, useState } from 'react'
 
 const UserManagement = () => {
@@ -54,7 +55,7 @@ const UserManagement = () => {
   }
 
   // Filter function
-  const filteredUsers = users.filter((user) => {
+  const filteredUsers: User[] = users.filter((user) => {
     // Role filter
     if (filterRole && user.role.toLowerCase() !== filterRole.toLowerCase()) {
       return false

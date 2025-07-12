@@ -53,7 +53,7 @@ export interface SubscriptionUpdateRoleResponse {
 }
 
 export interface UserSubscription {
-  status: string
+  status: SubscriptionStatus
   subscription_type: string
   start_date: string
   end_date: string
@@ -66,7 +66,7 @@ export interface UserSubscriptionStatus {
   email: string
   full_name: string
   role: string
-  status: string
+  status: SubscriptionStatus
   zalo_id: string
   onboarding_completed: boolean
 }
