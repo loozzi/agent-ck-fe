@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts'
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -12,6 +12,9 @@ import { cn } from '@/lib/utils'
 interface StockChartProps {
   ticker: string
   className?: string
+  entryPrice?: number
+  takeProfit?: number
+  stopLoss?: number
 }
 
 interface TimeRange {
@@ -37,7 +40,7 @@ const timeRanges: TimeRange[] = [
   { label: 'YTD', interval: '1D', days: -1 } // -1 means from start of year
 ]
 
-const StockChart = ({ ticker, className }: StockChartProps) => {
+const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss }: StockChartProps) => {
   const [chartData, setChartData] = useState<Daum[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -282,6 +285,34 @@ const StockChart = ({ ticker, className }: StockChartProps) => {
                   tick={{ fontSize: 12 }}
                 />
                 <Tooltip content={<CustomTooltip />} />
+                {/* Đường kẻ ngang cho Entry, TP, SL */}
+                {entryPrice && (
+                  <ReferenceLine
+                    y={entryPrice}
+                    stroke='#2563eb'
+                    strokeDasharray='4 2'
+                    strokeWidth={2}
+                    label={{ value: 'Entry', position: 'right', fill: '#2563eb', fontSize: 12, fontWeight: 'bold' }}
+                  />
+                )}
+                {takeProfit && (
+                  <ReferenceLine
+                    y={takeProfit}
+                    stroke='#22c55e'
+                    strokeDasharray='4 2'
+                    strokeWidth={2}
+                    label={{ value: 'TP', position: 'right', fill: '#22c55e', fontSize: 12, fontWeight: 'bold' }}
+                  />
+                )}
+                {stopLoss && (
+                  <ReferenceLine
+                    y={stopLoss}
+                    stroke='#ef4444'
+                    strokeDasharray='4 2'
+                    strokeWidth={2}
+                    label={{ value: 'SL', position: 'right', fill: '#ef4444', fontSize: 12, fontWeight: 'bold' }}
+                  />
+                )}
                 <Area
                   type='monotone'
                   dataKey='close'
