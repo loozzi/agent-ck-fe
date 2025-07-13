@@ -81,6 +81,12 @@ const AdminLayout = () => {
       href: '/admin/category-management'
     },
     {
+      id: 'lesson-management',
+      title: 'Quản lý bài học',
+      icon: <FaBookOpen className='w-4 h-4' />,
+      href: '/admin/lesson-management'
+    },
+    {
       id: 'settings',
       title: 'Cài đặt',
       icon: <IoIosSettings className='w-4 h-4' />,

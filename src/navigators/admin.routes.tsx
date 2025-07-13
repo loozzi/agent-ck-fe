@@ -8,6 +8,7 @@ import PromtManagement from '@/pages/trainer/PromtManagement'
 import RuleController from '@/pages/trainer/RuleController'
 import PromtDetail from '@/pages/trainer/PromtDetail'
 import CategoryManagement from '@/pages/trainer/CategoryManagement'
+import LessonManagement from '@/pages/admin/Lesson'
 
 export const adminRoutesConfig: RouteBrowser[] = [
   {
@@ -57,6 +58,12 @@ export const adminRoutesConfig: RouteBrowser[] = [
     element: <CategoryManagement />,
     exact: true,
     name: 'Quản lý danh mục'
+  },
+  {
+    name: 'Lesson Management',
+    route: 'lesson-management',
+    element: <LessonManagement />,
+    exact: true
   }
 ]
 

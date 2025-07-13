@@ -4,7 +4,8 @@ import type {
   ChatHistoryParams,
   ChatPayload,
   ChatResponse,
-  ChatSessionInfo
+  ChatSessionInfo,
+  SuggestQuestionResponse
 } from '@/types/chat'
 import type { AxiosResponse } from 'axios'
 import apiInstance from './axios.config'
@@ -27,7 +28,9 @@ const chatService = {
   },
   clearCache: (): Promise<AxiosResponse<void>> => {
     return apiInstance.post<void>('/chat/cache/clear')
-  }
+  },
+  getSuggestedQuestions: (): Promise<AxiosResponse<SuggestQuestionResponse>> =>
+    apiInstance.get<SuggestQuestionResponse>('/chat/suggest-questions')
 }
 
 export default chatService
