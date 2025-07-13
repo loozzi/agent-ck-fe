@@ -43,3 +43,7 @@ export interface CacheStats {
   session_cache_size: number
   message_cache_size: number
 }
+
+export interface SuggestQuestionResponse {
+  suggested_questions: string[]
+}

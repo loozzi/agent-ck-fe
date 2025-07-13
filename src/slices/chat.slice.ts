@@ -8,6 +8,7 @@ const initialState: ChatState = {
   histories: [],
   sessionInfo: null,
   health: null,
+  suggestedQuestions: [],
 
   loadingHistories: false,
   loadingSessionInfo: false,
@@ -110,6 +111,24 @@ export const deleteChatHistories = createAsyncThunk('chat/deleteHistories', asyn
   }
 })
 
+export const fetchSuggestedQuestions = createAsyncThunk(
+  'chat/fetchSuggestedQuestions',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await chatService.getSuggestedQuestions()
+      if (response.status !== 200) {
+        const errorMessage =
+          (response as any).response?.data?.detail || 'Không thể lấy câu hỏi gợi ý. Vui lòng thử lại sau.'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+      return response.data.suggested_questions
+    } catch (error) {
+      return rejectWithValue('Không thể lấy câu hỏi gợi ý. Vui lòng thử lại sau.')
+    }
+  }
+)
+
 const chatSlice = createSlice({
   name: 'chat',
   initialState,
@@ -197,6 +216,17 @@ const chatSlice = createSlice({
       .addCase(deleteChatHistories.rejected, (state, action) => {
         state.loadingHistories = false
         state.error = action.payload as string
+      })
+      .addCase(fetchSuggestedQuestions.pending, (state) => {
+        state.error = null
+      })
+      .addCase(fetchSuggestedQuestions.fulfilled, (state, action) => {
+        state.suggestedQuestions = action.payload
+        state.error = null
+      })
+      .addCase(fetchSuggestedQuestions.rejected, (state, action) => {
+        state.error = action.payload as string
+        state.suggestedQuestions = []
       })
   }
 })
