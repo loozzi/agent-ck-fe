@@ -1,7 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { useAppDispatch, useAppSelector } from '@/app/hook'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,17 +10,27 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
-import { Send, Bot, User, Loader2, Trash2 } from 'lucide-react'
-import { useAppDispatch, useAppSelector } from '@/app/hook'
-import { sendMessage, fetchChatHistories, deleteChatHistories } from '@/slices/chat.slice'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { deleteChatHistories, fetchChatHistories, fetchSuggestedQuestions, sendMessage } from '@/slices/chat.slice'
 import type { ChatHistory } from '@/types/chat'
+import { Bot, Loader2, Send, Trash2, User } from 'lucide-react'
+import React, { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import { toast } from 'react-toastify'
+import remarkGfm from 'remark-gfm'
 
 const Learning = () => {
   const dispatch = useAppDispatch()
-  const { histories, loadingSend, loadingHistories, error } = useAppSelector((state) => state.chat)
+  const { histories, loadingSend, loadingHistories, error, suggestedQuestions } = useAppSelector((state) => state.chat)
+
+  // Fetch suggested questions if no chat history
+  useEffect(() => {
+    if (histories.length === 0) {
+      dispatch(fetchSuggestedQuestions())
+    }
+  }, [dispatch, histories.length])
 
   const [inputMessage, setInputMessage] = useState('')
   const [hasMoreHistory, setHasMoreHistory] = useState(true)
@@ -61,6 +68,15 @@ const Learning = () => {
     }
 
     return messages
+  }
+  // Handler for clicking a suggested question
+  const handleSuggestedQuestionClick = (question: string) => {
+    if (!loadingSend) {
+      setInputMessage(question)
+      setTimeout(() => {
+        handleSendMessage()
+      }, 0)
+    }
   }
 
   // Helper function to determine if message is from AI
@@ -370,7 +386,7 @@ const Learning = () => {
             )}
 
             <div className='space-y-2 md:space-y-4'>
-              {messages.map((message) => (
+              {messages.map((message, idx) => (
                 <div
                   key={message.id}
                   className={`flex gap-2 md:gap-3 ${!isAIMessage(message.role) ? 'justify-end' : 'justify-start'}`}
@@ -396,6 +412,24 @@ const Learning = () => {
                     >
                       {formatTimestamp(message.created_at)}
                     </span>
+
+                    {/* Show suggested questions below welcome message if no history */}
+                    {histories.length === 0 && idx === 0 && suggestedQuestions && suggestedQuestions.length > 0 && (
+                      <div className='mt-4 flex flex-wrap gap-2'>
+                        {suggestedQuestions.map((q, i) => (
+                          <Button
+                            key={q}
+                            variant='outline'
+                            size='sm'
+                            className='border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 hover:text-blue-900 transition-colors duration-150 text-xs md:text-sm px-3 py-1 rounded-full'
+                            onClick={() => handleSuggestedQuestionClick(q)}
+                            disabled={loadingSend}
+                          >
+                            {q}
+                          </Button>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {!isAIMessage(message.role) && (
