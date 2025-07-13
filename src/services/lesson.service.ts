@@ -13,7 +13,7 @@ import type {
 
 const LESSON_ROUTES = {
   GET_LESSON_CATEGORIES: '/lessons/categories',
-  CREATE_s_CATEGORY: '/lessons/categories',
+  CREATE_LESSON_CATEGORY: '/lessons/categories',
   UPDATE_LESSON_CATEGORY: (categoryId: string) => `/lessons/categories/${categoryId}`,
   DELETE_LESSON_CATEGORY: (categoryId: string) => `/lessons/categories/${categoryId}`,
   GET_ALL_LESSONS: '/lessons/',
@@ -28,7 +28,7 @@ const lessonService = {
   getLessonsCategories: async (): Promise<AxiosResponse<Category[]>> =>
     apiInstance.get<Category[]>(LESSON_ROUTES.GET_LESSON_CATEGORIES),
   createCategory: async (payload: CreateCategoryPayload): Promise<AxiosResponse<Category>> =>
-    apiInstance.post<Category>(LESSON_ROUTES.CREATE_s_CATEGORY, payload),
+    apiInstance.post<Category>(LESSON_ROUTES.CREATE_LESSON_CATEGORY, payload),
   updateLessonCategory: async (categoryId: string, payload: CreateCategoryPayload): Promise<AxiosResponse<Category>> =>
     apiInstance.put<Category>(LESSON_ROUTES.UPDATE_LESSON_CATEGORY(categoryId), payload),
   deleteLessonCategory: async (categoryId: string): Promise<AxiosResponse<void>> =>
