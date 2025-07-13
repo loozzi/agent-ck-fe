@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { fetchWallet } from '@/slices/portfolio.slice'
+import { fetchRecommendations, generateRecommendation } from '@/slices/recommendation.slice'
 import { fetchListStocksByName } from '@/slices/stock.slice'
 import { addToWatchlist, deleteWatchlistItem, fetchWatchlistDetail } from '@/slices/watchlist.slice'
 import type { WalletItem } from '@/types/portfolio'
@@ -40,16 +41,56 @@ const Watchlist = () => {
   // Lấy state từ watchlist slice
   const { watchlistDetail, isLoading: watchlistLoading } = useSelector((state: RootState) => state.watchlist)
 
+  // Lấy state từ recommendation slice
+  const {
+    recommendationData,
+    loading: recommendationLoading,
+    error: recommendationError
+  } = useSelector((state: RootState) => state.recommendation)
+  const recommendations = recommendationData?.recommendations || []
+
   const [search, setSearch] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [addToWatchlistQuery, setAddToWatchlistQuery] = useState('')
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null)
   const [showChart, setShowChart] = useState(false)
+  // State for which recommendation chart is open
+  const [openRecChart, setOpenRecChart] = useState<string | null>(null)
   const sortBy = 'performance'
+
+  // State for reset dialog
+  const [showResetDialog, setShowResetDialog] = useState(false)
+  const [resetLoading, setResetLoading] = useState(false)
+
+  // Handle reset recommendations
+  async function handleResetRecommendations() {
+    setResetLoading(true)
+    try {
+      await dispatch(
+        generateRecommendation({
+          limit: 10,
+          exclude_portfolio: false,
+          period: 30,
+          interval: '1d',
+          expiry_days: 1
+        }) as any
+      )
+      dispatch(fetchRecommendations() as any)
+      setShowResetDialog(false)
+    } catch (error) {
+      // Xử lý lỗi nếu cần
+    }
+    setResetLoading(false)
+  }
 
   useEffect(() => {
     dispatch(fetchWallet() as any)
     dispatch(fetchWatchlistDetail() as any)
+  }, [dispatch])
+
+  // Lấy gợi ý AI khi vào trang
+  useEffect(() => {
+    dispatch(fetchRecommendations() as any)
   }, [dispatch])
 
   // Debounce search for stocks
@@ -225,7 +266,10 @@ const Watchlist = () => {
         <div className='h-full w-full mt-14'>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-0 h-full'>
             {/* Left Panel - Portfolio & Watchlist (White Background) */}
-            <div className='lg:col-span-1 bg-white p-6 overflow-y-auto h-full'>
+            <div
+              className='lg:col-span-1 bg-white p-6 overflow-y-auto h-full flex flex-col'
+              style={{ minHeight: '100%' }}
+            >
               {/* Header */}
               <div className='flex items-center justify-between mb-4'>
                 <div className='flex items-center gap-3'>
@@ -520,28 +564,67 @@ const Watchlist = () => {
             </div>
 
             {/* Right Panel - AI Recommendations (Purple Background) */}
-            <div className='lg:col-span-1 bg-gradient-to-br from-purple-600 to-indigo-700 p-6 text-white overflow-y-auto h-full'>
-              <div className='flex items-center gap-2 mb-4'>
-                <div className='p-2 bg-white/20 rounded-lg'>
-                  <Activity className='w-4 h-4' />
+            <div
+              className='lg:col-span-1 bg-gradient-to-br from-purple-600 to-indigo-700 p-4 sm:p-6 text-white overflow-y-auto h-full flex flex-col'
+              style={{ minHeight: '100%' }}
+            >
+              <div className='flex items-center gap-2 mb-4 justify-between'>
+                <div className='flex items-center gap-2'>
+                  <div className='p-2 bg-white/20 rounded-lg'>
+                    <Activity className='w-4 h-4' />
+                  </div>
+                  <div>
+                    <h2 className='text-lg font-bold'>Gợi ý cổ phiếu AI</h2>
+                    <p className='text-purple-100 text-xs'>Phân tích bởi AI</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className='text-lg font-bold'>AI Stock Recommendations</h2>
-                  <p className='text-purple-100 text-xs'>AI-Powered Analysis</p>
-                </div>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='text-red border-white/30 hover:bg-white/20 font-semibold'
+                  onClick={() => setShowResetDialog(true)}
+                >
+                  Làm mới
+                </Button>
               </div>
+
+              {/* Dialog xác nhận reset recommendations */}
+              {showResetDialog && (
+                <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+                  <DialogContent className='max-w-md w-full'>
+                    <DialogHeader>
+                      <DialogTitle>Làm mới danh sách gợi ý AI?</DialogTitle>
+                    </DialogHeader>
+                    <div className='py-4 text-sm text-purple-900'>
+                      Việc làm mới sẽ xóa hết các mã hiện tại và chạy lại AI, bạn có muốn tiếp tục không?
+                    </div>
+                    <div className='flex justify-end gap-2 mt-4'>
+                      <Button variant='outline' onClick={() => setShowResetDialog(false)} disabled={resetLoading}>
+                        Đóng
+                      </Button>
+                      <Button
+                        className='bg-purple-600 hover:bg-purple-700'
+                        onClick={handleResetRecommendations}
+                        disabled={resetLoading}
+                      >
+                        {resetLoading ? 'Đang làm mới...' : 'Xác nhận'}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
 
               {/* Stock Chart Search */}
               <div className='space-y-3 mb-6'>
                 <div className='bg-white/10 rounded-lg p-4 backdrop-blur-sm'>
                   <h3 className='text-white font-semibold mb-3 flex items-center gap-2'>
                     <BarChart3 className='w-4 h-4' />
-                    Search Stock Charts
+                    Tìm kiếm biểu đồ giá
                   </h3>
 
                   <div className='space-y-3'>
                     <Input
-                      placeholder='Search stocks by symbol or name...'
+                      placeholder='Tìm mã cổ phiếu theo ký hiệu hoặc tên...'
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className='bg-white/20 border-white/30 text-white placeholder:text-white/70 h-8 text-sm'
@@ -571,25 +654,130 @@ const Watchlist = () => {
                     {searchQuery && stockLoading && (
                       <div className='flex items-center justify-center p-4'>
                         <Loader2 className='w-4 h-4 animate-spin text-white' />
-                        <span className='ml-2 text-sm text-white'>Searching...</span>
+                        <span className='ml-2 text-sm text-white'>Đang tìm kiếm...</span>
                       </div>
                     )}
 
                     {searchQuery && !stockLoading && stocks && stocks.length === 0 && (
-                      <p className='text-center text-white/70 text-sm p-4'>No stocks found for "{searchQuery}"</p>
+                      <p className='text-center text-white/70 text-sm p-4'>
+                        Không tìm thấy mã phù hợp cho "{searchQuery}"
+                      </p>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Placeholder for AI content - will be filled later */}
+              {/* AI Recommendations Content */}
               <div className='space-y-3'>
                 <div className='bg-white/10 rounded-lg p-4 backdrop-blur-sm'>
-                  <p className='text-purple-100 text-center py-8 text-sm'>
-                    AI Recommendations
-                    <br />
-                    Coming Soon...
-                  </p>
+                  {/* Fetch and display recommendations */}
+                  {recommendationLoading ? (
+                    <div className='flex items-center justify-center py-8'>
+                      <Loader2 className='w-4 h-4 animate-spin mr-2' />
+                      <span className='text-sm text-purple-100'>Đang tải gợi ý AI...</span>
+                    </div>
+                  ) : recommendationError ? (
+                    <div className='text-center py-8 text-purple-100'>
+                      <p className='text-sm'>Không thể tải gợi ý AI: {recommendationError}</p>
+                    </div>
+                  ) : !recommendations || recommendations.length === 0 ? (
+                    <div className='text-center py-8 text-purple-100'>
+                      <p className='text-sm'>Chưa có gợi ý AI nào cho bạn.</p>
+                    </div>
+                  ) : (
+                    <div className='space-y-4'>
+                      {recommendations.slice(0, 5).map((rec, idx) => (
+                        <div
+                          key={rec.id || rec.ticker + idx}
+                          className='bg-white/10 rounded-xl p-4 flex flex-col gap-2 shadow-sm'
+                        >
+                          <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-2'>
+                            <div className='flex items-center gap-2'>
+                              <span className='font-bold text-lg text-white'>{rec.ticker}</span>
+                              <span
+                                className={`px-2 py-0.5 rounded text-xs font-semibold ${rec.signal === 'BUY' ? 'bg-green-600' : rec.signal === 'SELL' ? 'bg-red-600' : 'bg-yellow-400 text-gray-900'}`}
+                              >
+                                {rec.signal}
+                              </span>
+                              <span className='ml-2 text-xs text-white/80'>Điểm: {rec.score?.toFixed(1) ?? '-'}</span>
+                            </div>
+                            <div className='flex flex-col sm:items-end items-start'>
+                              <span className='font-bold text-xl text-white'>
+                                {rec.entry_price ? `${rec.entry_price.toLocaleString('vi-VN')}đ` : '-'}
+                              </span>
+                            </div>
+                          </div>
+                          <div className='flex flex-wrap gap-2 text-xs text-white/80'>
+                            <span>
+                              Độ tin cậy: <span className='font-bold text-white'>{rec.confidence ?? '-'}</span>
+                            </span>
+                            <span>
+                              Giá vào lệnh: <span className='font-bold text-white'>{rec.entry_price ?? '-'}</span>
+                            </span>
+                            <span>
+                              Chốt lời: <span className='font-bold text-white'>{rec.take_profit ?? '-'}</span>
+                            </span>
+                            <span>
+                              Cắt lỗ: <span className='font-bold text-white'>{rec.stop_loss ?? '-'}</span>
+                            </span>
+                            <span>
+                              Tỷ lệ R/R: <span className='font-bold text-white'>{rec.risk_reward_ratio ?? '-'}</span>
+                            </span>
+                            <span>
+                              Rủi ro: <span className='font-bold text-white'>{rec.risk_level ?? '-'}</span>
+                            </span>
+                            <span>
+                              Khung thời gian: <span className='font-bold text-white'>{rec.timeframe ?? '-'}</span>
+                            </span>
+                          </div>
+                          <div className='mb-2 text-xs text-white/70'>
+                            <span className='font-semibold'>Thời gian sinh:</span>{' '}
+                            {rec.created_at ? new Date(rec.created_at).toLocaleString('vi-VN') : '-'}
+                          </div>
+                          {rec.reasoning && rec.reasoning.length > 0 && (
+                            <div className='mb-2 text-xs text-white/90'>
+                              <span className='font-semibold'>Lý do:</span>{' '}
+                              {Array.isArray(rec.reasoning) ? rec.reasoning.join(', ') : rec.reasoning}
+                            </div>
+                          )}
+                          {/* Nút xem biểu đồ */}
+                          <div className='flex justify-end'>
+                            {openRecChart === rec.ticker ? (
+                              <Button
+                                variant='outline'
+                                size='sm'
+                                className='text-purple-700 border-purple-300'
+                                onClick={() => setOpenRecChart(null)}
+                              >
+                                Đóng biểu đồ
+                              </Button>
+                            ) : (
+                              <Button
+                                variant='outline'
+                                size='sm'
+                                className='text-purple-700 border-purple-300'
+                                onClick={() => setOpenRecChart(rec.ticker)}
+                              >
+                                <BarChart3 className='w-4 h-4 mr-1' /> Xem biểu đồ
+                              </Button>
+                            )}
+                          </div>
+                          {/* Chỉ hiển thị biểu đồ khi được chọn */}
+                          {openRecChart === rec.ticker && (
+                            <div className='w-full' style={{ height: '100%' }}>
+                              <StockChart
+                                ticker={rec.ticker}
+                                className='w-full h-full'
+                                entryPrice={rec.entry_price / 1000}
+                                takeProfit={rec.take_profit / 1000}
+                                stopLoss={rec.stop_loss / 1000}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -601,7 +789,7 @@ const Watchlist = () => {
               <DialogHeader className='p-4 sm:p-6 pb-0'>
                 <DialogTitle className='flex items-center gap-2 text-sm sm:text-base'>
                   <BarChart3 className='w-4 h-4 sm:w-5 sm:h-5' />
-                  {selectedTicker} - Stock Chart
+                  {selectedTicker} - Biểu đồ giá
                 </DialogTitle>
               </DialogHeader>
               <div className='px-4 sm:px-6 pb-4 sm:pb-6'>
@@ -616,7 +804,7 @@ const Watchlist = () => {
                   <div className='flex items-center justify-center h-64 sm:h-96'>
                     <div className='text-center'>
                       <Loader2 className='w-6 h-6 sm:w-8 sm:h-8 animate-spin mx-auto mb-2' />
-                      <p className='text-sm text-gray-500'>Loading chart...</p>
+                      <p className='text-sm text-gray-500'>Đang tải biểu đồ...</p>
                     </div>
                   </div>
                 )}
