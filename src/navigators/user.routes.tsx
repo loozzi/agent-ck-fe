@@ -9,6 +9,7 @@ import StockChartDemo from '@/pages/demo/StockChartDemo'
 import type { RouteBrowser } from '@/types/routes'
 import { Route, Routes } from 'react-router'
 import Strategy from '@/pages/user/Strategy'
+import ChatPage from '@/pages/user/ChatPage'
 
 export const userRoutesConfig: RouteBrowser[] = [
   {
@@ -64,6 +65,11 @@ export const userRoutesConfig: RouteBrowser[] = [
     route: 'strategy',
     element: <Strategy />,
     exact: true
+  },
+  {
+    name: 'chat',
+    route: 'chat',
+    element: <ChatPage />
   }
 ]
 
