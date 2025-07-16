@@ -17,7 +17,7 @@ const AppNavigator = () => {
       <Routes>
         {/* Public routes */}
         <Route path='/signin' element={<UserAuth />} />
-
+        <Route path='/survey' element={<Survey />} />
         <Route path='/unauthorized' element={<Unauthorized />} />
         <Route path='/signout' element={<SignOut />} />
         <Route path='/' element={<Home />} />
@@ -43,14 +43,6 @@ const AppNavigator = () => {
                 `
               }}
             />
-          }
-        />
-        <Route
-          path='/survey'
-          element={
-            <ProtectedRoute requiredRoles={['user']}>
-              <Survey />
-            </ProtectedRoute>
           }
         />
         <Route

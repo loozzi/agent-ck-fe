@@ -47,6 +47,8 @@ const persistConfig = {
   blacklist: [
     'portfolio',
     'survey',
+    'mbti',
+    'chat',
     'subscription',
     'stock',
     'news',
@@ -59,7 +61,8 @@ const persistConfig = {
     'strategy',
     'recommendationReducer',
     'lesson',
-    'adminSurvey'
+    'adminSurvey',
+    'recommendation'
   ], // reducers that you do not want to persist
   whiteList: ['auth'] // reducers that you want to persist
 }

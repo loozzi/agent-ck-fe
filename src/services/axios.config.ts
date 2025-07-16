@@ -68,7 +68,7 @@ apiInstance.interceptors.response.use(
     const responseData = error.response?.data as Record<string, unknown>
 
     // Handle onboarding required
-    if (status === 403 || responseData?.onboarding_required) {
+    if (status == 403 && responseData?.onboarding_required) {
       console.log('Onboarding required, redirecting to survey...')
       window.location.href = '/survey'
       return Promise.reject(error)
