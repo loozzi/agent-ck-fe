@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { getMeAction } from '@/slices/auth.slice'
 import { fetchQuestions, fetchSurveyStatus, submitSurvey } from '@/slices/survey.slice'
 import type { SurveyPayload } from '@/types/survey'
 import { CheckCircle2, ChevronLeft, ChevronRight, Clock, FileText, History, Target } from 'lucide-react'
@@ -171,6 +172,8 @@ const Survey = () => {
       })
 
       await dispatch(submitSurvey(surveyPayload as SurveyPayload)).unwrap()
+      await dispatch(getMeAction()).unwrap()
+      setIsCompleted(true)
       toast.success('Đã nộp khảo sát thành công!')
       navigate('/')
     } catch (error) {
