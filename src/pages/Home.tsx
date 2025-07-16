@@ -23,6 +23,19 @@ const Home = () => {
     <div className='min-h-screen bg-gray-50'>
       <Header />
       <main className='pt-14'>
+        <div
+          className='fixed bottom-4 right-4 z-50'
+          dangerouslySetInnerHTML={{
+            __html: `<div
+          class="zalo-follow-button"
+          data-oaid="4412053929170802954"
+          data-cover="no"
+          data-article=""
+          data-width="350"
+          data-height="420"
+        ></div>`
+          }}
+        />
         <HeroSection />
         <NewsSection />
       </main>

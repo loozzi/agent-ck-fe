@@ -7,6 +7,7 @@ import './Header.css'
 const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const isLoggedIn = useAppSelector((state) => state.auth.isAuthenticated)
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
@@ -92,9 +93,8 @@ const Header = () => {
               ))}
 
               {/* User/Profile Button */}
-              {(() => {
-                const isLoggedIn = useAppSelector((state) => state.auth.isAuthenticated)
-                return isLoggedIn ? (
+              {isLoggedIn ? (
+                <>
                   <NavLink
                     to='/dashboard'
                     className='flex items-center space-x-1 text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm px-3 py-2 rounded-md'
@@ -102,16 +102,22 @@ const Header = () => {
                     <User size={16} />
                     <span>Bảng điều khiển</span>
                   </NavLink>
-                ) : (
                   <NavLink
-                    to='/signin'
-                    className='flex items-center space-x-1 text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm px-3 py-2 rounded-md'
+                    to='/signout'
+                    className='flex items-center space-x-1 text-white hover:text-red-400 transition-colors duration-200 font-medium text-sm px-3 py-2 rounded-md'
                   >
-                    <User size={16} />
-                    <span>Đăng nhập</span>
+                    <span>Đăng xuất</span>
                   </NavLink>
-                )
-              })()}
+                </>
+              ) : (
+                <NavLink
+                  to='/signin'
+                  className='flex items-center space-x-1 text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm px-3 py-2 rounded-md'
+                >
+                  <User size={16} />
+                  <span>Đăng nhập</span>
+                </NavLink>
+              )}
             </nav>
           </div>
         </div>
@@ -137,6 +143,50 @@ const Header = () => {
                   </NavLink>
                 </div>
               ))}
+              {/* User/Profile Button for mobile */}
+              {isLoggedIn ? (
+                <>
+                  <NavLink
+                    to='/dashboard'
+                    className='flex items-center justify-between w-full text-left px-3 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors duration-200'
+                    onClick={() => {
+                      setActiveDropdown(null)
+                      setIsMobileMenuOpen(false)
+                    }}
+                  >
+                    <div className='flex items-center space-x-2'>
+                      <User size={16} />
+                      <span className='text-sm'>Bảng điều khiển</span>
+                    </div>
+                  </NavLink>
+                  <NavLink
+                    to='/signout'
+                    className='flex items-center justify-between w-full text-left px-3 py-2 text-red-500 hover:bg-red-50 hover:text-red-700 rounded-md transition-colors duration-200'
+                    onClick={() => {
+                      setActiveDropdown(null)
+                      setIsMobileMenuOpen(false)
+                    }}
+                  >
+                    <div className='flex items-center space-x-2'>
+                      <span className='text-sm'>Đăng xuất</span>
+                    </div>
+                  </NavLink>
+                </>
+              ) : (
+                <NavLink
+                  to='/signin'
+                  className='flex items-center justify-between w-full text-left px-3 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors duration-200'
+                  onClick={() => {
+                    setActiveDropdown(null)
+                    setIsMobileMenuOpen(false)
+                  }}
+                >
+                  <div className='flex items-center space-x-2'>
+                    <User size={16} />
+                    <span className='text-sm'>Đăng nhập</span>
+                  </div>
+                </NavLink>
+              )}
             </div>
           </div>
         )}
