@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
+import JoditEditor from '@/components/ui/JoditEditor'
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import {
@@ -41,6 +42,8 @@ import { useEffect, useState } from 'react'
 import { Plus, Edit, Trash2, Eye, BookOpen, FolderPlus } from 'lucide-react'
 
 const LessonManagement = () => {
+  // State cho nội dung rich text editor
+  const [editorContent, setEditorContent] = useState('')
   console.log('LessonManagement component rendering')
   const dispatch = useAppDispatch()
   const { categories, lessons, allLessons, loading, error } = useAppSelector((state) => state.lesson)
@@ -321,14 +324,14 @@ const LessonManagement = () => {
                         <Label htmlFor='lesson-content' className='text-right'>
                           Nội dung
                         </Label>
-                        <Textarea
-                          id='lesson-content'
-                          value={lessonForm.content}
-                          onChange={(e) => setLessonForm({ ...lessonForm, content: e.target.value })}
-                          className='col-span-3'
-                          rows={6}
-                          placeholder='Nhập nội dung bài học'
-                        />
+                        <div className='col-span-3'>
+                          <JoditEditor
+                            value={editorContent}
+                            tabIndex={1}
+                            onBlur={(newContent) => setEditorContent(newContent)}
+                            onChange={(newContent) => setEditorContent(newContent)}
+                          />
+                        </div>
                       </div>
                       <div className='grid grid-cols-4 items-center gap-4'>
                         <Label htmlFor='lesson-active' className='text-right'>
@@ -566,7 +569,7 @@ const LessonManagement = () => {
       {/* Lesson View Dialog */}
       {viewingLesson && (
         <Dialog open={!!viewingLesson} onOpenChange={() => setViewingLesson(null)}>
-          <DialogContent className='sm:max-w-[700px]'>
+          <DialogContent className='sm:max-w-[1000px]'>
             <DialogHeader>
               <DialogTitle>{viewingLesson.title}</DialogTitle>
               <DialogDescription>

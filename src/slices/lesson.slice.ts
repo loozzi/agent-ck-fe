@@ -1,3 +1,4 @@
+import { store } from '@/app/store'
 import lessonService from '@/services/lesson.service'
 import type {
   AllLessonsResponse,
@@ -120,8 +121,9 @@ export const getLessonById = createAsyncThunk<Lesson, string>(
   'lesson/getLessonById',
   async (lessonId, { rejectWithValue }) => {
     try {
-      const response = await lessonService.getLessonById(lessonId)
-      return response.data
+      // const response = await lessonService.getLessonById(lessonId)
+      // return response.data
+      return store.getState().lesson.lessons.find((lesson) => lesson.id === lessonId) as Lesson
     } catch (error) {
       const errorMessage = (error as any).response?.data.detail || 'Không thể tải bài học'
       toast.error(errorMessage)
@@ -288,7 +290,7 @@ const lessonSlice = createSlice({
         state.error = action.payload as string
       })
       .addCase(getLessonById.pending, (state) => {
-        state.loading = true
+        // state.loading = true
         state.error = null
       })
       .addCase(getLessonById.fulfilled, (state) => {
