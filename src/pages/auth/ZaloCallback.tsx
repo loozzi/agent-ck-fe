@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/app/hook'
-import { zaloCompleteLogin } from '@/slices/auth.slice'
+import { getMeAction, zaloCompleteLogin } from '@/slices/auth.slice'
 import { getZaloData, sendZaloCode } from '@/slices/zalo.slice'
 import { useEffect } from 'react'
 
@@ -45,7 +45,9 @@ const ZaloCallback = () => {
           },
           user_info: userData
         })
-      )
+      ).then(() => {
+        dispatch(getMeAction())
+      })
     }
   }, [userData])
 
@@ -55,7 +57,7 @@ const ZaloCallback = () => {
     }
   }, [isAuthenticated])
 
-  return <div>ZaloCallback</div>
+  return <div>Đang xác thực tài khoản...</div>
 }
 
 export default ZaloCallback
