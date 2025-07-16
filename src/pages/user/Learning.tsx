@@ -1,15 +1,18 @@
 import { useAppDispatch, useAppSelector } from '@/app/hook'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { chatAboutLesson, fetchAllLessons } from '@/slices/lesson.slice'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import CKViewer from '@/components/common/CKViewer'
+import { fetchAllLessons } from '@/slices/lesson.slice'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 
 const Learning = () => {
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
+
   const { allLessons } = useAppSelector((state) => state.lesson)
   const [openCategory, setOpenCategory] = useState<string | null>(null)
+  // Đã chuyển sang dialogContent, không cần openLesson nữa
+  const [dialogContent, setDialogContent] = useState<{ title: string; content: string } | null>(null)
 
   useEffect(() => {
     dispatch(fetchAllLessons({}))
@@ -19,62 +22,88 @@ const Learning = () => {
     setOpenCategory((prev) => (prev === category ? null : category))
   }
 
-  const handleChatAboutLesson = async (lessonId: string) => {
-    // Gọi chatAboutLesson, sau đó chuyển hướng sang trang trợ lý AI
-    await dispatch(chatAboutLesson({ lessonId }))
-    navigate('/user/chat')
+  const handleToggleLesson = (lesson: { id: string; title: string; content: string }) => {
+    if (dialogContent && dialogContent.title === lesson.title) {
+      setDialogContent(null)
+    } else {
+      setDialogContent({ title: lesson.title, content: lesson.content })
+    }
   }
 
   const categories = allLessons.categories
 
+  // Danh sách màu nền random cho card
+  const cardColors = ['#f3f8ff', '#ffe4e6', '#fffbe6', '#e6f7ff', '#e6ffe6', '#f0e6ff', '#fff0e6', '#e6fff7']
+
   return (
     <div className='max-w-3xl mx-auto p-4'>
       <h1 className='text-2xl font-bold mb-6 text-center'>Danh sách bài học</h1>
-      <div className='flex flex-col gap-6'>
-        {Object.entries(categories).map(([category, lessons]) => (
-          <Card
-            key={category}
-            className={`p-0 shadow-lg border-2 border-blue-100 rounded-2xl transition-all duration-200 ${openCategory === category ? 'ring-2 ring-blue-400' : ''}`}
-          >
-            <button
-              className='w-full flex flex-col items-start md:flex-row md:items-center justify-between px-6 py-6 bg-blue-50 hover:bg-blue-100 rounded-2xl focus:outline-none text-left min-h-[90px] md:min-h-[110px]'
-              onClick={() => handleToggleCategory(category)}
-              aria-expanded={openCategory === category}
-              style={{ fontSize: 22, fontWeight: 600 }}
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+        {Object.entries(categories).map(([category, lessons], idx) => {
+          // Lấy màu random từ mảng, nếu hết thì lặp lại
+          const bgColor = cardColors[idx % cardColors.length]
+          return (
+            <Card
+              key={category}
+              className={`p-0 shadow-lg border border-blue-100 rounded-3xl transition-all duration-200 flex flex-col items-center min-h-[340px] md:min-h-[380px] w-full`}
+              style={{ background: bgColor }}
             >
-              <span>{category}</span>
-              <span className='ml-auto text-xl md:text-2xl'>{openCategory === category ? '▲' : '▼'}</span>
-            </button>
-            {openCategory === category && (
-              <div className='bg-white rounded-b-2xl px-6 pb-4 pt-2 flex flex-col gap-4'>
-                {lessons.length === 0 && (
-                  <div className='text-gray-400 text-center'>Chưa có bài học trong mục này.</div>
-                )}
-                {lessons.map((lesson) => (
-                  <div
-                    key={lesson.id}
-                    className='flex flex-col md:flex-row md:items-center justify-between border-b last:border-b-0 py-3'
-                  >
-                    <div>
-                      <div className='font-semibold text-lg'>{lesson.title}</div>
-                      <div className='text-base text-gray-500 line-clamp-2'>{lesson.content}</div>
-                    </div>
-                    <Button
-                      className='mt-3 md:mt-0 md:ml-4 min-w-[140px] text-base h-11 rounded-lg'
-                      onClick={() => handleChatAboutLesson(lesson.id)}
+              <button
+                className='w-full flex flex-col items-center gap-4 px-8 py-10 rounded-t-3xl focus:outline-none text-center min-h-[180px] md:min-h-[220px]'
+                onClick={() => handleToggleCategory(category)}
+                aria-expanded={openCategory === category}
+                style={{ fontSize: 26, fontWeight: 700, background: bgColor }}
+              >
+                <span className='block'>{category}</span>
+                <span className='text-xl md:text-2xl mt-2'>{openCategory === category ? '▲' : '▼'}</span>
+              </button>
+              {openCategory === category && (
+                <div className='bg-white rounded-b-3xl px-6 pb-4 pt-2 flex flex-col gap-2 w-full'>
+                  {lessons.length === 0 && (
+                    <div className='text-gray-400 text-center'>Chưa có bài học trong mục này.</div>
+                  )}
+                  {lessons.map((lesson) => (
+                    <div
+                      key={lesson.id}
+                      className='flex items-center justify-between border-b last:border-b-0 py-2 gap-2'
                     >
-                      Tìm hiểu thêm
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
-        ))}
+                      <div className='flex-1 min-w-0'>
+                        <div className='font-semibold truncate'>{lesson.title}</div>
+                      </div>
+                      <div className='flex gap-2'>
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          className='h-8 px-3 text-xs'
+                          onClick={() => handleToggleLesson(lesson)}
+                        >
+                          {'Xem chi tiết'}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          )
+        })}
         {Object.entries(categories).length === 0 && (
-          <div className='text-center text-gray-400'>Chưa có bài học nào.</div>
+          <div className='text-center text-gray-400 col-span-2'>Chưa có bài học nào.</div>
         )}
       </div>
+      {/* Dialog hiển thị nội dung bài học */}
+      <Dialog open={!!dialogContent} onOpenChange={(open) => !open && setDialogContent(null)}>
+        <DialogContent className='max-w-2xl'>
+          <DialogHeader>
+            <DialogTitle>{dialogContent?.title}</DialogTitle>
+          </DialogHeader>
+          {dialogContent && (
+            <div className='mt-2'>
+              <CKViewer content={dialogContent.content} />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
