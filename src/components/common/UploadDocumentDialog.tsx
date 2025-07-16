@@ -9,6 +9,7 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import MultiSelectCheckbox from '@/components/ui/MultiSelectCheckbox'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { uploadDocument } from '@/slices/prompt.slice'
@@ -31,7 +32,24 @@ const UploadDocumentDialog = ({ onUploaded }: UploadDocumentDialogProps) => {
   const [file, setFile] = useState<File | null>(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [category, setCategory] = useState<'learning_mode'>('learning_mode')
+  const CATEGORY_OPTIONS = [
+    { value: 'long_term', label: 'Dài hạn' },
+    { value: 'short_term', label: 'Ngắn hạn' },
+    { value: 'value_style', label: 'Đầu tư giá trị' },
+    { value: 'high_risk', label: 'Rủi ro cao' },
+    { value: 'moderate_risk', label: 'Rủi ro vừa' },
+    { value: 'low_risk', label: 'Rủi ro thấp' },
+    { value: 'goal_>10%', label: 'Mục tiêu >10%' },
+    { value: 'goal_learning', label: 'Mục tiêu học hỏi' },
+    { value: 'f0', label: 'F0' },
+    { value: 'advance', label: 'Nâng cao' },
+    { value: 'passive', label: 'Thụ động' },
+    { value: 'learning_mode', label: 'Chế độ học' },
+    { value: 'low_time', label: 'Ít thời gian' },
+    { value: 'active', label: 'Chủ động' },
+    { value: 'general', label: 'Chung' }
+  ]
+  const [category, setCategory] = useState<string[]>(['learning_mode'])
   const [fileError, setFileError] = useState<string | null>(null)
 
   const onDrop = (acceptedFiles: File[]) => {
@@ -76,7 +94,7 @@ const UploadDocumentDialog = ({ onUploaded }: UploadDocumentDialogProps) => {
       setFile(null)
       setTitle('')
       setDescription('')
-      setCategory('learning_mode')
+      setCategory(['learning_mode'])
       onUploaded?.()
     } catch (error) {
       toast.error('Tải lên tài liệu thất bại!')
@@ -141,31 +159,13 @@ const UploadDocumentDialog = ({ onUploaded }: UploadDocumentDialogProps) => {
           </div>
           <div className='space-y-2'>
             <Label htmlFor='category'>Danh mục</Label>
-            <select
-              id='category'
-              className='w-full border rounded px-3 py-2'
+            <MultiSelectCheckbox
+              options={CATEGORY_OPTIONS}
               value={category}
-              onChange={(e) => setCategory(e.target.value as typeof category)}
-              required
-            >
-              <option value='' disabled>
-                Chọn danh mục
-              </option>
-              <option value='long_term'>Dài hạn</option>
-              <option value='short_term'>Ngắn hạn</option>
-              <option value='value_style'>Đầu tư giá trị</option>
-              <option value='high_risk'>Rủi ro cao</option>
-              <option value='moderate_risk'>Rủi ro vừa</option>
-              <option value='low_risk'>Rủi ro thấp</option>
-              <option value='goal_>10%'>Mục tiêu {'>'}10%</option>
-              <option value='goal_learning'>Mục tiêu học hỏi</option>
-              <option value='f0'>F0</option>
-              <option value='advance'>Nâng cao</option>
-              <option value='passive'>Thụ động</option>
-              <option value='learning_mode'>Chế độ học</option>
-              <option value='low_time'>Ít thời gian</option>
-              <option value='active'>Chủ động</option>
-            </select>
+              onChange={setCategory}
+              // label='Danh mục'
+              className='mt-1'
+            />
           </div>
           <div className='flex justify-end space-x-2'>
             <Button

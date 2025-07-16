@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hook'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import MultiSelectCheckbox from '@/components/ui/MultiSelectCheckbox'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -30,7 +31,7 @@ export interface LogicRuleFormData {
   action: LogicRuleAction
   timeframe: string
   priority: number
-  category: CategoryEnum | 'general'
+  category: CategoryEnum[] | ['general']
   is_active: boolean
 }
 
@@ -52,7 +53,7 @@ const RuleController = () => {
   const [filterIndicator, setFilterIndicator] = useState<string>('all')
   const [filterAction, setFilterAction] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<string>('all')
-  const [filterCategory, setFilterCategory] = useState<CategoryEnum | 'all'>('all')
+  const [filterCategory, setFilterCategory] = useState<string[]>([])
   const [activeTab, setActiveTab] = useState('all')
 
   // Loading states
@@ -76,7 +77,9 @@ const RuleController = () => {
     const matchesAction = !filterAction || filterAction === 'all' || rule.action === filterAction
     const matchesStatus =
       !filterStatus || filterStatus === 'all' || (filterStatus === 'active' ? rule.is_active : !rule.is_active)
-    const matchesCategory = filterCategory === 'all' || rule.category === filterCategory
+    // rule.category có thể là 'a,b,c' hoặc 'a'
+    const ruleCategories = typeof rule.category === 'string' ? rule.category.split(',') : []
+    const matchesCategory = filterCategory.length === 0 || filterCategory.some((cat) => ruleCategories.includes(cat))
     const matchesTab =
       activeTab === 'all' || (activeTab === 'active' && rule.is_active) || (activeTab === 'inactive' && !rule.is_active)
 
@@ -97,29 +100,30 @@ const RuleController = () => {
   }
 
   // Handlers
-  const handleCreateRule = async (data: LogicRuleFormData) => {
-    try {
-      if (data.conditions.length === 0) {
-        toast.error('Vui lòng thêm ít nhất một điều kiện')
-        return
-      }
+  const handleCreateRule = (data: LogicRuleFormData) => {
+    if (data.conditions.length === 0) {
+      toast.error('Vui lòng thêm ít nhất một điều kiện')
+      return
+    }
 
-      const payload = {
-        name: data.name,
-        description: data.description,
-        indicator: data.conditions[0].indicator,
-        operator: data.conditions[0].operator,
-        threshold_value: data.conditions[0].value,
-        action: data.action,
-        timeframe: data.timeframe,
-        priority: data.priority,
-        category: data.category,
-        is_active: data.is_active
-      }
+    // Đảm bảo category là mảng CategoryEnum[]
+    const payload = {
+      name: data.name,
+      description: data.description,
+      indicator: data.conditions[0].indicator,
+      operator: data.conditions[0].operator,
+      threshold_value: data.conditions[0].value,
+      action: data.action,
+      timeframe: data.timeframe,
+      priority: data.priority,
+      category: Array.isArray(data.category) ? data.category : [data.category],
+      is_active: data.is_active
+    }
 
-      await dispatch(createLogicRule(payload)).unwrap()
-      setShowCreateDialog(false)
-    } catch (error) {}
+    dispatch(createLogicRule(payload))
+      .unwrap()
+      .then(() => setShowCreateDialog(false))
+      .catch(() => {})
   }
 
   const handleEditRule = async (data: LogicRuleFormData) => {
@@ -341,32 +345,7 @@ const RuleController = () => {
                 </SelectContent>
               </Select>
 
-              <Select
-                value={filterCategory}
-                onValueChange={(value) => setFilterCategory(value as CategoryEnum | 'all')}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder='Tất cả danh mục' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>Tất cả danh mục</SelectItem>
-                  <SelectItem value='general'>Chung</SelectItem>
-                  <SelectItem value='long_term'>Dài hạn</SelectItem>
-                  <SelectItem value='short_term'>Ngắn hạn</SelectItem>
-                  <SelectItem value='value_style'>Đầu tư giá trị</SelectItem>
-                  <SelectItem value='high_risk'>Rủi ro cao</SelectItem>
-                  <SelectItem value='moderate_risk'>Rủi ro vừa</SelectItem>
-                  <SelectItem value='low_risk'>Rủi ro thấp</SelectItem>
-                  <SelectItem value='goal_>10%'>Mục tiêu {'>'}10%</SelectItem>
-                  <SelectItem value='goal_learning'>Mục tiêu học hỏi</SelectItem>
-                  <SelectItem value='f0'>F0</SelectItem>
-                  <SelectItem value='advance'>Nâng cao</SelectItem>
-                  <SelectItem value='passive'>Thụ động</SelectItem>
-                  <SelectItem value='learning_mode'>Chế độ học</SelectItem>
-                  <SelectItem value='low_time'>Ít thời gian</SelectItem>
-                  <SelectItem value='active'>Chủ động</SelectItem>
-                </SelectContent>
-              </Select>
+              <Select value={filterCategory} onChange={setFilterCategory} label='Danh mục' className='mt-1' />
               <Button variant='outline' onClick={clearFilters}>
                 Xóa bộ lọc
               </Button>

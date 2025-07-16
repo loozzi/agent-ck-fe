@@ -21,7 +21,7 @@ export interface CreatePromptPayload {
   name: string
   description: string
   prompt_text: string
-  category: CategoryEnum
+  category: CategoryEnum[]
   is_active: boolean
 }
 
@@ -29,11 +29,16 @@ export interface UpdatePromtPayload {
   name?: string
   description?: string
   prompt_text?: string
-  category?: CategoryEnum
+  category?: CategoryEnum[]
   is_active?: boolean
 }
 
-export interface Prompt extends CreatePromptPayload {
+export interface Prompt {
+  name: string
+  description: string
+  prompt_text: string
+  category: string
+  is_active: boolean
   id: string
   trainer_id: string
   created_at: string
@@ -49,7 +54,7 @@ export interface DocumentUploadPayload {
   file: File
   title: string
   description?: string
-  category?: CategoryEnum
+  category?: CategoryEnum[]
 }
 
 export interface CategoryContent {

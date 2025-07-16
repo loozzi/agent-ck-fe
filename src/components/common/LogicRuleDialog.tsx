@@ -1,23 +1,24 @@
-import React, { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import MultiSelectCheckbox from '@/components/ui/MultiSelectCheckbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Trash2, Plus, Move, Target } from 'lucide-react'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { Textarea } from '@/components/ui/textarea'
 import type {
   LogicRule,
+  LogicRuleAction,
   LogicRuleIndicator,
   LogicRuleOperator,
-  LogicRuleAction,
   LogicRuleTimeFrame
 } from '@/types/logicRules'
 import type { CategoryEnum } from '@/types/prompts'
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
+import { Move, Plus, Target, Trash2 } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 
 interface LogicCondition {
   id: string
@@ -34,7 +35,7 @@ interface LogicRuleFormData {
   timeframe: LogicRuleTimeFrame
   priority: number
   is_active: boolean
-  category: CategoryEnum
+  category: CategoryEnum[]
 }
 
 interface LogicRuleDialogProps {
@@ -96,7 +97,7 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
     timeframe: '1d',
     priority: 1,
     is_active: true,
-    category: 'general'
+    category: ['general']
   })
 
   useEffect(() => {
@@ -116,7 +117,11 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
         timeframe: rule.timeframe,
         priority: rule.priority,
         is_active: rule.is_active,
-        category: rule.category || 'general'
+        category: rule.category
+          ? typeof rule.category === 'string'
+            ? rule.category.split(',')
+            : rule.category
+          : ['general']
       })
     } else {
       setFormData({
@@ -127,7 +132,7 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
         timeframe: '1d',
         priority: 1,
         is_active: true,
-        category: 'general'
+        category: ['general']
       })
     }
   }, [rule])
@@ -216,31 +221,28 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
             </div>
             <div className='space-y-2'>
               <Label htmlFor='category'>Danh mục</Label>
-              <Select
+              <MultiSelectCheckbox
+                options={[
+                  { value: 'general', label: 'Chung' },
+                  { value: 'long_term', label: 'Dài hạn' },
+                  { value: 'short_term', label: 'Ngắn hạn' },
+                  { value: 'value_style', label: 'Đầu tư giá trị' },
+                  { value: 'high_risk', label: 'Rủi ro cao' },
+                  { value: 'moderate_risk', label: 'Rủi ro vừa' },
+                  { value: 'low_risk', label: 'Rủi ro thấp' },
+                  { value: 'goal_>10%', label: 'Mục tiêu >10%' },
+                  { value: 'goal_learning', label: 'Mục tiêu học hỏi' },
+                  { value: 'f0', label: 'F0' },
+                  { value: 'advance', label: 'Nâng cao' },
+                  { value: 'passive', label: 'Thụ động' },
+                  { value: 'learning_mode', label: 'Chế độ học' },
+                  { value: 'low_time', label: 'Ít thời gian' },
+                  { value: 'active', label: 'Chủ động' }
+                ]}
                 value={formData.category}
-                onValueChange={(value) => setFormData((prev) => ({ ...prev, category: value as CategoryEnum }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder='Chọn danh mục' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='general'>Chung</SelectItem>
-                  <SelectItem value='long_term'>Dài hạn</SelectItem>
-                  <SelectItem value='short_term'>Ngắn hạn</SelectItem>
-                  <SelectItem value='value_style'>Đầu tư giá trị</SelectItem>
-                  <SelectItem value='high_risk'>Rủi ro cao</SelectItem>
-                  <SelectItem value='moderate_risk'>Rủi ro vừa</SelectItem>
-                  <SelectItem value='low_risk'>Rủi ro thấp</SelectItem>
-                  <SelectItem value='goal_>10%'>Mục tiêu {'>'}10%</SelectItem>
-                  <SelectItem value='goal_learning'>Mục tiêu học hỏi</SelectItem>
-                  <SelectItem value='f0'>F0</SelectItem>
-                  <SelectItem value='advance'>Nâng cao</SelectItem>
-                  <SelectItem value='passive'>Thụ động</SelectItem>
-                  <SelectItem value='learning_mode'>Chế độ học</SelectItem>
-                  <SelectItem value='low_time'>Ít thời gian</SelectItem>
-                  <SelectItem value='active'>Chủ động</SelectItem>
-                </SelectContent>
-              </Select>
+                onChange={(selected) => setFormData((prev) => ({ ...prev, category: selected }))}
+                className='mt-1'
+              />
             </div>
           </div>
 

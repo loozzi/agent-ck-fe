@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import MultiSelectCheckbox from '@/components/ui/MultiSelectCheckbox'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
@@ -27,11 +28,28 @@ const CreatePromptDialog = ({ onCreated }: CreatePromptDialogProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const dispatch = useDispatch<AppDispatch>()
 
+  const CATEGORY_OPTIONS = [
+    { value: 'long_term', label: 'Dài hạn' },
+    { value: 'short_term', label: 'Ngắn hạn' },
+    { value: 'value_style', label: 'Đầu tư giá trị' },
+    { value: 'high_risk', label: 'Rủi ro cao' },
+    { value: 'moderate_risk', label: 'Rủi ro vừa' },
+    { value: 'low_risk', label: 'Rủi ro thấp' },
+    { value: 'goal_>10%', label: 'Mục tiêu >10%' },
+    { value: 'goal_learning', label: 'Mục tiêu học hỏi' },
+    { value: 'f0', label: 'F0' },
+    { value: 'advance', label: 'Nâng cao' },
+    { value: 'passive', label: 'Thụ động' },
+    { value: 'learning_mode', label: 'Chế độ học' },
+    { value: 'low_time', label: 'Ít thời gian' },
+    { value: 'active', label: 'Chủ động' },
+    { value: 'general', label: 'Chung' }
+  ]
   const [formData, setFormData] = useState<CreatePromptPayload>({
     name: '',
     description: '',
     prompt_text: '',
-    category: 'learning_mode',
+    category: ['learning_mode'],
     is_active: true
   })
 
@@ -46,7 +64,7 @@ const CreatePromptDialog = ({ onCreated }: CreatePromptDialogProps) => {
         name: '',
         description: '',
         prompt_text: '',
-        category: 'general',
+        category: ['general'],
         is_active: true
       })
       onCreated?.()
@@ -57,10 +75,10 @@ const CreatePromptDialog = ({ onCreated }: CreatePromptDialogProps) => {
     }
   }
 
-  const handleInputChange = (field: keyof CreatePromptPayload, value: string | boolean) => {
+  const handleInputChange = (field: keyof CreatePromptPayload, value: string | boolean | string[]) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: field === 'category' ? (value as string[]) : value
     }))
   }
 
@@ -103,31 +121,14 @@ const CreatePromptDialog = ({ onCreated }: CreatePromptDialogProps) => {
 
           <div className='space-y-2'>
             <Label htmlFor='category'>Danh mục</Label>
-            <select
-              id='category'
-              className='w-full border rounded px-3 py-2'
+
+            <MultiSelectCheckbox
+              options={CATEGORY_OPTIONS}
               value={formData.category}
-              onChange={(e) => handleInputChange('category', e.target.value)}
-              required
-            >
-              <option value='' disabled>
-                Chọn danh mục
-              </option>
-              <option value='long_term'>Dài hạn</option>
-              <option value='short_term'>Ngắn hạn</option>
-              <option value='value_style'>Đầu tư giá trị</option>
-              <option value='high_risk'>Rủi ro cao</option>
-              <option value='moderate_risk'>Rủi ro vừa</option>
-              <option value='low_risk'>Rủi ro thấp</option>
-              <option value='goal_>10%'>Mục tiêu {'>'}10%</option>
-              <option value='goal_learning'>Mục tiêu học hỏi</option>
-              <option value='f0'>F0</option>
-              <option value='advance'>Nâng cao</option>
-              <option value='passive'>Thụ động</option>
-              <option value='learning_mode'>Chế độ học</option>
-              <option value='low_time'>Ít thời gian</option>
-              <option value='active'>Chủ động</option>
-            </select>
+              onChange={(selected) => handleInputChange('category', selected)}
+              // label='Danh mục'
+              className='mt-1'
+            />
           </div>
 
           <div className='space-y-2'>

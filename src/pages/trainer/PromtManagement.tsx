@@ -22,7 +22,7 @@ const PromtManagement = () => {
   // const adminState = useReduxSelector((state: RootState) => state.admin)
 
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  // const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [selectedStatus, setSelectedStatus] = useState<string>('all')
 
   useEffect(() => {
@@ -45,10 +45,6 @@ const PromtManagement = () => {
   const handleSearch = () => {
     const params: any = {}
 
-    if (selectedCategory !== 'all') {
-      params.category = selectedCategory
-    }
-
     if (selectedStatus !== 'all') {
       params.is_active = selectedStatus === 'active'
     }
@@ -65,13 +61,12 @@ const PromtManagement = () => {
       prompt.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       prompt.description.toLowerCase().includes(searchTerm.toLowerCase())
 
-    const matchesCategory = selectedCategory === 'all' || prompt.category === selectedCategory
     const matchesStatus =
       selectedStatus === 'all' ||
       (selectedStatus === 'active' && prompt.is_active) ||
       (selectedStatus === 'inactive' && !prompt.is_active)
 
-    return matchesSearch && matchesCategory && matchesStatus
+    return matchesSearch && matchesStatus
   })
 
   const StatCard = ({ title, value, icon: Icon, description }: any) => (
@@ -151,20 +146,6 @@ const PromtManagement = () => {
             </div>
 
             <div className='flex items-center justify-between md:flex-row flex-col'>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className='w-full md:w-48'>
-                  <SelectValue placeholder='Chọn danh mục' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>Tất cả danh mục</SelectItem>
-                  {Array.from(new Set(prompts.map((p) => p.category))).map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
               <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                 <SelectTrigger className='w-full md:w-48'>
                   <SelectValue placeholder='Trạng thái' />

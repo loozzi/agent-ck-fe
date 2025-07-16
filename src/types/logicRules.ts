@@ -14,11 +14,21 @@ export interface CreateLogicRulePayload {
   action: LogicRuleAction
   timeframe: LogicRuleTimeFrame
   priority: number
-  category: CategoryEnum
+  category: CategoryEnum[]
   is_active: boolean
 }
 
-export interface LogicRule extends CreateLogicRulePayload {
+export interface LogicRule {
+  name: string
+  description: string
+  indicator: LogicRuleIndicator
+  operator: LogicRuleOperator
+  threshold_value: string
+  action: LogicRuleAction
+  timeframe: LogicRuleTimeFrame
+  priority: number
+  category: string
+  is_active: boolean
   id: string
   trainer_id: string
   created_at: string
@@ -40,6 +50,6 @@ export interface UpdateLogicRulePayload {
   action?: LogicRuleAction
   timeframe?: LogicRuleTimeFrame
   priority?: number
-  category?: CategoryEnum
+  category?: CategoryEnum[]
   is_active?: boolean
 }
