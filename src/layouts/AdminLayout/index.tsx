@@ -87,6 +87,12 @@ const AdminLayout = () => {
       href: '/admin/lesson-management'
     },
     {
+      id: 'survey-management',
+      title: 'Quản lý khảo sát',
+      icon: <FaList className='w-4 h-4' />,
+      href: '/admin/survey-management'
+    },
+    {
       id: 'settings',
       title: 'Cài đặt',
       icon: <IoIosSettings className='w-4 h-4' />,

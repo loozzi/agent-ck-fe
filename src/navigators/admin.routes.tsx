@@ -9,6 +9,7 @@ import RuleController from '@/pages/trainer/RuleController'
 import PromtDetail from '@/pages/trainer/PromtDetail'
 import CategoryManagement from '@/pages/trainer/CategoryManagement'
 import LessonManagement from '@/pages/admin/Lesson'
+import SurveyManagement from '@/pages/admin/SurveyManagement'
 
 export const adminRoutesConfig: RouteBrowser[] = [
   {
@@ -63,6 +64,12 @@ export const adminRoutesConfig: RouteBrowser[] = [
     name: 'Lesson Management',
     route: 'lesson-management',
     element: <LessonManagement />,
+    exact: true
+  },
+  {
+    name: 'Survey Management',
+    route: 'survey-management',
+    element: <SurveyManagement />,
     exact: true
   }
 ]
