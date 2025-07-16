@@ -60,3 +60,10 @@ export interface ZaloState {
   userData?: ZaloDataResponse
   error?: string
 }
+
+export interface Window {
+  ZaloSocialSDK?: {
+    reload: () => void
+    // Có thể bổ sung các method khác nếu cần
+  }
+}

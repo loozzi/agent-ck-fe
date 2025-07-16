@@ -248,6 +248,9 @@ const userSlice = createSlice({
         state.token = action.payload.access_token
         state.refreshToken = action.payload.refresh_token
         state.loading = false
+        if (!action.payload.user.onboarding_completed) {
+          window.location.href = '/survey'
+        }
       })
       .addCase(zaloCompleteLogin.rejected, (state) => {
         state.loading = false
