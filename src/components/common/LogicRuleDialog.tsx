@@ -117,11 +117,7 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
         timeframe: rule.timeframe,
         priority: rule.priority,
         is_active: rule.is_active,
-        category: rule.category
-          ? typeof rule.category === 'string'
-            ? rule.category.split(',')
-            : rule.category
-          : ['general']
+        category: rule.category ? (rule.category.split(',').map((cat) => cat.trim()) as CategoryEnum[]) : ['general']
       })
     } else {
       setFormData({
@@ -240,7 +236,7 @@ export const LogicRuleDialog: React.FC<LogicRuleDialogProps> = ({
                   { value: 'active', label: 'Chủ động' }
                 ]}
                 value={formData.category}
-                onChange={(selected) => setFormData((prev) => ({ ...prev, category: selected }))}
+                onChange={(selected) => setFormData((prev) => ({ ...prev, category: selected as CategoryEnum[] }))}
                 className='mt-1'
               />
             </div>

@@ -1,23 +1,22 @@
-import { useState, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/app/hook'
+import { DeleteLogicRuleDialog } from '@/components/common/DeleteLogicRuleDialog'
+import { LogicRuleCard } from '@/components/common/LogicRuleCard'
+import '@/components/common/LogicRuleController.css'
+import { LogicRuleDetailDialog } from '@/components/common/LogicRuleDetailDialog'
+import { LogicRuleDialog } from '@/components/common/LogicRuleDialog'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import MultiSelectCheckbox from '@/components/ui/MultiSelectCheckbox'
-import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, Search, Filter, Activity, BarChart3, Settings, AlertCircle } from 'lucide-react'
-import { LogicRuleCard } from '@/components/common/LogicRuleCard'
-import { LogicRuleDialog } from '@/components/common/LogicRuleDialog'
-import { LogicRuleDetailDialog } from '@/components/common/LogicRuleDetailDialog'
-import { DeleteLogicRuleDialog } from '@/components/common/DeleteLogicRuleDialog'
-import { createLogicRule, getLogicRules, updateLogicRule, deleteLogicRule } from '@/slices/logicRule.slice'
 import { fetchLogicRules as fetchAdminLogicRules } from '@/slices/admin.slice'
-import type { LogicRule, LogicRuleIndicator, LogicRuleAction } from '@/types/logicRules'
+import { createLogicRule, deleteLogicRule, getLogicRules, updateLogicRule } from '@/slices/logicRule.slice'
+import type { LogicRule, LogicRuleAction, LogicRuleIndicator } from '@/types/logicRules'
 import type { CategoryEnum } from '@/types/prompts'
+import { Activity, AlertCircle, BarChart3, Filter, Plus, Search, Settings } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import '@/components/common/LogicRuleController.css'
 
 export interface LogicRuleFormData {
   name: string
@@ -204,7 +203,7 @@ const RuleController = () => {
     setFilterIndicator('all')
     setFilterAction('all')
     setFilterStatus('all')
-    setFilterCategory('all')
+    setFilterCategory([])
   }
 
   return (
@@ -344,8 +343,6 @@ const RuleController = () => {
                   <SelectItem value='inactive'>Tạm dừng</SelectItem>
                 </SelectContent>
               </Select>
-
-              <Select value={filterCategory} onChange={setFilterCategory} label='Danh mục' className='mt-1' />
               <Button variant='outline' onClick={clearFilters}>
                 Xóa bộ lọc
               </Button>

@@ -1,3 +1,4 @@
+import { useAppDispatch, useAppSelector } from '@/app/hook'
 import MultiSelectCheckbox from '@/components/ui/MultiSelectCheckbox'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -14,7 +15,6 @@ import {
 } from '@/slices/adminSurvey.slice'
 import type { CreateSurveyQuestionPayload, SurveyQuestion } from '@/types/adminSurvey.types'
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 
 const defaultForm: CreateSurveyQuestionPayload = {
   question_id: '',
@@ -42,8 +42,8 @@ const partOptions = [
 
 const SurveyManagement = () => {
   const [optionInput, setOptionInput] = useState('')
-  const dispatch = useDispatch()
-  const { questions, isLoading, error } = useSelector((state: any) => state.adminSurvey)
+  const dispatch = useAppDispatch()
+  const { questions, isLoading, error } = useAppSelector((state) => state.adminSurvey)
   const [openDialog, setOpenDialog] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [form, setForm] = useState<CreateSurveyQuestionPayload>(defaultForm)
@@ -80,7 +80,7 @@ const SurveyManagement = () => {
     setForm(defaultForm)
   }
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleFormChange = (e: React.ChangeEvent<any>) => {
     const { name, value, type, checked } = e.target
     setForm((prev) => ({
       ...prev,

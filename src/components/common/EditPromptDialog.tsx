@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import type { AppDispatch } from '@/app/store'
 import { updatePrompt } from '@/slices/prompt.slice'
-import type { UpdatePromtPayload, Prompt } from '@/types/prompts'
+import type { UpdatePromtPayload, Prompt, CategoryEnum } from '@/types/prompts'
 import {
   Dialog,
   DialogContent,
@@ -32,7 +32,7 @@ const EditPromptDialog = ({ prompt, onUpdated }: EditPromptDialogProps) => {
     name: prompt.name,
     description: prompt.description,
     prompt_text: prompt.prompt_text,
-    category: prompt.category,
+    category: (prompt.category.split(',').map((cat) => cat.trim()) as CategoryEnum[]) || [],
     is_active: prompt.is_active
   })
 
@@ -42,7 +42,7 @@ const EditPromptDialog = ({ prompt, onUpdated }: EditPromptDialogProps) => {
         name: prompt.name,
         description: prompt.description,
         prompt_text: prompt.prompt_text,
-        category: prompt.category,
+        category: (prompt.category.split(',').map((cat) => cat.trim()) as CategoryEnum[]) || [],
         is_active: prompt.is_active
       })
     }

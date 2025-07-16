@@ -17,6 +17,7 @@ import { UploadCloud } from 'lucide-react'
 import { useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { toast } from 'react-toastify'
+import type { CategoryEnum } from '@/types/prompts'
 
 interface UploadDocumentDialogProps {
   onUploaded?: () => void
@@ -49,7 +50,7 @@ const UploadDocumentDialog = ({ onUploaded }: UploadDocumentDialogProps) => {
     { value: 'active', label: 'Chủ động' },
     { value: 'general', label: 'Chung' }
   ]
-  const [category, setCategory] = useState<string[]>(['learning_mode'])
+  const [category, setCategory] = useState<CategoryEnum[]>(['learning_mode'])
   const [fileError, setFileError] = useState<string | null>(null)
 
   const onDrop = (acceptedFiles: File[]) => {

@@ -123,7 +123,7 @@ export const uploadDocument = createAsyncThunk(
         formData.append('description', payload.description)
       }
       if (payload.category) {
-        formData.append('category', payload.category)
+        formData.append('category', Array.isArray(payload.category) ? payload.category.join(',') : payload.category)
       }
 
       const response = await promtService.uploadDocument(formData)

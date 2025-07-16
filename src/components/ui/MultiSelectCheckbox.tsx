@@ -8,7 +8,7 @@ interface Option {
 interface MultiSelectCheckboxProps {
   options: Option[]
   value: string[]
-  onChange: (value: string[]) => void
+  onChange: (value: any[]) => void
   className?: string
   label?: string
 }

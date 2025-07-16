@@ -15,7 +15,10 @@ const portfolioService = {
   refreshValues: async (): Promise<void> => {
     return apiInstance.post('/portfolio/refresh-values')
   },
-  updateTransaction: async (id: string, payload: Partial<AddTransactionPayload>): Promise<AxiosResponse<TransactionItem>> => {
+  updateTransaction: async (
+    id: string,
+    payload: Partial<AddTransactionPayload>
+  ): Promise<AxiosResponse<TransactionItem>> => {
     return apiInstance.put(`/portfolio/transaction/${id}`, payload)
   },
   deleteTransaction: async (id: string): Promise<void> => {

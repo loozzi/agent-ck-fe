@@ -46,7 +46,7 @@ export interface StockHistory {
   ticker: string
   name: string
   start_date: string
-  end_date: string 
+  end_date: string
   interval: string
   data: Daum[]
   total_records: number
