@@ -1,4 +1,10 @@
-import type { SessionResponse, SignInResponse, SignUpResponse, ZaloCompleteLoginPayload } from '@/types/auth'
+import type {
+  SessionResponse,
+  SignInResponse,
+  SignUpResponse,
+  ZaloCompleteLoginPayload,
+  ZaloCompleteLoginResponse
+} from '@/types/auth'
 import type { RefreshTokenPayload, SignInPayload, SignUpPayload } from '@/types/payload'
 import type { AxiosResponse } from 'axios'
 import apiInstance from './axios.config'
@@ -15,7 +21,7 @@ const authService = {
   },
   getSessions: (): Promise<AxiosResponse<SessionResponse>> => apiInstance.get('/auth/sessions'),
   signOut: (): Promise<AxiosResponse<void>> => apiInstance.post('/auth/logout'),
-  completeLogin: (data: ZaloCompleteLoginPayload): Promise<AxiosResponse<SignInResponse>> =>
+  completeLogin: (data: ZaloCompleteLoginPayload): Promise<AxiosResponse<ZaloCompleteLoginResponse>> =>
     apiInstance.post('/auth/zalo/complete-login', data)
 }
 

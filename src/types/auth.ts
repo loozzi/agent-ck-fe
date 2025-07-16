@@ -28,6 +28,7 @@ export interface UserResponse {
   email: string
   full_name: string
   status: string
+  avatar: string
   role: UserRole
   zalo_id: any
   zalo_name: string
@@ -67,4 +68,6 @@ export interface ZaloCompleteLoginPayload {
   user_info: ZaloDataResponse
 }
 
-export interface ZaloCompleteLoginResponse {}
+export interface ZaloCompleteLoginResponse extends SignInResponse {
+  user: UserResponse
+}

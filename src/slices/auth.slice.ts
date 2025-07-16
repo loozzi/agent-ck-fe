@@ -243,7 +243,8 @@ const userSlice = createSlice({
       })
       .addCase(zaloCompleteLogin.fulfilled, (state, action) => {
         state.isAuthenticated = true
-        state.user = action.payload.user_info
+        state.signUpSuccess = true
+        state.user = action.payload.user
         state.token = action.payload.access_token
         state.refreshToken = action.payload.refresh_token
         state.loading = false

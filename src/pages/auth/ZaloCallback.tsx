@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/app/hook'
-import { getMeAction, zaloCompleteLogin } from '@/slices/auth.slice'
+import { zaloCompleteLogin } from '@/slices/auth.slice'
 import { getZaloData, sendZaloCode } from '@/slices/zalo.slice'
 import { useEffect } from 'react'
 
@@ -45,9 +45,7 @@ const ZaloCallback = () => {
           },
           user_info: userData
         })
-      ).then(() => {
-        dispatch(getMeAction())
-      })
+      )
     }
   }, [userData])
 
