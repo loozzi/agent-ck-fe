@@ -4,7 +4,7 @@ import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 
 const apiInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/',
-  timeout: 10000 // Set a timeout of 10 seconds
+  timeout: 100000 // Set a timeout of 10 seconds
 })
 
 // Track refresh token promise to avoid multiple refresh calls

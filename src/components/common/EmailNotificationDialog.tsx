@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useAppDispatch, useAppSelector } from '@/app/hook'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -10,10 +11,10 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Mail, Shield, Clock, Check } from 'lucide-react'
-import userService from '@/services/user.service'
+import { changeEmail, resendVerification, setTimeRemaining, verifyEmail } from '@/slices/email.slice'
 import { setEmailDeclinePreference } from '@/utils/emailPreferences'
+import { Check, Clock, Mail, Shield } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 interface EmailNotificationDialogProps {
   open: boolean
@@ -39,8 +40,9 @@ const EmailNotificationDialog = ({
 }: EmailNotificationDialogProps) => {
   const [step, setStep] = useState<DialogStep>('ask')
   const [formData, setFormData] = useState<EmailFormData>({ email: '', otp: '' })
+  const dispatch = useAppDispatch()
+  const { timeRemaining, loading, error } = useAppSelector((state) => state.email)
   const [otpRequested, setOtpRequested] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [otpSent, setOtpSent] = useState(false)
 
   const handleAskResponse = (wantsEmail: boolean) => {
@@ -60,40 +62,41 @@ const EmailNotificationDialog = ({
     if (!formData.email || !isValidEmail(formData.email)) {
       return
     }
-
-    setIsLoading(true)
     try {
-      // Call API to request OTP
-      await userService.requestEmailOtp(formData.email)
+      await dispatch(changeEmail({ new_email: formData.email }))
       setOtpRequested(true)
       setOtpSent(true)
       setTimeout(() => setOtpSent(false), 3000)
     } catch (error) {
-      console.error('Error requesting OTP:', error)
-    } finally {
-      setIsLoading(false)
+      // error handled by slice
     }
   }
+
+  // Đóng form khi có lỗi từ email slice
+  useEffect(() => {
+    if (error) {
+      onOpenChange(false)
+      setTimeout(() => {
+        setFormData({ email: '', otp: '' })
+        setOtpRequested(false)
+        setStep('ask')
+      }, 300)
+    }
+  }, [error])
 
   const handleSubmitEmail = async () => {
     if (!formData.email || !formData.otp || !isValidEmail(formData.email)) {
       return
     }
-
-    setIsLoading(true)
     try {
-      // Call API to verify OTP and update email
-      await userService.updateEmail(formData.email, formData.otp)
+      await dispatch(verifyEmail({ verification_code: formData.otp }))
       onComplete?.(formData.email)
       onOpenChange(false)
-      // Reset form
       setFormData({ email: '', otp: '' })
       setOtpRequested(false)
       setStep('ask')
     } catch (error) {
-      console.error('Error updating email:', error)
-    } finally {
-      setIsLoading(false)
+      // error handled by slice
     }
   }
 
@@ -102,8 +105,23 @@ const EmailNotificationDialog = ({
     return emailRegex.test(email)
   }
 
-  const canRequestOtp = formData.email && isValidEmail(formData.email) && !otpRequested
+  const canRequestOtp = formData.email && isValidEmail(formData.email) && !otpRequested && timeRemaining === 0
   const canSubmitEmail = formData.email && formData.otp && isValidEmail(formData.email) && otpRequested
+  // Countdown effect
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null
+    if (timeRemaining > 0) {
+      timer = setInterval(() => {
+        dispatch(setTimeRemaining(timeRemaining - 1))
+      }, 1000)
+    }
+    return () => {
+      if (timer) clearInterval(timer)
+    }
+  }, [timeRemaining, dispatch])
+  const handleResend = async () => {
+    await dispatch(resendVerification())
+  }
 
   const handleClose = () => {
     onOpenChange(false)
@@ -170,24 +188,31 @@ const EmailNotificationDialog = ({
                     placeholder='your.email@example.com'
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    disabled={isLoading}
+                    disabled={loading}
                   />
                   <Button
                     type='button'
                     variant='outline'
                     onClick={handleRequestOtp}
-                    disabled={!canRequestOtp || isLoading}
+                    disabled={!canRequestOtp || loading}
                     className='whitespace-nowrap'
                   >
-                    {isLoading ? (
+                    {loading ? (
                       <>
                         <Clock className='h-4 w-4 animate-spin mr-2' />
                         Đang gửi...
                       </>
+                    ) : timeRemaining > 0 ? (
+                      `Gửi lại (${timeRemaining}s)`
                     ) : (
                       'Lấy mã'
                     )}
                   </Button>
+                  {otpRequested && timeRemaining === 0 && (
+                    <Button type='button' variant='ghost' size='sm' onClick={handleResend} disabled={loading}>
+                      Gửi lại mã
+                    </Button>
+                  )}
                 </div>
                 {!isValidEmail(formData.email) && formData.email && (
                   <p className='text-sm text-red-600'>Email không hợp lệ</p>
@@ -203,7 +228,7 @@ const EmailNotificationDialog = ({
                     placeholder='Nhập mã OTP'
                     value={formData.otp}
                     onChange={(e) => setFormData({ ...formData, otp: e.target.value })}
-                    disabled={isLoading}
+                    disabled={loading}
                     maxLength={6}
                   />
                   {otpSent && (
@@ -219,7 +244,7 @@ const EmailNotificationDialog = ({
 
               <div className='text-sm text-gray-600 space-y-1'>
                 <p>• Mã OTP sẽ được gửi đến email bạn vừa nhập</p>
-                <p>• Mã có hiệu lực trong 5 phút</p>
+                <p>• Mã có hiệu lực trong 2 phút</p>
                 <p>• Kiểm tra cả hộp thư spam nếu không thấy email</p>
               </div>
             </div>
@@ -227,8 +252,8 @@ const EmailNotificationDialog = ({
               <Button variant='outline' onClick={handleClose}>
                 Hủy
               </Button>
-              <Button onClick={handleSubmitEmail} disabled={!canSubmitEmail || isLoading}>
-                {isLoading ? (
+              <Button onClick={handleSubmitEmail} disabled={!canSubmitEmail || loading}>
+                {loading ? (
                   <>
                     <Clock className='h-4 w-4 animate-spin mr-2' />
                     Đang xử lý...

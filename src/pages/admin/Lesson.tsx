@@ -1,13 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@/app/hook'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
-import { Switch } from '@/components/ui/switch'
 import {
   Dialog,
   DialogContent,
@@ -17,40 +11,41 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
+import { Textarea } from '@/components/ui/textarea'
 import {
-  fetchLessonsCategories,
   createLessonCategory,
-  updateLessonCategory,
+  deleteLesson,
   deleteLessonCategory,
   fetchAllLessons,
-  createLesson,
-  updateLesson,
-  deleteLesson,
-  getLessonById
+  fetchLessonsCategories,
+  updateLessonCategory
 } from '@/slices/lesson.slice'
 import type {
   Category,
   CreateCategoryPayload,
-  CreateLessonPayload,
-  Lesson,
-  UpdateLessonPayload
+  Lesson
 } from '@/types/lesson.type'
+import { BookOpen, Edit, Eye, FolderPlus, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Plus, Edit, Trash2, Eye, BookOpen, FolderPlus } from 'lucide-react'
+import { useNavigate } from 'react-router'
 
 const LessonManagement = () => {
+  // State cho nội dung rich text editor
   console.log('LessonManagement component rendering')
   const dispatch = useAppDispatch()
   const { categories, lessons, allLessons, loading, error } = useAppSelector((state) => state.lesson)
 
+  const navigate = useNavigate()
+
   // Dialog states
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false)
-  const [lessonDialogOpen, setLessonDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
-  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null)
-  const [viewingLesson, setViewingLesson] = useState<Lesson | null>(null)
 
   // Form states
   const [categoryForm, setCategoryForm] = useState<CreateCategoryPayload>({
@@ -60,13 +55,6 @@ const LessonManagement = () => {
     is_active: true
   })
 
-  const [lessonForm, setLessonForm] = useState<CreateLessonPayload>({
-    category_id: '',
-    title: '',
-    content: '',
-    display_order: 0,
-    is_active: true
-  })
 
   // Filter states
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
@@ -126,39 +114,9 @@ const LessonManagement = () => {
 
   // Lesson handlers
   const handleCreateLesson = async () => {
-    try {
-      await dispatch(createLesson(lessonForm)).unwrap()
-      setLessonDialogOpen(false)
-      resetLessonForm()
-      dispatch(fetchAllLessons({}))
-    } catch (error) {
-      console.error('Error creating lesson:', error)
-    }
+    navigate('/admin/lesson-management/create')
   }
 
-  const handleUpdateLesson = async () => {
-    if (!editingLesson) return
-    try {
-      const updatePayload: UpdateLessonPayload = {
-        category_id: lessonForm.category_id,
-        title: lessonForm.title,
-        content: lessonForm.content,
-        is_active: lessonForm.is_active
-      }
-      await dispatch(
-        updateLesson({
-          lessonId: editingLesson.id,
-          payload: updatePayload
-        })
-      ).unwrap()
-      setLessonDialogOpen(false)
-      setEditingLesson(null)
-      resetLessonForm()
-      dispatch(fetchAllLessons({}))
-    } catch (error) {
-      console.error('Error updating lesson:', error)
-    }
-  }
 
   const handleDeleteLesson = async (lessonId: string) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa bài học này không?')) {
@@ -172,13 +130,7 @@ const LessonManagement = () => {
   }
 
   const handleViewLesson = async (lesson: Lesson) => {
-    try {
-      const fullLesson = await dispatch(getLessonById(lesson.id)).unwrap()
-      setViewingLesson(fullLesson)
-    } catch (error) {
-      console.error('Error fetching lesson details:', error)
-      setViewingLesson(lesson) // Fallback to basic lesson data
-    }
+    navigate(`/admin/lesson-management/${lesson.id}`)
   }
 
   // Form helpers
@@ -191,15 +143,6 @@ const LessonManagement = () => {
     })
   }
 
-  const resetLessonForm = () => {
-    setLessonForm({
-      category_id: '',
-      title: '',
-      content: '',
-      display_order: 0,
-      is_active: true
-    })
-  }
 
   const openEditCategoryDialog = (category: Category) => {
     setEditingCategory(category)
@@ -213,15 +156,7 @@ const LessonManagement = () => {
   }
 
   const openEditLessonDialog = (lesson: Lesson) => {
-    setEditingLesson(lesson)
-    setLessonForm({
-      category_id: lesson.category_id,
-      title: lesson.title,
-      content: lesson.content,
-      display_order: 0,
-      is_active: lesson.is_active
-    })
-    setLessonDialogOpen(true)
+    navigate(`/admin/lesson-management/${lesson.id}?edit=true`)
   }
 
   // Filter lessons by category
@@ -270,88 +205,10 @@ const LessonManagement = () => {
                   </CardTitle>
                   <CardDescription>Quản lý tất cả bài học trong hệ thống</CardDescription>
                 </div>
-                <Dialog open={lessonDialogOpen} onOpenChange={setLessonDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button onClick={resetLessonForm}>
-                      <Plus className='h-4 w-4 mr-2' />
-                      Thêm bài học
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className='sm:max-w-[600px]'>
-                    <DialogHeader>
-                      <DialogTitle>{editingLesson ? 'Chỉnh sửa bài học' : 'Thêm bài học mới'}</DialogTitle>
-                      <DialogDescription>
-                        {editingLesson ? 'Cập nhật thông tin bài học' : 'Tạo bài học mới trong hệ thống'}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className='grid gap-4 py-4'>
-                      <div className='grid grid-cols-4 items-center gap-4'>
-                        <Label htmlFor='lesson-category' className='text-right'>
-                          Danh mục
-                        </Label>
-                        <Select
-                          value={lessonForm.category_id}
-                          onValueChange={(value) => setLessonForm({ ...lessonForm, category_id: value })}
-                        >
-                          <SelectTrigger className='col-span-3'>
-                            <SelectValue placeholder='Chọn danh mục' />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categories.map((category) => (
-                              <SelectItem key={category.id} value={category.id}>
-                                {category.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className='grid grid-cols-4 items-center gap-4'>
-                        <Label htmlFor='lesson-title' className='text-right'>
-                          Tiêu đề
-                        </Label>
-                        <Input
-                          id='lesson-title'
-                          value={lessonForm.title}
-                          onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })}
-                          className='col-span-3'
-                          placeholder='Nhập tiêu đề bài học'
-                        />
-                      </div>
-                      <div className='grid grid-cols-4 items-start gap-4'>
-                        <Label htmlFor='lesson-content' className='text-right'>
-                          Nội dung
-                        </Label>
-                        <Textarea
-                          id='lesson-content'
-                          value={lessonForm.content}
-                          onChange={(e) => setLessonForm({ ...lessonForm, content: e.target.value })}
-                          className='col-span-3'
-                          rows={6}
-                          placeholder='Nhập nội dung bài học'
-                        />
-                      </div>
-                      <div className='grid grid-cols-4 items-center gap-4'>
-                        <Label htmlFor='lesson-active' className='text-right'>
-                          Kích hoạt
-                        </Label>
-                        <Switch
-                          id='lesson-active'
-                          checked={lessonForm.is_active}
-                          onCheckedChange={(checked) => setLessonForm({ ...lessonForm, is_active: checked })}
-                        />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button
-                        type='submit'
-                        onClick={editingLesson ? handleUpdateLesson : handleCreateLesson}
-                        disabled={loading}
-                      >
-                        {loading ? 'Đang xử lý...' : editingLesson ? 'Cập nhật' : 'Tạo mới'}
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                <Button onClick={handleCreateLesson}>
+                  <Plus className='h-4 w-4 mr-2' />
+                  Thêm bài học
+                </Button>
               </div>
             </CardHeader>
             <CardContent>
@@ -562,32 +419,6 @@ const LessonManagement = () => {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Lesson View Dialog */}
-      {viewingLesson && (
-        <Dialog open={!!viewingLesson} onOpenChange={() => setViewingLesson(null)}>
-          <DialogContent className='sm:max-w-[700px]'>
-            <DialogHeader>
-              <DialogTitle>{viewingLesson.title}</DialogTitle>
-              <DialogDescription>
-                Danh mục: {getCategoryName(viewingLesson.category_id)} | Trạng thái:{' '}
-                {viewingLesson.is_active ? 'Kích hoạt' : 'Tạm dừng'}
-              </DialogDescription>
-            </DialogHeader>
-            <div className='py-4'>
-              <Label>Nội dung bài học:</Label>
-              <div className='mt-2 p-4 bg-gray-50 rounded-md'>
-                <div className='whitespace-pre-wrap'>{viewingLesson.content}</div>
-              </div>
-            </div>
-            <Separator />
-            <div className='text-sm text-muted-foreground'>
-              <p>Ngày tạo: {new Date(viewingLesson.created_at).toLocaleString('vi-VN')}</p>
-              <p>Ngày cập nhật: {new Date(viewingLesson.updated_at).toLocaleString('vi-VN')}</p>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   )
 }

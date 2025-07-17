@@ -9,6 +9,8 @@ import RuleController from '@/pages/trainer/RuleController'
 import PromtDetail from '@/pages/trainer/PromtDetail'
 import CategoryManagement from '@/pages/trainer/CategoryManagement'
 import LessonManagement from '@/pages/admin/Lesson'
+import LessonDetail from '@/pages/admin/LessonDetail'
+import LessonCreate from '@/pages/admin/LessonCreate'
 import SurveyManagement from '@/pages/admin/SurveyManagement'
 
 export const adminRoutesConfig: RouteBrowser[] = [
@@ -64,6 +66,18 @@ export const adminRoutesConfig: RouteBrowser[] = [
     name: 'Lesson Management',
     route: 'lesson-management',
     element: <LessonManagement />,
+    exact: true
+  },
+  {
+    name: 'Lesson Create',
+    route: 'lesson-management/create',
+    element: <LessonCreate />,
+    exact: true
+  },
+  {
+    name: 'Lesson Detail',
+    route: 'lesson-management/:id',
+    element: <LessonDetail />,
     exact: true
   },
   {

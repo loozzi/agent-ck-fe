@@ -19,19 +19,19 @@ import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { BarChart3, Bell, Globe, RefreshCw, TrendingUp, TrendingDown, ListChecks } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { fetchEmailStatus } from '@/slices/email.slice'
 
 const UserDashboard = () => {
   const dispatch = useAppDispatch()
   const { subscription, user } = useAppSelector((state) => state.auth)
   const { latestNews, news, isLoading } = useAppSelector((state) => state.news)
   const { watchlistDetail, isLoading: watchlistLoading } = useAppSelector((state) => state.watchlist)
+  const { emailStatus } = useAppSelector((state) => state.email)
   const [refreshTime, setRefreshTime] = useState(new Date())
   const [showEmailDialog, setShowEmailDialog] = useState(false)
   const [activeTab, setActiveTab] = useState('all')
 
   useEffect(() => {
-    // Check if user has email, if not show dialog
-    // Also check if user has previously declined email notifications
     if (user) {
       const hasDeclined = hasDeclinedEmailNotification(user.id)
       if (!user.email && !hasDeclined) {
@@ -132,6 +132,10 @@ const UserDashboard = () => {
     }, 100)
   }
 
+  useEffect(() => {
+    dispatch(fetchEmailStatus())
+  }, [])
+
   return (
     <div className='space-y-4'>
       {/* EmailNotificationDialog */}
@@ -156,7 +160,9 @@ const UserDashboard = () => {
 
           {/* Desktop Actions */}
           <div className='hidden lg:flex items-center space-x-2'>
-            <EmailSettingsButton onClick={handleManualEmailDialog} hasEmail={!!user?.email} />
+            {!emailStatus.email_verified && (
+              <EmailSettingsButton onClick={handleManualEmailDialog} hasEmail={!!user?.email} />
+            )}
             <Badge variant='outline' className='text-xs'>
               Cập nhật lần cuối: {format(refreshTime, 'HH:mm', { locale: vi })}
             </Badge>
@@ -169,7 +175,7 @@ const UserDashboard = () => {
 
         {/* Mobile and Tablet Actions */}
         <div className='flex lg:hidden flex-wrap items-center gap-2'>
-          <EmailSettingsButton onClick={handleManualEmailDialog} hasEmail={!!user?.email} />
+          <EmailSettingsButton onClick={handleManualEmailDialog} hasEmail={emailStatus.email_verified} />
           <Badge variant='outline' className='text-xs'>
             Cập nhật lần cuối: {format(refreshTime, 'HH:mm', { locale: vi })}
           </Badge>
