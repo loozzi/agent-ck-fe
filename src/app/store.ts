@@ -19,6 +19,7 @@ import strategyReducer from '@/slices/strategy.slice'
 import recommendationReducer from '@/slices/recommendation.slice'
 import lessonReducer from '@/slices/lesson.slice'
 import adminSurveyReducer from '@/slices/adminSurvey.slice'
+import emailReducer from '@/slices/email.slice'
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -38,7 +39,8 @@ const rootReducer = combineReducers({
   strategy: strategyReducer,
   recommendation: recommendationReducer,
   lesson: lessonReducer,
-  adminSurvey: adminSurveyReducer
+  adminSurvey: adminSurveyReducer,
+  email: emailReducer
 })
 
 const persistConfig = {
@@ -62,7 +64,8 @@ const persistConfig = {
     'recommendationReducer',
     'lesson',
     'adminSurvey',
-    'recommendation'
+    'recommendation',
+    'email'
   ], // reducers that you do not want to persist
   whiteList: ['auth'] // reducers that you want to persist
 }

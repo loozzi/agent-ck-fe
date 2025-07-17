@@ -1,7 +1,7 @@
 export interface EmailStatusResponse {
   current_email: string
   email_verified: boolean
-  pending_email?: string
+  pending_email: string
   id_zalo_default_email: boolean
   has_custom_email: boolean
 }
@@ -31,12 +31,10 @@ export interface ResendVerificationResponse {
   pending_email: string
 }
 
-
 export interface EmailState {
-    status: EmailStatusResponse | null
-    updateRequest: EmailUpdateRequest | null
-    verificationRequest: EmailVerificationRequest | null
-    resendVerificationResponse: ResendVerificationResponse | null
-    error: string | null
-    loading: boolean
+  emailStatus: EmailStatusResponse
+  verificationSent: boolean
+  timeRemaining: number
+  error: string | null
+  loading: boolean
 }
