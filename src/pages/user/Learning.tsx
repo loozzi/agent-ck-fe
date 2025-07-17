@@ -2,7 +2,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hook'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import CKViewer from '@/components/common/CKViewer'
+import JoditEditor from 'jodit-react'
 import { fetchAllLessons } from '@/slices/lesson.slice'
 import { useEffect, useState } from 'react'
 
@@ -99,7 +99,7 @@ const Learning = () => {
           </DialogHeader>
           {dialogContent && (
             <div className='mt-2'>
-              <CKViewer content={dialogContent.content} />
+              <JoditEditor value={dialogContent?.content || ''} config={{ readonly: true, toolbar: false }} />
             </div>
           )}
         </DialogContent>
