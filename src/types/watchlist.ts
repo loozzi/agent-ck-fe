@@ -166,10 +166,6 @@ export interface WatchlistDetailsResponse {
 // Add items to watchlist
 export interface AddToWatchlistPayload {
   ticker: string
-  notes: string
-  tags: string[]
-  category: string
-  target_price: number
 }
 
 export interface BulkAddToWatchlistPayload {
