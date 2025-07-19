@@ -18,7 +18,6 @@ import {
   ArrowUpRight,
   BarChart3,
   DollarSign,
-  Filter,
   Loader2,
   PieChart,
   Plus,
@@ -30,6 +29,7 @@ import {
   Wallet
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { FaTrash } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
 
 const Watchlist = () => {
@@ -217,7 +217,7 @@ const Watchlist = () => {
       currency: 'VND',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
-    }).format(value)
+    }).format(value * 1000)
   }
 
   const formatNumber = (value: number) => {
@@ -277,7 +277,7 @@ const Watchlist = () => {
                     <Wallet className='w-5 h-5 text-white' />
                   </div>
                   <div>
-                    <h1 className='text-xl font-bold text-gray-900'>Your Portfolio & Watchlist</h1>
+                    <h1 className='text-xl font-bold text-gray-900'>Danh mục đầu tư và theo dõi</h1>
                     <p className='text-sm text-gray-600'>
                       Portfolio Value: {portfolioSummary ? formatCurrency(portfolioSummary.totalValue) : '₫142,830,750'}
                       <span className='text-green-600 ml-2'>(+15.2%)</span>
@@ -293,7 +293,7 @@ const Watchlist = () => {
                     <CardContent className='p-3'>
                       <div className='flex items-center justify-between'>
                         <div>
-                          <p className='text-xs text-gray-500'>Total Value</p>
+                          <p className='text-xs text-gray-500'>Tổng giá trị</p>
                           <p className='text-sm font-bold'>{formatCurrency(portfolioSummary.totalValue)}</p>
                         </div>
                         <DollarSign className='w-4 h-4 text-blue-500' />
@@ -305,7 +305,7 @@ const Watchlist = () => {
                     <CardContent className='p-3'>
                       <div className='flex items-center justify-between'>
                         <div>
-                          <p className='text-xs text-gray-500'>Total P&L</p>
+                          <p className='text-xs text-gray-500'>Tổng P&L</p>
                           <p
                             className={`text-sm font-bold ${portfolioSummary.totalGainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}
                           >
@@ -343,7 +343,7 @@ const Watchlist = () => {
                     <CardContent className='p-3'>
                       <div className='flex items-center justify-between'>
                         <div>
-                          <p className='text-xs text-gray-500'>Positions</p>
+                          <p className='text-xs text-gray-500'>Vị thế</p>
                           <p className='text-sm font-bold'>{portfolioSummary.totalItems}</p>
                         </div>
                         <PieChart className='w-4 h-4 text-orange-500' />
@@ -355,15 +355,11 @@ const Watchlist = () => {
 
               {/* Portfolio Section */}
               <div className='mb-6'>
-                <div className='flex items-center justify-between mb-3'>
+                <div className='flex items-center mb-3'>
                   <h2 className='text-base font-semibold flex items-center gap-2'>
                     <Activity className='w-4 h-4' />
-                    Your Portfolio
+                    Danh mục đầu tư của bạn
                   </h2>
-                  <Button size='sm' className='bg-blue-600 hover:bg-blue-700'>
-                    <Plus className='w-3 h-3 mr-1' />
-                    Add
-                  </Button>
                 </div>
 
                 {/* Portfolio Stock List */}
@@ -386,7 +382,7 @@ const Watchlist = () => {
                               >
                                 {stock.ticker}
                               </button>
-                              <p className='text-xs text-gray-500'>{formatNumber(stock.quantity)} shares</p>
+                              <p className='text-xs text-gray-500'>{formatNumber(stock.quantity)} cổ phiếu</p>
                             </div>
                             <Button
                               size='sm'
@@ -432,22 +428,19 @@ const Watchlist = () => {
                 <div className='flex items-center justify-between mb-3'>
                   <h2 className='text-base font-semibold flex items-center gap-2'>
                     <Star className='w-4 h-4' />
-                    Your Watchlist
+                    Danh mục theo dõi
                   </h2>
 
                   <div className='flex gap-2'>
                     <div className='relative'>
                       <Search className='w-3 h-3 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400' />
                       <Input
-                        placeholder='Search stocks...'
+                        placeholder='Tìm kiếm cổ phiếu...'
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className='pl-7 w-48 h-8 text-sm'
                       />
                     </div>
-                    <Button variant='outline' size='sm'>
-                      <Filter className='w-3 h-3' />
-                    </Button>
                   </div>
                 </div>
 
@@ -456,15 +449,19 @@ const Watchlist = () => {
                   {watchlistLoading ? (
                     <div className='flex items-center justify-center py-8'>
                       <Loader2 className='w-4 h-4 animate-spin mr-2' />
-                      <span className='text-sm text-gray-500'>Loading watchlist...</span>
+                      <span className='text-sm text-gray-500'>Đang tải danh mục theo dõi...</span>
                     </div>
                   ) : filteredWatchlistItems.length === 0 ? (
                     <div className='text-center py-8 text-gray-500'>
                       <Star className='w-8 h-8 mx-auto mb-2 opacity-50' />
                       <p className='text-sm'>
-                        {search.trim() ? 'No stocks found matching your search.' : 'Your watchlist is empty.'}
+                        {search.trim()
+                          ? 'Không tìm thấy cổ phiếu nào phù hợp với tìm kiếm của bạn.'
+                          : 'Danh mục theo dõi của bạn trống.'}
                       </p>
-                      {!search.trim() && <p className='text-xs mt-1'>Add stocks below to start tracking them.</p>}
+                      {!search.trim() && (
+                        <p className='text-xs mt-1'>Thêm cổ phiếu bên dưới để bắt đầu theo dõi chúng.</p>
+                      )}
                     </div>
                   ) : (
                     filteredWatchlistItems.map((item) => (
@@ -472,8 +469,8 @@ const Watchlist = () => {
                         key={item.id}
                         className='flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg border border-gray-100'
                       >
-                        <div className='flex items-center gap-2'>
-                          <div>
+                        <div className='flex items-center gap-2 justify-between flex-1 mr-2'>
+                          <div className='flex-1'>
                             <button
                               onClick={() => handleTickerClick(item.ticker)}
                               className='font-bold text-blue-600 text-sm hover:text-blue-800 hover:underline cursor-pointer'
@@ -482,22 +479,24 @@ const Watchlist = () => {
                             </button>
                             <p className='text-xs text-gray-500'>{item.company_name}</p>
                           </div>
-                          <Button
-                            size='sm'
-                            variant='ghost'
-                            onClick={() => handleTickerClick(item.ticker)}
-                            className='ml-2 p-1 h-6 w-6'
-                          >
-                            <BarChart3 className='w-3 h-3' />
-                          </Button>
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            className='text-red-500 hover:text-red-700 text-xs'
-                            onClick={() => handleRemoveWatchlistItem(item.id)}
-                          >
-                            Remove
-                          </Button>
+                          <div className='flex items-center gap-2'>
+                            <Button
+                              size='sm'
+                              variant='ghost'
+                              onClick={() => handleTickerClick(item.ticker)}
+                              className='ml-2 p-1 h-6 w-6'
+                            >
+                              <BarChart3 className='w-3 h-3' />
+                            </Button>
+                            <Button
+                              variant='outline'
+                              size='sm'
+                              className='text-red-500 hover:text-red-700 text-xs'
+                              onClick={() => handleRemoveWatchlistItem(item.id)}
+                            >
+                              <FaTrash className='w-3 h-3' />
+                            </Button>
+                          </div>
                         </div>
 
                         <div className='text-right'>
@@ -524,7 +523,7 @@ const Watchlist = () => {
                   <div className='space-y-2'>
                     <div className='flex gap-2'>
                       <Input
-                        placeholder='Search stocks by symbol or name...'
+                        placeholder='Mã hoặc tên...'
                         className='flex-1 h-8 text-sm'
                         value={addToWatchlistQuery}
                         onChange={(e) => setAddToWatchlistQuery(e.target.value)}
@@ -534,7 +533,8 @@ const Watchlist = () => {
                         onClick={() => handleAddToWatchlist(addToWatchlistQuery)}
                         disabled={!addToWatchlistQuery.trim()}
                       >
-                        Add
+                        <Plus className='w-3 h-3 mr-1' />
+                        Thêm vào danh mục theo dõi
                       </Button>
                     </div>
 
@@ -785,14 +785,8 @@ const Watchlist = () => {
 
           {/* Stock Chart Dialog */}
           <Dialog open={showChart} onOpenChange={handleDialogOpenChange}>
-            <DialogContent className='max-w-7xl max-h-[95vh] w-[95vw] sm:w-[90vw] md:w-[85vw] p-0 m-4'>
-              <DialogHeader className='p-4 sm:p-6 pb-0'>
-                <DialogTitle className='flex items-center gap-2 text-sm sm:text-base'>
-                  <BarChart3 className='w-4 h-4 sm:w-5 sm:h-5' />
-                  {selectedTicker} - Biểu đồ giá
-                </DialogTitle>
-              </DialogHeader>
-              <div className='px-4 sm:px-6 pb-4 sm:pb-6'>
+            <DialogContent className='max-w-7xl max-h-[95vh] w-[95vw] sm:w-[90vw] md:w-[85vw] p-0 m-0 rounded-xl'>
+              <div>
                 {selectedTicker ? (
                   <div className='w-full'>
                     <StockChart

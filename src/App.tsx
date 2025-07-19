@@ -21,6 +21,7 @@ function App() {
           draggable
           pauseOnHover
           theme='light'
+          style={{ width: 'auto', maxWidth: '100vw', boxSizing: 'border-box', overflowX: 'hidden' }}
         />
       </PersistGate>
     </Provider>
