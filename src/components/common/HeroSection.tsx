@@ -1,8 +1,8 @@
-import { useEffect } from 'react'
-import { ArrowRight, TrendingUp, BarChart3, Shield, Users } from 'lucide-react'
-import { NavLink } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from '@/app/hook'
+import { useAppDispatch } from '@/app/hook'
 import { fetchStockByTicker } from '@/slices/stock.slice'
+import { ArrowRight, BarChart3, Shield, TrendingUp, Users } from 'lucide-react'
+import { useEffect } from 'react'
+import { NavLink } from 'react-router-dom'
 
 const HeroSection = () => {
   const dispatch = useAppDispatch()
@@ -17,17 +17,6 @@ const HeroSection = () => {
     const newsSection = document.getElementById('news-section')
     if (newsSection) {
       newsSection.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
-
-  // Calculate percentage change
-  const calculateChange = (current: number, open: number) => {
-    const change = current - open
-    const percentage = (change / open) * 100
-    return {
-      change: change.toFixed(2),
-      percentage: percentage.toFixed(2),
-      isPositive: change >= 0
     }
   }
 

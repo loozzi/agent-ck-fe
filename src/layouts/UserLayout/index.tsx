@@ -4,7 +4,7 @@ import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
 import UserNavigator from '@/navigators/user.routes'
 import { useEffect, useState, type JSX } from 'react'
-import { FaBookOpen, FaBookReader, FaHome, FaRobot, FaWallet } from 'react-icons/fa'
+import { FaBookOpen, FaHome, FaRobot, FaWallet } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
 
 export interface RouteItem {
