@@ -22,18 +22,18 @@ const LessonDetail: React.FC = () => {
   const [form, setForm] = React.useState({
     category_id: '',
     title: '',
-    content: '',
     is_active: true
   })
+  const [content, setContent] = React.useState('')
   // Sync form state when opening edit
   React.useEffect(() => {
     if (editing && lesson) {
       setForm({
         category_id: lesson.category_id,
         title: lesson.title,
-        content: lesson.content,
         is_active: lesson.is_active
       })
+      setContent(lesson.content || '')
     }
   }, [editing, lesson])
   const handleEdit = () => {
@@ -41,12 +41,16 @@ const LessonDetail: React.FC = () => {
   }
 
   const handleEditChange = (field: string, value: any) => {
-    setForm((prev) => ({ ...prev, [field]: value }))
+    if (field === 'content') {
+      setContent(value)
+    } else {
+      setForm((prev) => ({ ...prev, [field]: value }))
+    }
   }
 
   const handleEditSave = async () => {
     if (!lesson) return
-    await dispatch(updateLesson({ lessonId: lesson.id, payload: form }))
+    await dispatch(updateLesson({ lessonId: lesson.id, payload: { ...form, content } }))
     setEditing(false)
     dispatch(fetchAllLessons({}))
   }
@@ -106,11 +110,7 @@ const LessonDetail: React.FC = () => {
           </div>
           <div className='mb-2'>
             <label className='block text-sm mb-1'>Nội dung</label>
-            <JoditEditor
-              value={form.content}
-              onChange={(newContent) => handleEditChange('content', newContent)}
-              config={{ readonly: false }}
-            />
+            <JoditEditor key='edit' value={content} onChange={setContent} config={{ readonly: false }} />
           </div>
           <div className='mb-2'>
             <label className='block text-sm mb-1'>Trạng thái</label>

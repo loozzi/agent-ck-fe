@@ -6,7 +6,7 @@ const analysisService = {
   getAnalysis: (params: AnalysisRequest): Promise<AxiosResponse<AnalysisResponse>> =>
     apiInstance.get<AnalysisResponse>('/analysis/analyses', { params }),
   getTickerAnalysis: (ticker: string): Promise<AxiosResponse<TickerAnalysisResponse>> =>
-    apiInstance.get<TickerAnalysisResponse>(`/analysis/ticker/${ticker}`)
+    apiInstance.post<TickerAnalysisResponse>(`/analysis/ticker/analyze`, { ticker })
 }
 
 export default analysisService

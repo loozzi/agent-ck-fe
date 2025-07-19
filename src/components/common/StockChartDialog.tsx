@@ -7,9 +7,19 @@ interface StockChartDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   selectedTicker: string | null
+  entryPrice?: number
+  takeProfit?: number
+  stopLoss?: number
 }
 
-const StockChartDialog: React.FC<StockChartDialogProps> = ({ open, onOpenChange, selectedTicker }) => (
+const StockChartDialog: React.FC<StockChartDialogProps> = ({
+  open,
+  onOpenChange,
+  selectedTicker,
+  entryPrice,
+  takeProfit,
+  stopLoss
+}) => (
   <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent className='max-w-7xl max-h-[95vh] w-[95vw] sm:w-[90vw] md:w-[85vw] p-0 m-0 rounded-xl'>
       <div>
@@ -17,6 +27,9 @@ const StockChartDialog: React.FC<StockChartDialogProps> = ({ open, onOpenChange,
           <div className='w-full'>
             <StockChart
               ticker={selectedTicker}
+              entryPrice={entryPrice}
+              takeProfit={takeProfit}
+              stopLoss={stopLoss}
               className='w-full h-[50vh] sm:h-[60vh] min-h-[300px] sm:min-h-[400px]'
             />
           </div>

@@ -92,6 +92,7 @@ const Watchlist: React.FC<WatchlistProps> = ({
                 >
                   <BarChart3 className='w-3 h-3' />
                 </Button>
+                {/* TODO: Khi mở biểu đồ, truyền thêm dữ liệu dự đoán giá vào StockChart */}
                 <Button
                   variant='outline'
                   size='sm'

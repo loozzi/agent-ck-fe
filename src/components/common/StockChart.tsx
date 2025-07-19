@@ -15,6 +15,7 @@ interface StockChartProps {
   entryPrice?: number
   takeProfit?: number
   stopLoss?: number
+  entryTime?: string // ISO date string
 }
 
 interface TimeRange {
@@ -40,7 +41,7 @@ const timeRanges: TimeRange[] = [
   { label: 'YTD', interval: '1D', days: -1 } // -1 means from start of year
 ]
 
-const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss }: StockChartProps) => {
+const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss, entryTime }: StockChartProps) => {
   const [chartData, setChartData] = useState<Daum[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -257,6 +258,7 @@ const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss }: Sto
           <div className='h-80 w-full'>
             <ResponsiveContainer width='100%' height='100%'>
               <AreaChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                {/* ...removed entry time line and dot... */}
                 <defs>
                   <linearGradient id='colorPrice' x1='0' y1='0' x2='0' y2='1'>
                     <stop
@@ -279,7 +281,19 @@ const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss }: Sto
                   tick={{ fontSize: 12 }}
                 />
                 <YAxis
-                  domain={['auto', 'auto']}
+                  domain={([dataMin, dataMax]) => {
+                    let min = dataMin
+                    let max = dataMax
+                    if (typeof takeProfit === 'number') max = Math.max(max, takeProfit)
+                    if (typeof stopLoss === 'number') min = Math.min(min, stopLoss)
+                    if (typeof entryPrice === 'number') {
+                      min = Math.min(min, entryPrice)
+                      max = Math.max(max, entryPrice)
+                    }
+                    // Add some padding
+                    const padding = (max - min) * 0.05
+                    return [min - padding, max + padding]
+                  }}
                   tickFormatter={(value) => formatCurrency(value)}
                   className='text-xs text-gray-600 dark:text-gray-400'
                   tick={{ fontSize: 12 }}
@@ -295,6 +309,25 @@ const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss }: Sto
                     label={{ value: 'Entry', position: 'right', fill: '#2563eb', fontSize: 12, fontWeight: 'bold' }}
                   />
                 )}
+                {/* Đường kẻ dọc cho thời điểm vào lệnh (entryTime) - line liền, màu giống entry price */}
+                {entryTime &&
+                  chartData.length > 0 &&
+                  (() => {
+                    const entryDate = new Date(entryTime)
+                    let closestIdx = 0
+                    let minDiff = Infinity
+                    chartData.forEach((d, idx) => {
+                      const dDate = new Date(d.time)
+                      const diff = Math.abs(dDate.getTime() - entryDate.getTime())
+                      if (diff < minDiff) {
+                        minDiff = diff
+                        closestIdx = idx
+                      }
+                    })
+                    const entryX = chartData[closestIdx]?.time
+                    const entryPriceColor = '#2563eb'
+                    return <ReferenceLine x={entryX} stroke={entryPriceColor} strokeWidth={2} ifOverflow='hidden' />
+                  })()}
                 {takeProfit && (
                   <ReferenceLine
                     y={takeProfit}

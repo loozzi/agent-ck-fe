@@ -21,7 +21,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ filteredWallet, formatCurrency, f
     <div className='space-y-2'>
       {filteredWallet.map((stock: WalletItem) => {
         const performance = ((stock.current_price - stock.avg_price) / stock.avg_price) * 100
-        const gainLoss = stock.current_value - stock.avg_price * stock.quantity
         return (
           <div
             key={stock.id}
@@ -54,13 +53,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ filteredWallet, formatCurrency, f
                 {performance >= 0 ? <ArrowUpRight className='w-3 h-3' /> : <ArrowDownRight className='w-3 h-3' />}
                 {performance >= 0 ? '+' : ''}
                 {performance.toFixed(2)}%
-              </p>
-            </div>
-            <div className='text-right ml-3'>
-              <p className='font-bold text-sm'>{formatCurrency(stock.current_value)}</p>
-              <p className={`text-xs ${gainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {gainLoss >= 0 ? '+' : ''}
-                {formatCurrency(gainLoss)}
               </p>
             </div>
           </div>

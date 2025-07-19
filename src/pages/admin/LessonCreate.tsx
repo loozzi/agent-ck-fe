@@ -10,12 +10,18 @@ const LessonCreate: React.FC = () => {
   const dispatch = useAppDispatch()
   const categories = useAppSelector((state) => state.lesson.categories)
   const [form, setForm] = React.useState({
-    category_id: categories[0]?.id || '',
+    category_id: '',
     title: '',
-    content: '',
     is_active: true,
     display_order: 0
   })
+  const [content, setContent] = React.useState('')
+
+  React.useEffect(() => {
+    if (categories.length && !form.category_id) {
+      setForm((prev) => ({ ...prev, category_id: categories[0].id }))
+    }
+  }, [categories])
   const [loading, setLoading] = React.useState(false)
 
   const handleChange = (field: string, value: unknown) => {
@@ -24,7 +30,7 @@ const LessonCreate: React.FC = () => {
 
   const handleSave = async () => {
     setLoading(true)
-    await dispatch(createLesson(form))
+    await dispatch(createLesson({ ...form, content }))
     await dispatch(fetchAllLessons({}))
     setLoading(false)
     navigate(-1)
@@ -60,11 +66,7 @@ const LessonCreate: React.FC = () => {
       </div>
       <div className='mb-2'>
         <label className='block text-sm mb-1'>Nội dung</label>
-        <JoditEditor
-          value={form.content}
-          onChange={(newContent) => handleChange('content', newContent)}
-          config={{ readonly: false }}
-        />
+        <JoditEditor key='create' value={content} onChange={setContent} config={{ readonly: false }} />
       </div>
       <div className='mb-2'>
         <label className='block text-sm mb-1'>Trạng thái</label>

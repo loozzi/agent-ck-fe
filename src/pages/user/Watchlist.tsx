@@ -7,7 +7,7 @@ import WatchlistSection from '@/components/common/Watchlist'
 import Header from '@/components/layouts/Header'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { fetchAnalysis } from '@/slices/analysis.slice'
+import { fetchAnalysis, fetchTickerAnalysis } from '@/slices/analysis.slice'
 import { fetchWallet } from '@/slices/portfolio.slice'
 import { fetchListStocksByName } from '@/slices/stock.slice'
 import { addToWatchlist, deleteWatchlistItem, fetchWatchlistDetail } from '@/slices/watchlist.slice'
@@ -37,7 +37,12 @@ const Watchlist = () => {
   const { watchlistDetail, isLoading: watchlistLoading } = useSelector((state: RootState) => state.watchlist)
 
   // Lấy state từ analysis slice
-  const { analyses, loading: analysisLoading, error: analysisError } = useSelector((state: RootState) => state.analysis)
+  const {
+    analyses,
+    loading: analysisLoading,
+    error: analysisError,
+    tickerAnalysis
+  } = useSelector((state: RootState) => state.analysis)
 
   const [search, setSearch] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
@@ -47,22 +52,6 @@ const Watchlist = () => {
   // State for which recommendation chart is open
   const [openRecChart, setOpenRecChart] = useState<string | null>(null)
   const sortBy = 'performance'
-
-  // State for reset dialog
-  const [showResetDialog, setShowResetDialog] = useState(false)
-  const [resetLoading, setResetLoading] = useState(false)
-
-  // Handle reset analysis
-  async function handleResetAnalysis() {
-    setResetLoading(true)
-    try {
-      await dispatch(fetchAnalysis({ limit: 10 }) as any)
-      setShowResetDialog(false)
-    } catch (error) {
-      // Xử lý lỗi nếu cần
-    }
-    setResetLoading(false)
-  }
 
   useEffect(() => {
     dispatch(fetchWallet() as any)
@@ -201,9 +190,11 @@ const Watchlist = () => {
     return new Intl.NumberFormat('vi-VN').format(value)
   }
 
-  const handleTickerClick = (ticker: string) => {
+  const handleTickerClick = async (ticker: string) => {
     setSelectedTicker(ticker)
     setShowChart(true)
+    // Fetch ticker analysis for prediction lines
+    await dispatch(fetchTickerAnalysis(ticker) as any)
   }
 
   const handleCloseChart = () => {
@@ -426,17 +417,25 @@ const Watchlist = () => {
 
               {/* AI Recommendations Content */}
               <AIRecommendations
-                recommendations={analyses}
+                recommendations={analyses.filter((a) => a.source === 'recommendation')}
                 recommendationLoading={analysisLoading}
                 recommendationError={analysisError}
                 openRecChart={openRecChart}
                 setOpenRecChart={setOpenRecChart}
+                formatCurrency={formatCurrency}
               />
             </div>
           </div>
 
           {/* Stock Chart Dialog */}
-          <StockChartDialog open={showChart} onOpenChange={handleDialogOpenChange} selectedTicker={selectedTicker} />
+          <StockChartDialog
+            open={showChart}
+            onOpenChange={handleDialogOpenChange}
+            selectedTicker={selectedTicker}
+            entryPrice={tickerAnalysis?.entry_price}
+            takeProfit={tickerAnalysis?.take_profit}
+            stopLoss={tickerAnalysis?.stop_loss}
+          />
         </div>
       )}
     </div>
