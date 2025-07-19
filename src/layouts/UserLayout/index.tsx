@@ -62,12 +62,12 @@ const UserLayout = () => {
       icon: <FaWallet className='w-4 h-4' />,
       href: '/portfolio'
     },
-    {
-      id: 'strategy',
-      title: 'Chiến lược',
-      icon: <FaBookReader className='w-4 h-4' />,
-      href: '/strategy'
-    },
+    // {
+    //   id: 'strategy',
+    //   title: 'Chiến lược',
+    //   icon: <FaBookReader className='w-4 h-4' />,
+    //   href: '/strategy'
+    // },
     {
       id: 'learning',
       title: 'Học tập',

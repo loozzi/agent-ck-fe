@@ -6,7 +6,6 @@ import { fetchStockByTicker } from '@/slices/stock.slice'
 
 const HeroSection = () => {
   const dispatch = useAppDispatch()
-  const { stocks } = useAppSelector((state) => state.stock)
 
   useEffect(() => {
     // Fetch VN-Index and HNX-Index data
@@ -20,10 +19,6 @@ const HeroSection = () => {
       newsSection.scrollIntoView({ behavior: 'smooth' })
     }
   }
-
-  // Find stock data
-  const vnIndex = stocks.find((stock) => stock.ticker === 'VNINDEX')
-  const hnxIndex = stocks.find((stock) => stock.ticker === 'HNXINDEX')
 
   // Calculate percentage change
   const calculateChange = (current: number, open: number) => {
@@ -105,70 +100,6 @@ const HeroSection = () => {
               </div>
               <h3 className='text-xl font-semibold mb-2 text-gray-900'>Cộng đồng Chuyên gia</h3>
               <p className='text-gray-600'>Kết nối với cộng đồng nhà đầu tư chuyên nghiệp</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Market Stats */}
-      <div className='border-t border-gray-200 bg-gray-50'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-          <div className='grid grid-cols-2 md:grid-cols-4 gap-8 text-center'>
-            <div>
-              {vnIndex ? (
-                <>
-                  <div className='text-3xl font-bold text-gray-900'>
-                    {vnIndex.close.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </div>
-                  <div className='text-gray-600 text-sm'>VN-Index</div>
-                  <div
-                    className={`text-sm ${calculateChange(vnIndex.close, vnIndex.open).isPositive ? 'text-green-600' : 'text-red-600'}`}
-                  >
-                    {calculateChange(vnIndex.close, vnIndex.open).isPositive ? '+' : ''}
-                    {calculateChange(vnIndex.close, vnIndex.open).change}(
-                    {calculateChange(vnIndex.close, vnIndex.open).isPositive ? '+' : ''}
-                    {calculateChange(vnIndex.close, vnIndex.open).percentage}%)
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className='text-3xl font-bold text-gray-900'>1,240.56</div>
-                  <div className='text-gray-600 text-sm'>VN-Index</div>
-                  <div className='text-green-600 text-sm'>+12.34 (+1.01%)</div>
-                </>
-              )}
-            </div>
-            <div>
-              {hnxIndex ? (
-                <>
-                  <div className='text-3xl font-bold text-gray-900'>
-                    {hnxIndex.close.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </div>
-                  <div className='text-gray-600 text-sm'>HNX-Index</div>
-                  <div
-                    className={`text-sm ${calculateChange(hnxIndex.close, hnxIndex.open).isPositive ? 'text-green-600' : 'text-red-600'}`}
-                  >
-                    {calculateChange(hnxIndex.close, hnxIndex.open).isPositive ? '+' : ''}
-                    {calculateChange(hnxIndex.close, hnxIndex.open).change}(
-                    {calculateChange(hnxIndex.close, hnxIndex.open).isPositive ? '+' : ''}
-                    {calculateChange(hnxIndex.close, hnxIndex.open).percentage}%)
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className='text-3xl font-bold text-gray-900'>234.78</div>
-                  <div className='text-gray-600 text-sm'>HNX-Index</div>
-                  <div className='text-green-600 text-sm'>+2.45 (+1.05%)</div>
-                </>
-              )}
-            </div>
-            <div>
-              <div className='text-3xl font-bold text-gray-900'>10,000+</div>
-              <div className='text-gray-600 text-sm'>Nhà đầu tư</div>
-            </div>
-            <div>
-              <div className='text-3xl font-bold text-gray-900'>500+</div>
-              <div className='text-gray-600 text-sm'>Mã chứng khoán</div>
             </div>
           </div>
         </div>
