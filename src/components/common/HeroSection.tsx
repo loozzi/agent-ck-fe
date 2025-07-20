@@ -1,11 +1,15 @@
 import { useAppDispatch } from '@/app/hook'
+import ZaloIcon from '@/assets/zalo.png'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import apiInstance from '@/services/axios.config'
 import { fetchStockByTicker } from '@/slices/stock.slice'
-import { ArrowRight, BarChart3, Shield, TrendingUp, Users } from 'lucide-react'
-import { useEffect } from 'react'
-import { NavLink } from 'react-router-dom'
+import { fetchZaloAuthUrl } from '@/slices/zalo.slice'
+import { BarChart3, Shield, TrendingUp, Users } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 const HeroSection = () => {
   const dispatch = useAppDispatch()
+  const [showLoginPopup, setShowLoginPopup] = useState(false)
 
   useEffect(() => {
     // Fetch VN-Index and HNX-Index data
@@ -17,6 +21,17 @@ const HeroSection = () => {
     const newsSection = document.getElementById('news-section')
     if (newsSection) {
       newsSection.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
+  // Xử lý đăng nhập bằng Zalo
+  const handleZaloLogin = async () => {
+    setShowLoginPopup(true)
+    try {
+      dispatch(fetchZaloAuthUrl())
+      await apiInstance.get('/auth/zalo/login')
+    } finally {
+      setShowLoginPopup(false)
     }
   }
 
@@ -48,22 +63,44 @@ const HeroSection = () => {
 
           {/* CTA Buttons */}
           <div className='flex flex-col sm:flex-row gap-4 justify-center mb-16'>
-            <NavLink
-              to='/dashboard'
+            <button
+              type='button'
+              onClick={handleZaloLogin}
               className='inline-flex items-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl'
             >
-              Bắt đầu đầu tư
-              <ArrowRight className='ml-2 h-5 w-5' />
-            </NavLink>
+              <img src={ZaloIcon} alt='Zalo Icon' className='mr-2 h-5 w-5' />
+              Tham gia ngay
+            </button>
 
             <button
               onClick={scrollToNews}
               className='inline-flex items-center px-8 py-4 border-2 border-blue-600 text-blue-600 font-semibold rounded-lg hover:bg-blue-600 hover:text-white transition-all duration-200'
             >
+              <TrendingUp className='mr-2 h-5 w-5' />
               Xem tin tức
-              <TrendingUp className='ml-2 h-5 w-5' />
             </button>
           </div>
+
+          {/* Popup đăng nhập Zalo */}
+          <Dialog open={showLoginPopup}>
+            <DialogContent showCloseButton={false}>
+              <DialogHeader>
+                <DialogTitle>Đang đăng nhập bằng Zalo...</DialogTitle>
+              </DialogHeader>
+              <div className='flex items-center justify-center py-6'>
+                <svg
+                  className='animate-spin h-8 w-8 text-blue-600'
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                >
+                  <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
+                  <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8v8z'></path>
+                </svg>
+                <span className='ml-4 text-blue-600 font-medium'>Vui lòng chờ...</span>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Features */}
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8 mt-16'>

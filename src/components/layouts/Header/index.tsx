@@ -1,4 +1,7 @@
 import { useAppSelector } from '@/app/hook'
+import ZaloIcon from '@/assets/zalo.png'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import apiInstance from '@/services/axios.config'
 import { BookOpen, Info, Menu, TrendingUp, User, X } from 'lucide-react'
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
@@ -8,6 +11,19 @@ const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const isLoggedIn = useAppSelector((state) => state.auth.isAuthenticated)
+  const [showLoginPopup, setShowLoginPopup] = useState(false)
+  const handleZaloLogin = async () => {
+    setShowLoginPopup(true)
+    try {
+      // Gọi đăng nhập Zalo
+      // Nếu dùng redux, cần dispatch
+      // Nếu không, chỉ gọi API
+      // dispatch(fetchZaloAuthUrl())
+      await apiInstance.get('/auth/zalo/login')
+    } finally {
+      setShowLoginPopup(false)
+    }
+  }
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
@@ -110,13 +126,14 @@ const Header = () => {
                   </NavLink>
                 </>
               ) : (
-                <NavLink
-                  to='/signin'
+                <button
+                  type='button'
+                  onClick={handleZaloLogin}
                   className='flex items-center space-x-1 text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm px-3 py-2 rounded-md'
                 >
-                  <User size={16} />
-                  <span>Đăng nhập</span>
-                </NavLink>
+                  <img src={ZaloIcon} alt='Zalo Icon' className='h-5 w-5' />
+                  <span>Đăng nhập bằng Zalo</span>
+                </button>
               )}
             </nav>
           </div>
@@ -173,19 +190,20 @@ const Header = () => {
                   </NavLink>
                 </>
               ) : (
-                <NavLink
-                  to='/signin'
-                  className='flex items-center justify-between w-full text-left px-3 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors duration-200'
-                  onClick={() => {
+                <button
+                  type='button'
+                  onClick={async () => {
                     setActiveDropdown(null)
                     setIsMobileMenuOpen(false)
+                    await handleZaloLogin()
                   }}
+                  className='flex items-center justify-between w-full text-left px-3 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors duration-200'
                 >
                   <div className='flex items-center space-x-2'>
-                    <User size={16} />
-                    <span className='text-sm'>Đăng nhập</span>
+                    <img src={ZaloIcon} alt='Zalo Icon' className='h-5 w-5' />
+                    <span className='text-sm'>Đăng nhập bằng Zalo</span>
                   </div>
-                </NavLink>
+                </button>
               )}
             </div>
           </div>
@@ -193,6 +211,26 @@ const Header = () => {
 
         {/* Close dropdown when clicking outside */}
         {activeDropdown && <div className='fixed inset-0 z-40' onClick={() => setActiveDropdown(null)} />}
+        {/* Popup đăng nhập Zalo */}
+        <Dialog open={showLoginPopup}>
+          <DialogContent showCloseButton={false}>
+            <DialogHeader>
+              <DialogTitle>Đang đăng nhập bằng Zalo...</DialogTitle>
+            </DialogHeader>
+            <div className='flex items-center justify-center py-6'>
+              <svg
+                className='animate-spin h-8 w-8 text-blue-600'
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+              >
+                <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
+                <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8v8z'></path>
+              </svg>
+              <span className='ml-4 text-blue-600 font-medium'>Vui lòng chờ...</span>
+            </div>
+          </DialogContent>
+        </Dialog>
       </header>
     </>
   )

@@ -33,11 +33,11 @@ const isWhitelistedEndpoint = (url: string): boolean => {
   return whiteList.some((endpoint) => url.includes(endpoint))
 }
 
-// Logout user and redirect to login
+// Logout user and redirect to home
 const logoutUser = (reason: string = 'Authentication failed') => {
   console.log(`Logging out user: ${reason}`)
   store.dispatch(authActions.signOut())
-  window.location.href = '/auth/login'
+  window.location.href = '/'
 }
 
 apiInstance.interceptors.request.use(

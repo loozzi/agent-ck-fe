@@ -1,7 +1,7 @@
 import { useAppSelector } from '@/app/hook'
-import Header from '@/components/layouts/Header'
 import HeroSection from '@/components/common/HeroSection'
 import NewsSection from '@/components/common/NewsSection'
+import Header from '@/components/layouts/Header'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
