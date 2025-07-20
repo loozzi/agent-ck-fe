@@ -71,3 +71,14 @@ export interface ZaloCompleteLoginPayload {
 export interface ZaloCompleteLoginResponse extends SignInResponse {
   user: UserResponse
 }
+
+export interface ChangePasswordPayload {
+  current_password: string
+  new_password: string
+}
+
+export interface ChangePasswordResponse {
+  message: string
+  password_changed: boolean
+  sessions_invalidated: boolean
+}

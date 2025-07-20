@@ -1,4 +1,6 @@
 import type {
+  ChangePasswordPayload,
+  ChangePasswordResponse,
   SessionResponse,
   SignInResponse,
   SignUpResponse,
@@ -22,7 +24,9 @@ const authService = {
   getSessions: (): Promise<AxiosResponse<SessionResponse>> => apiInstance.get('/auth/sessions'),
   signOut: (): Promise<AxiosResponse<void>> => apiInstance.post('/auth/logout'),
   completeLogin: (data: ZaloCompleteLoginPayload): Promise<AxiosResponse<ZaloCompleteLoginResponse>> =>
-    apiInstance.post('/auth/zalo/complete-login', data)
+    apiInstance.post('/auth/zalo/complete-login', data),
+  changePassword: (data: ChangePasswordPayload): Promise<AxiosResponse<ChangePasswordResponse>> =>
+    apiInstance.post('/auth/change-password', data)
 }
 
 export default authService

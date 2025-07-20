@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { FaBookOpen, FaChartLine, FaList } from 'react-icons/fa'
 import { MdDashboard, MdOutlineMonitorHeart } from 'react-icons/md'
 import type { RouteItem } from '../UserLayout'
+import { IoIosSettings } from 'react-icons/io'
 
 const TrainerLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false)
@@ -73,13 +74,13 @@ const TrainerLayout = () => {
       title: 'Feedback logger',
       icon: <FaChartLine className='w-4 h-4' />,
       href: '/trainer/feedback'
+    },
+    {
+      id: 'settings',
+      title: 'Cài đặt',
+      icon: <IoIosSettings className='w-4 h-4' />,
+      href: '/trainer/setting'
     }
-    // {
-    //   id: 'settings',
-    //   title: 'Cài đặt',
-    //   icon: <IoIosSettings className='w-4 h-4' />,
-    //   href: '#'
-    // }
   ]
 
   return (

@@ -128,6 +128,25 @@ export const zaloCompleteLogin = createAsyncThunk(
   }
 )
 
+export const changePasswordAction = createAsyncThunk(
+  'auth/changePassword',
+  async (payload: { current_password: string; new_password: string }, { rejectWithValue }) => {
+    try {
+      const response = await authService.changePassword(payload)
+      if (response.status === 200) {
+        toast.success(response.data.message || 'Đổi mật khẩu thành công')
+        return true
+      } else {
+        toast.error((response as any).response.data.detail || 'Đổi mật khẩu không thành công')
+        return rejectWithValue('Đổi mật khẩu không thành công')
+      }
+    } catch (error) {
+      toast.error('Đã xảy ra lỗi khi đổi mật khẩu')
+      return rejectWithValue(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi đổi mật khẩu')
+    }
+  }
+)
+
 const userSlice = createSlice({
   name: 'auth',
   initialState: initialState,
@@ -258,6 +277,15 @@ const userSlice = createSlice({
         state.user = null
         state.token = null
         state.refreshToken = null
+      })
+      .addCase(changePasswordAction.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(changePasswordAction.fulfilled, (state) => {
+        state.loading = false
+      })
+      .addCase(changePasswordAction.rejected, (state) => {
+        state.loading = false
       })
   }
 })

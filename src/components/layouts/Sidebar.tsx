@@ -140,7 +140,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && (
                   <div className='flex items-center space-x-2 cursor-pointer select-none' onClick={() => navigate('/')}>
                     <div className='w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center'>
-                      <span className='text-white font-bold text-sm'>{APP_NAME}</span>
+                      <span className='text-white font-bold text-sm'>CK</span>
                     </div>
                     <span className='font-semibold'>{APP_NAME}</span>
                   </div>

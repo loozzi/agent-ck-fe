@@ -1,3 +1,4 @@
+import AdminSetting from '@/pages/admin/Setting'
 import CategoryManagement from '@/pages/trainer/CategoryManagement'
 import FeedbackLogger from '@/pages/trainer/FeedbackLogger'
 import PromtDetail from '@/pages/trainer/PromtDetail'
@@ -43,6 +44,12 @@ export const trainerRouterConfig: RouteBrowser[] = [
     element: <CategoryManagement />, // Placeholder for CategoryManagement component
     exact: true,
     name: 'Quản lý danh mục'
+  },
+  {
+    name: 'Setting',
+    route: 'setting',
+    element: <AdminSetting />,
+    exact: true
   }
 ]
 
