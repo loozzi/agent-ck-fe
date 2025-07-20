@@ -10,6 +10,7 @@ import SidebarMenuItem from './SidebarItem'
 import { useNavigate } from 'react-router'
 import type { UserResponse } from '@/types/auth'
 import { useAppSelector } from '@/app/hook'
+import { APP_NAME } from '@/configs/env.config'
 
 export interface SidebarItem {
   id: string
@@ -139,9 +140,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && (
                   <div className='flex items-center space-x-2 cursor-pointer select-none' onClick={() => navigate('/')}>
                     <div className='w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center'>
-                      <span className='text-white font-bold text-sm'>CK</span>
+                      <span className='text-white font-bold text-sm'>{APP_NAME}</span>
                     </div>
-                    <span className='font-semibold'>AgentCK</span>
+                    <span className='font-semibold'>{APP_NAME}</span>
                   </div>
                 )}
 

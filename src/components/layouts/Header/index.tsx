@@ -6,6 +6,7 @@ import { BookOpen, Info, Menu, TrendingUp, User, X } from 'lucide-react'
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import './Header.css'
+import { APP_NAME } from '@/configs/env.config'
 
 const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
@@ -90,7 +91,7 @@ const Header = () => {
                 <div className='bg-blue-700 p-2 rounded-lg logo-minimal'>
                   <TrendingUp size={20} className='text-white' />
                 </div>
-                <span className='text-white font-bold text-lg'>CK Pro</span>
+                <span className='text-white font-bold text-lg'>{APP_NAME}</span>
               </NavLink>
             </div>
 

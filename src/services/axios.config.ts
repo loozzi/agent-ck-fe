@@ -1,10 +1,11 @@
 import { store } from '@/app/store'
+import { API_BASE_URL, API_TIMEOUT } from '@/configs/env.config'
 import { authActions } from '@/slices/auth.slice'
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 
 const apiInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/',
-  timeout: 100000 // Set a timeout of 10 seconds
+  baseURL: API_BASE_URL,
+  timeout: API_TIMEOUT
 })
 
 // Track refresh token promise to avoid multiple refresh calls

@@ -2,6 +2,7 @@ import type { ZaloState } from '@/types/zalo'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import zaloService from '@/services/zalo.service'
 import { toast } from 'react-toastify'
+import { AUTHORIZATION_URL_CALLBACK } from '@/configs/env.config'
 
 const initialState: ZaloState = {
   state: '',
@@ -23,7 +24,7 @@ export const fetchZaloAuthUrl = createAsyncThunk('zalo/fetchZaloAuthUrl', async 
 
     // Modify the redirect_uri in the authorization_url
     const url = new URL(authorization_url)
-    url.searchParams.set('redirect_uri', 'https://agent-ck-fe.vercel.app/auth/zalo/callback')
+    url.searchParams.set('redirect_uri', AUTHORIZATION_URL_CALLBACK)
 
     return { authorization_url: url.toString(), state }
   } catch (error) {
