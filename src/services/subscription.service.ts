@@ -6,7 +6,11 @@ import type {
   SubscriptionUpdateRolePayload,
   SubscriptionCodeParams,
   SubscriptionUpdateRoleResponse,
-  SubscriptionDirectActivePayload
+  SubscriptionDirectActivePayload,
+  SubscriptionPricingResponse,
+  SubscriptionPurchaseHistoryResponse,
+  SubscriptionPurchasePayload,
+  SubscriptionPurchaseResponse
 } from '@/types/subscription'
 import apiInstance from './axios.config'
 import type { AxiosResponse } from 'axios'
@@ -39,7 +43,19 @@ const subscriptionService = {
     return apiInstance.delete<void>(`/admin/users/subscription`, { params: { user_id: userId } })
   },
   directActiveSubscription: (data: SubscriptionDirectActivePayload): Promise<AxiosResponse<SubscriptionStatus>> =>
-    apiInstance.post<SubscriptionStatus>('/subscription/direct-activate', data)
+    apiInstance.post<SubscriptionStatus>('/subscription/direct-activate', data),
+  getSubscriptionPricings: (): Promise<AxiosResponse<SubscriptionPricingResponse[]>> => {
+    return apiInstance.get<SubscriptionPricingResponse[]>('/subscription/pricing')
+  },
+  getSubscriptionPurchaseHistory: (): Promise<AxiosResponse<SubscriptionPurchaseHistoryResponse[]>> => {
+    return apiInstance.get<SubscriptionPurchaseHistoryResponse[]>('/subscription/purchase-history')
+  },
+  getNextTierInfo: (): Promise<AxiosResponse<SubscriptionPricingResponse>> => {
+    return apiInstance.get<SubscriptionPricingResponse>('/subscription/next-tier')
+  },
+  purchaseSubscription: (data: SubscriptionPurchasePayload): Promise<AxiosResponse<SubscriptionPurchaseResponse>> => {
+    return apiInstance.post<SubscriptionPurchaseResponse>('/subscription/purchase', data)
+  }
 }
 
 export default subscriptionService

@@ -84,3 +84,43 @@ export interface SubscriptionDirectActivePayload {
   durations_days: number
   subcription_type: SubscriptionType
 }
+
+export interface SubscriptionPricingResponse {
+  id: string
+  tier_name: string
+  purchase_count_min: number
+  purchase_count_max: number
+  price_vnd: number
+  duration_days: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface SubscriptionPurchaseHistoryResponse {
+  id: string
+  user_id: string
+  subscription_id: string
+  purchase_count: number
+  price_paid_vnd: number
+  pricing_tier_id: string
+  duration_days: number
+  payment_method: string
+  notes: string
+  created_at: string
+}
+
+export interface SubscriptionPurchasePayload {
+  pricing_tier_id: string
+  payment_method: string
+  payment_reference: string
+}
+
+export interface SubscriptionPurchaseResponse {
+  success: boolean
+  message: string
+  subscription_id: string
+  purchase_history_id: string
+  amount_paid_vnd: number
+  subscription_end_date: string
+}

@@ -1,6 +1,7 @@
 import { useAppSelector } from '@/app/hook'
 import HeroSection from '@/components/common/HeroSection'
 import NewsSection from '@/components/common/NewsSection'
+import SubscriptionSection from '@/components/common/SubscriptionSection'
 import Header from '@/components/layouts/Header'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -24,6 +25,7 @@ const Home = () => {
       <Header />
       <main className='pt-14'>
         <HeroSection />
+        <SubscriptionSection />
         <NewsSection />
       </main>
     </div>

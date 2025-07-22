@@ -3,6 +3,7 @@ import type { SubscriptionState } from '@/types/slices/subscription'
 import type {
   CreateSupscriptionPayload,
   SubscriptionCodeParams,
+  SubscriptionPurchasePayload,
   SubscriptionUpdateRolePayload
 } from '@/types/subscription'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
@@ -12,6 +13,9 @@ const initialState: SubscriptionState = {
   subscriptionCodes: [],
   userSubscriptionStatus: [],
   messages: [],
+  listPricings: [],
+  nextTierInfo: null,
+  purchaseHistory: [],
   isLoading: false,
   error: null
 }
@@ -140,6 +144,76 @@ export const revorkCode = createAsyncThunk('subscription/revorkCode', async (use
   }
 })
 
+export const fetchSubscriptionPricings = createAsyncThunk(
+  'subscription/fetchSubscriptionPricings',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await subscriptionService.getSubscriptionPricings()
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể lấy thông tin giá đăng ký'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+      return response.data
+    } catch (error) {
+      toast.error('Failed to fetch subscription pricings')
+      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+    }
+  }
+)
+
+export const fetchSubscriptionPurchaseHistory = createAsyncThunk(
+  'subscription/fetchSubscriptionPurchaseHistory',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await subscriptionService.getSubscriptionPurchaseHistory()
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể lấy lịch sử mua đăng ký'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+      return response.data
+    } catch (error) {
+      toast.error('Failed to fetch subscription purchase history')
+      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+    }
+  }
+)
+
+export const fetchNextTierInfo = createAsyncThunk('subscription/fetchNextTierInfo', async (_, { rejectWithValue }) => {
+  try {
+    const response = await subscriptionService.getNextTierInfo()
+    if (response.status !== 200) {
+      const errorMessage = (response as any).response?.data?.detail || 'Không thể lấy thông tin cấp độ tiếp theo'
+      toast.error(errorMessage)
+      return rejectWithValue(errorMessage)
+    }
+    return response.data
+  } catch (error) {
+    toast.error('Failed to fetch next tier info')
+    return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+  }
+})
+
+export const purchaseSubscription = createAsyncThunk(
+  'subscription/purchaseSubscription',
+  async (payload: SubscriptionPurchasePayload, { rejectWithValue }) => {
+    try {
+      const response = await subscriptionService.purchaseSubscription(payload)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể mua đăng ký'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+      toast.success('Đăng ký đã được mua thành công')
+      return response.data
+    } catch (error) {
+      toast.error('Failed to purchase subscription')
+      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+    }
+  }
+)
+
 const subscriptionSlice = createSlice({
   name: 'subscription',
   initialState,
@@ -222,6 +296,73 @@ const subscriptionSlice = createSlice({
         state.isLoading = false
         state.error = action.payload as string
       })
+      .addCase(fetchSubscriptionPricings.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(fetchSubscriptionPricings.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.listPricings = action.payload
+      })
+      .addCase(fetchSubscriptionPricings.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(fetchSubscriptionPurchaseHistory.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(fetchSubscriptionPurchaseHistory.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.purchaseHistory = action.payload
+      })
+      .addCase(fetchSubscriptionPurchaseHistory.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(fetchNextTierInfo.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(fetchNextTierInfo.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.nextTierInfo = action.payload
+      })
+      .addCase(fetchNextTierInfo.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(purchaseSubscription.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(purchaseSubscription.fulfilled, (state) => {
+        state.isLoading = false
+      })
+      .addCase(purchaseSubscription.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addMatcher(
+        (action) => action.type.endsWith('/pending'),
+        (state) => {
+          state.isLoading = true
+          state.error = null
+        }
+      )
+      .addMatcher(
+        (action) => action.type.endsWith('/fulfilled'),
+        (state) => {
+          state.isLoading = false
+        }
+      )
+      .addMatcher(
+        (action) => action.type.endsWith('/rejected'),
+        (state, action) => {
+          state.isLoading = false
+          state.error = action.payload as string
+        }
+      )
   }
 })
 
