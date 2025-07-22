@@ -1,6 +1,7 @@
 import subscriptionService from '@/services/subscription.service'
 import type { SubscriptionState } from '@/types/slices/subscription'
 import type {
+  CreateSubscriptionPricingPayload,
   CreateSupscriptionPayload,
   SubscriptionCodeParams,
   SubscriptionPurchasePayload,
@@ -214,6 +215,63 @@ export const purchaseSubscription = createAsyncThunk(
   }
 )
 
+export const createSubscriptionPricing = createAsyncThunk(
+  'subscription/createSubscriptionPricing',
+  async (payload: CreateSubscriptionPricingPayload, { rejectWithValue }) => {
+    try {
+      const response = await subscriptionService.createSubscriptionPricing(payload)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể tạo giá đăng ký'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+      toast.success('Giá đăng ký đã được tạo thành công')
+      return response.data
+    } catch (error) {
+      toast.error('Failed to create subscription pricing')
+      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+    }
+  }
+)
+
+export const updateSubscriptionPricing = createAsyncThunk(
+  'subscription/updateSubscriptionPricing',
+  async ({ id, data }: { id: string; data: Partial<CreateSubscriptionPricingPayload> }, { rejectWithValue }) => {
+    try {
+      const response = await subscriptionService.updateSubscriptionPricing(id, data)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể cập nhật giá đăng ký'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+      toast.success('Giá đăng ký đã được cập nhật thành công')
+      return response.data
+    } catch (error) {
+      toast.error('Failed to update subscription pricing')
+      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+    }
+  }
+)
+
+export const deleteSubscriptionPricing = createAsyncThunk(
+  'subscription/deleteSubscriptionPricing',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await subscriptionService.deleteSubscriptionPricing(id)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể xóa giá đăng ký'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+      toast.success('Giá đăng ký đã được xóa thành công')
+      return id
+    } catch (error) {
+      toast.error('Failed to delete subscription pricing')
+      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+    }
+  }
+)
+
 const subscriptionSlice = createSlice({
   name: 'subscription',
   initialState,
@@ -340,6 +398,45 @@ const subscriptionSlice = createSlice({
         state.isLoading = false
       })
       .addCase(purchaseSubscription.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(createSubscriptionPricing.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(createSubscriptionPricing.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.listPricings.push(action.payload)
+      })
+      .addCase(createSubscriptionPricing.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(updateSubscriptionPricing.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(updateSubscriptionPricing.fulfilled, (state, action) => {
+        state.isLoading = false
+        const index = state.listPricings.findIndex((pricing) => pricing.id === action.payload.id)
+        if (index !== -1) {
+          state.listPricings[index] = action.payload
+        }
+      })
+      .addCase(updateSubscriptionPricing.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(deleteSubscriptionPricing.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(deleteSubscriptionPricing.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.listPricings = state.listPricings.filter((pricing) => pricing.id !== action.payload)
+      })
+      .addCase(deleteSubscriptionPricing.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload as string
       })

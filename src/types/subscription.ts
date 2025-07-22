@@ -145,3 +145,24 @@ export interface NextTier {
   is_active: boolean
   updated_at: string
 }
+
+export interface CreateSubscriptionPricingPayload {
+  tier_name: string
+  purchase_count_min: number
+  purchase_count_max: number
+  price_vnd: number
+  duration_days: number
+  is_active: boolean
+}
+
+export interface CreateSubscriptionPricingResponse {
+  id: string
+  tier_name: string
+  purchase_count_min: number
+  purchase_count_max: number
+  price_vnd: number
+  duration_days: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}

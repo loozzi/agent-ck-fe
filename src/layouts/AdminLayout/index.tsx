@@ -4,7 +4,7 @@ import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
 import AdminNavigator from '@/navigators/admin.routes'
 import { useEffect, useState } from 'react'
-import { FaBookOpen, FaHome, FaList, FaUsers } from 'react-icons/fa'
+import { FaBookOpen, FaHome, FaList, FaMoneyBill, FaUsers } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
 import { MdOutlineMonitorHeart } from 'react-icons/md'
 import type { RouteItem } from '../UserLayout'
@@ -91,6 +91,12 @@ const AdminLayout = () => {
       title: 'Quản lý khảo sát',
       icon: <FaList className='w-4 h-4' />,
       href: '/admin/survey-management'
+    },
+    {
+      id: 'planning',
+      title: 'Quản lý gói dịch vụ',
+      icon: <FaMoneyBill className='w-4 h-4' />,
+      href: '/admin/planning'
     },
     {
       id: 'settings',

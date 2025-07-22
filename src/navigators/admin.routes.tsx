@@ -1,17 +1,18 @@
-import type { RouteBrowser } from '@/types/routes'
-import { Route, Routes } from 'react-router'
 import AdminDashboard from '@/pages/admin/AdminDashboard'
+import LessonManagement from '@/pages/admin/Lesson'
+import LessonCreate from '@/pages/admin/LessonCreate'
+import LessonDetail from '@/pages/admin/LessonDetail'
+import PricingManagement from '@/pages/admin/PricingManagement'
 import AdminSetting from '@/pages/admin/Setting'
-import UserManagement from '@/pages/admin/UserManagement'
 import Subscription from '@/pages/admin/Subscription'
+import SurveyManagement from '@/pages/admin/SurveyManagement'
+import UserManagement from '@/pages/admin/UserManagement'
+import CategoryManagement from '@/pages/trainer/CategoryManagement'
+import PromtDetail from '@/pages/trainer/PromtDetail'
 import PromtManagement from '@/pages/trainer/PromtManagement'
 import RuleController from '@/pages/trainer/RuleController'
-import PromtDetail from '@/pages/trainer/PromtDetail'
-import CategoryManagement from '@/pages/trainer/CategoryManagement'
-import LessonManagement from '@/pages/admin/Lesson'
-import LessonDetail from '@/pages/admin/LessonDetail'
-import LessonCreate from '@/pages/admin/LessonCreate'
-import SurveyManagement from '@/pages/admin/SurveyManagement'
+import type { RouteBrowser } from '@/types/routes'
+import { Route, Routes } from 'react-router'
 
 export const adminRoutesConfig: RouteBrowser[] = [
   {
@@ -84,6 +85,12 @@ export const adminRoutesConfig: RouteBrowser[] = [
     name: 'Survey Management',
     route: 'survey-management',
     element: <SurveyManagement />,
+    exact: true
+  },
+  {
+    name: 'Planning',
+    route: 'planning',
+    element: <PricingManagement />,
     exact: true
   }
 ]

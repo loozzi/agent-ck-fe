@@ -11,7 +11,9 @@ import type {
   SubscriptionPurchaseHistoryResponse,
   SubscriptionPurchasePayload,
   SubscriptionPurchaseResponse,
-  NextTierResponse
+  NextTierResponse,
+  CreateSubscriptionPricingPayload,
+  CreateSubscriptionPricingResponse
 } from '@/types/subscription'
 import apiInstance from './axios.config'
 import type { AxiosResponse } from 'axios'
@@ -56,7 +58,20 @@ const subscriptionService = {
   },
   purchaseSubscription: (data: SubscriptionPurchasePayload): Promise<AxiosResponse<SubscriptionPurchaseResponse>> => {
     return apiInstance.post<SubscriptionPurchaseResponse>('/subscription/purchase', data)
+  },
+  createSubscriptionPricing: (
+    data: CreateSubscriptionPricingPayload
+  ): Promise<AxiosResponse<CreateSubscriptionPricingResponse>> => {
+    return apiInstance.post<CreateSubscriptionPricingResponse>('/subscription/pricing', data)
+  },
+  updateSubscriptionPricing: (
+    id: string,
+    data: Partial<CreateSubscriptionPricingPayload>
+  ): Promise<AxiosResponse<CreateSubscriptionPricingResponse>> => {
+    return apiInstance.patch<CreateSubscriptionPricingResponse>(`/subscription/pricing/${id}`, data)
+  },
+  deleteSubscriptionPricing: (id: string): Promise<AxiosResponse<void>> => {
+    return apiInstance.delete<void>(`/subscription/pricing/${id}`)
   }
 }
-
 export default subscriptionService
