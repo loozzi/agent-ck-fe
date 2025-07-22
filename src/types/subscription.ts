@@ -166,3 +166,16 @@ export interface CreateSubscriptionPricingResponse {
   created_at: string
   updated_at: string
 }
+
+export interface CreatePurchasePayload {
+  pricing_tier_id: string
+}
+
+export interface CreatePurchaseResponse {
+  payment_url: string
+  txn_ref: string
+  amount_vnd: number
+  tier_name: string
+  duration_days: number
+  expires_at: string
+}

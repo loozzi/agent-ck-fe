@@ -33,9 +33,7 @@ const Planning = () => {
     setIsPurchasing(true)
     await dispatch(
       purchaseSubscription({
-        pricing_tier_id: selectedTier,
-        payment_method: paymentMethod,
-        payment_reference: ''
+        pricing_tier_id: selectedTier
       })
     )
     setIsPurchasing(false)
@@ -158,7 +156,7 @@ const Planning = () => {
                       </SelectItem>
                     ))
                   ) : (
-                    <SelectItem value='' disabled>
+                    <SelectItem value='none' disabled>
                       Không có gói khả dụng
                     </SelectItem>
                   )}

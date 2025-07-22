@@ -1,10 +1,10 @@
 import subscriptionService from '@/services/subscription.service'
 import type { SubscriptionState } from '@/types/slices/subscription'
 import type {
+  CreatePurchasePayload,
   CreateSubscriptionPricingPayload,
   CreateSupscriptionPayload,
   SubscriptionCodeParams,
-  SubscriptionPurchasePayload,
   SubscriptionUpdateRolePayload
 } from '@/types/subscription'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
@@ -198,15 +198,15 @@ export const fetchNextTierInfo = createAsyncThunk('subscription/fetchNextTierInf
 
 export const purchaseSubscription = createAsyncThunk(
   'subscription/purchaseSubscription',
-  async (payload: SubscriptionPurchasePayload, { rejectWithValue }) => {
+  async (payload: CreatePurchasePayload, { rejectWithValue }) => {
     try {
-      const response = await subscriptionService.purchaseSubscription(payload)
+      const response = await subscriptionService.createPurchase(payload)
       if (response.status !== 200) {
         const errorMessage = (response as any).response?.data?.detail || 'Không thể mua đăng ký'
         toast.error(errorMessage)
         return rejectWithValue(errorMessage)
       }
-      toast.success('Đăng ký đã được mua thành công')
+      window.location.href = response.data.payment_url
       return response.data
     } catch (error) {
       toast.error('Failed to purchase subscription')

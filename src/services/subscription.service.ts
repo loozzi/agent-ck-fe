@@ -1,22 +1,22 @@
 import type {
+  CreatePurchasePayload,
+  CreatePurchaseResponse,
+  CreateSubscriptionPricingPayload,
+  CreateSubscriptionPricingResponse,
   CreateSupscriptionPayload,
+  NextTierResponse,
   SubscriptionCode,
-  SubscriptionMessage,
-  SubscriptionStatus,
-  SubscriptionUpdateRolePayload,
   SubscriptionCodeParams,
-  SubscriptionUpdateRoleResponse,
   SubscriptionDirectActivePayload,
+  SubscriptionMessage,
   SubscriptionPricingResponse,
   SubscriptionPurchaseHistoryResponse,
-  SubscriptionPurchasePayload,
-  SubscriptionPurchaseResponse,
-  NextTierResponse,
-  CreateSubscriptionPricingPayload,
-  CreateSubscriptionPricingResponse
+  SubscriptionStatus,
+  SubscriptionUpdateRolePayload,
+  SubscriptionUpdateRoleResponse
 } from '@/types/subscription'
-import apiInstance from './axios.config'
 import type { AxiosResponse } from 'axios'
+import apiInstance from './axios.config'
 
 const subscriptionService = {
   createSubscription: (data: CreateSupscriptionPayload): Promise<AxiosResponse<SubscriptionCode>> => {
@@ -56,8 +56,8 @@ const subscriptionService = {
   getNextTierInfo: (): Promise<AxiosResponse<NextTierResponse>> => {
     return apiInstance.get<NextTierResponse>('/subscription/next-tier-info')
   },
-  purchaseSubscription: (data: SubscriptionPurchasePayload): Promise<AxiosResponse<SubscriptionPurchaseResponse>> => {
-    return apiInstance.post<SubscriptionPurchaseResponse>('/subscription/purchase', data)
+  createPurchase: (data: CreatePurchasePayload): Promise<AxiosResponse<CreatePurchaseResponse>> => {
+    return apiInstance.post<CreatePurchaseResponse>('subscription/create-payment', data)
   },
   createSubscriptionPricing: (
     data: CreateSubscriptionPricingPayload
