@@ -1,4 +1,4 @@
-import { useAppDispatch } from '@/app/hook'
+import { useAppDispatch, useAppSelector } from '@/app/hook'
 import ZaloIcon from '@/assets/zalo.png'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import apiInstance from '@/services/axios.config'
@@ -6,10 +6,14 @@ import { fetchStockByTicker } from '@/slices/stock.slice'
 import { fetchZaloAuthUrl } from '@/slices/zalo.slice'
 import { BarChart3, Shield, TrendingUp, Users } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { FaUser } from 'react-icons/fa'
+import { useNavigate } from 'react-router-dom'
 
 const HeroSection = () => {
   const dispatch = useAppDispatch()
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
   const [showLoginPopup, setShowLoginPopup] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     // Fetch VN-Index and HNX-Index data
@@ -63,14 +67,25 @@ const HeroSection = () => {
 
           {/* CTA Buttons */}
           <div className='flex flex-col sm:flex-row gap-4 justify-center mb-16'>
-            <button
-              type='button'
-              onClick={handleZaloLogin}
-              className='inline-flex items-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl'
-            >
-              <img src={ZaloIcon} alt='Zalo Icon' className='mr-2 h-5 w-5' />
-              Tham gia ngay
-            </button>
+            {isAuthenticated ? (
+              <button
+                type='button'
+                onClick={() => navigate('/dashboard')}
+                className='inline-flex items-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl'
+              >
+                <FaUser className='mr-2 h-5 w-5' />
+                Bảng điều khiển
+              </button>
+            ) : (
+              <button
+                type='button'
+                onClick={handleZaloLogin}
+                className='inline-flex items-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl'
+              >
+                <img src={ZaloIcon} alt='Zalo Icon' className='mr-2 h-5 w-5' />
+                Tham gia ngay
+              </button>
+            )}
 
             <button
               onClick={scrollToNews}
