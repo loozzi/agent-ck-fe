@@ -23,7 +23,7 @@ const Setting = () => {
   }
 
   return (
-    <div className='max-w-xl mx-auto py-8'>
+    <div className='mx-auto py-8'>
       <h2 className='text-2xl font-bold mb-6'>Cài đặt người dùng</h2>
 
       {/* Thông tin người dùng */}

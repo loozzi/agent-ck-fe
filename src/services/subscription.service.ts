@@ -10,7 +10,8 @@ import type {
   SubscriptionPricingResponse,
   SubscriptionPurchaseHistoryResponse,
   SubscriptionPurchasePayload,
-  SubscriptionPurchaseResponse
+  SubscriptionPurchaseResponse,
+  NextTierResponse
 } from '@/types/subscription'
 import apiInstance from './axios.config'
 import type { AxiosResponse } from 'axios'
@@ -50,8 +51,8 @@ const subscriptionService = {
   getSubscriptionPurchaseHistory: (): Promise<AxiosResponse<SubscriptionPurchaseHistoryResponse[]>> => {
     return apiInstance.get<SubscriptionPurchaseHistoryResponse[]>('/subscription/purchase-history')
   },
-  getNextTierInfo: (): Promise<AxiosResponse<SubscriptionPricingResponse>> => {
-    return apiInstance.get<SubscriptionPricingResponse>('/subscription/next-tier')
+  getNextTierInfo: (): Promise<AxiosResponse<NextTierResponse>> => {
+    return apiInstance.get<NextTierResponse>('/subscription/next-tier-info')
   },
   purchaseSubscription: (data: SubscriptionPurchasePayload): Promise<AxiosResponse<SubscriptionPurchaseResponse>> => {
     return apiInstance.post<SubscriptionPurchaseResponse>('/subscription/purchase', data)

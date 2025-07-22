@@ -124,3 +124,24 @@ export interface SubscriptionPurchaseResponse {
   amount_paid_vnd: number
   subscription_end_date: string
 }
+
+export interface NextTierResponse {
+  total_purchases: number
+  paid_purchases: number
+  next_paid_purchase_count: number
+  has_free_subscription: boolean
+  next_tier: NextTier[]
+  message: string
+}
+
+export interface NextTier {
+  tier_name: string
+  id: string
+  purchase_count_max: number
+  duration_days: number
+  created_at: string
+  price_vnd: number
+  purchase_count_min: number
+  is_active: boolean
+  updated_at: string
+}

@@ -1,4 +1,5 @@
 import type {
+  NextTierResponse,
   SubscriptionCode,
   SubscriptionMessage,
   SubscriptionPricingResponse,
@@ -11,7 +12,7 @@ export interface SubscriptionState {
   userSubscriptionStatus: UserSubscriptionStatus[]
   messages: SubscriptionMessage[]
   listPricings: SubscriptionPricingResponse[]
-  nextTierInfo: SubscriptionPricingResponse | null
+  nextTierInfo: NextTierResponse | null
   purchaseHistory: SubscriptionPurchaseHistoryResponse[]
   isLoading: boolean
   error: string | null
