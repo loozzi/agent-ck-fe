@@ -1,4 +1,5 @@
 import AdminDashboard from '@/pages/admin/AdminDashboard'
+import HistoryTransaction from '@/pages/admin/HistoryTransaction'
 import LessonManagement from '@/pages/admin/Lesson'
 import LessonCreate from '@/pages/admin/LessonCreate'
 import LessonDetail from '@/pages/admin/LessonDetail'
@@ -91,6 +92,12 @@ export const adminRoutesConfig: RouteBrowser[] = [
     name: 'Planning',
     route: 'planning',
     element: <PricingManagement />,
+    exact: true
+  },
+  {
+    name: 'History Transaction',
+    route: 'history-transaction',
+    element: <HistoryTransaction />,
     exact: true
   }
 ]

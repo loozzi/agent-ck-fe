@@ -17,6 +17,7 @@ const initialState: SubscriptionState = {
   listPricings: [],
   nextTierInfo: null,
   purchaseHistory: [],
+  historyTransactions: null,
   isLoading: false,
   error: null
 }
@@ -272,6 +273,24 @@ export const deleteSubscriptionPricing = createAsyncThunk(
   }
 )
 
+export const fetchHistoryTransaction = createAsyncThunk(
+  'subscription/fetchHistoryTransaction',
+  async (params: { userId: string; page: number; limit: number }, { rejectWithValue }) => {
+    try {
+      const response = await subscriptionService.getHistoryTransaction(params)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể lấy lịch sử giao dịch'
+        toast.error(errorMessage)
+        return rejectWithValue(errorMessage)
+      }
+      return response.data
+    } catch (error) {
+      toast.error('Failed to fetch history transaction')
+      return rejectWithValue((error as any).response?.data?.message || 'An error occurred')
+    }
+  }
+)
+
 const subscriptionSlice = createSlice({
   name: 'subscription',
   initialState,
@@ -437,6 +456,18 @@ const subscriptionSlice = createSlice({
         state.listPricings = state.listPricings.filter((pricing) => pricing.id !== action.payload)
       })
       .addCase(deleteSubscriptionPricing.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(fetchHistoryTransaction.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(fetchHistoryTransaction.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.historyTransactions = action.payload
+      })
+      .addCase(fetchHistoryTransaction.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload as string
       })

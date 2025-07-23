@@ -179,3 +179,38 @@ export interface CreatePurchaseResponse {
   duration_days: number
   expires_at: string
 }
+
+export interface HistoryTransactionParams {
+  page?: number
+  page_size?: number
+}
+
+export interface HistoryTransactionResponse {
+  data: HistoryTransaction[]
+  pagination: Pagination
+  stats: Stats
+}
+
+export interface Pagination {
+  total: number
+  page: number
+  page_size: number
+  has_next: boolean
+  has_prev: boolean
+}
+
+export interface Stats {
+  total_money_vnd: number
+  paid_user_count: number
+  total_purchase_count: number
+}
+
+export interface HistoryTransaction {
+  user_id: string
+  email: string
+  full_name: string
+  subscription_id: string
+  subscription_name: string
+  price_paid_vnd: number
+  created_at: string
+}

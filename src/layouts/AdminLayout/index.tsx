@@ -99,6 +99,12 @@ const AdminLayout = () => {
       href: '/admin/planning'
     },
     {
+      id: 'history-transaction',
+      title: 'Quản lý lịch sử giao dịch',
+      icon: <FaMoneyBill className='w-4 h-4' />,
+      href: '/admin/history-transaction'
+    },
+    {
       id: 'settings',
       title: 'Cài đặt',
       icon: <IoIosSettings className='w-4 h-4' />,

@@ -13,7 +13,9 @@ import type {
   SubscriptionPurchaseHistoryResponse,
   SubscriptionStatus,
   SubscriptionUpdateRolePayload,
-  SubscriptionUpdateRoleResponse
+  SubscriptionUpdateRoleResponse,
+  HistoryTransactionResponse,
+  HistoryTransactionParams
 } from '@/types/subscription'
 import type { AxiosResponse } from 'axios'
 import apiInstance from './axios.config'
@@ -72,6 +74,9 @@ const subscriptionService = {
   },
   deleteSubscriptionPricing: (id: string): Promise<AxiosResponse<void>> => {
     return apiInstance.delete<void>(`/subscription/pricing/${id}`)
+  },
+  getHistoryTransaction: (params: HistoryTransactionParams): Promise<AxiosResponse<HistoryTransactionResponse>> => {
+    return apiInstance.get<HistoryTransactionResponse>('/admin/subscription/purchase-history', { params })
   }
 }
 export default subscriptionService

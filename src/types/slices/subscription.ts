@@ -1,4 +1,5 @@
 import type {
+  HistoryTransactionResponse,
   NextTierResponse,
   SubscriptionCode,
   SubscriptionMessage,
@@ -14,6 +15,7 @@ export interface SubscriptionState {
   listPricings: SubscriptionPricingResponse[]
   nextTierInfo: NextTierResponse | null
   purchaseHistory: SubscriptionPurchaseHistoryResponse[]
+  historyTransactions: HistoryTransactionResponse | null
   isLoading: boolean
   error: string | null
 }
