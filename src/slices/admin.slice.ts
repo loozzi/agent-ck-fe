@@ -16,6 +16,7 @@ const initialState: AdminState = {
   users: [],
   prompts: [],
   logicRules: [],
+  adminStats: undefined,
   isLoading: false,
   error: undefined
 }
@@ -132,6 +133,19 @@ export const directActiveSubscription = createAsyncThunk(
   }
 )
 
+export const fetchAdminStats = createAsyncThunk('admin/fetchAdminStats', async (_, { rejectWithValue }) => {
+  try {
+    const response = await adminService.fetchAdminStats()
+    if (response.status !== 200) {
+      const errorMessage = (response as any).response.data.detail || 'Không thể lấy thống kê quản trị viên'
+      return rejectWithValue(errorMessage)
+    }
+    return response.data
+  } catch (error) {
+    return rejectWithValue('Không thể lấy thống kê quản trị viên')
+  }
+})
+
 const adminSlice = createSlice({
   name: 'admin',
   initialState,
@@ -227,6 +241,18 @@ const adminSlice = createSlice({
         }
       })
       .addCase(directActiveSubscription.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(fetchAdminStats.pending, (state) => {
+        state.isLoading = true
+        state.error = undefined
+      })
+      .addCase(fetchAdminStats.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.adminStats = action.payload
+      })
+      .addCase(fetchAdminStats.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload as string
       })

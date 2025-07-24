@@ -54,6 +54,45 @@ export interface AdminState {
   users: User[]
   prompts: Prompt[]
   logicRules: LogicRule[]
+  adminStats?: AdminStatResponse
   isLoading: boolean
   error?: string
+}
+
+export interface AdminStatResponse {
+  users: UsersStat
+  purchase_history: PurchaseHistoryStat
+  survey_questions: number
+  prompts: number
+  logic_rules: number
+}
+
+export interface UsersStat {
+  total: number
+  subscribers: number
+  trainers: number
+  admins: number
+}
+
+export interface PurchaseHistoryStat {
+  total_records: number
+  total_money_paid_vnd: number
+  week: WeekStat
+  month: MonthStat
+  year: YearStat
+}
+
+export interface WeekStat {
+  count: number
+  money_vnd: number
+}
+
+export interface MonthStat {
+  count: number
+  money_vnd: number
+}
+
+export interface YearStat {
+  count: number
+  money_vnd: number
 }

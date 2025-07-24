@@ -1,4 +1,5 @@
 import type {
+  AdminStatResponse,
   DeleteSubscriptionCodeParams,
   GetAllLogicRulesParams,
   GetAllPromptsParams,
@@ -36,7 +37,8 @@ const adminService = {
   },
   getAllLogicRules: (params?: GetAllLogicRulesParams): Promise<AxiosResponse<LogicRule[]>> => {
     return apiInstance.get(ADMIN_ROUTE.LOGIC_RULES, { params })
-  }
+  },
+  fetchAdminStats: (): Promise<AxiosResponse<AdminStatResponse>> => apiInstance.get<AdminStatResponse>('/admin/stats')
 }
 
 export default adminService
