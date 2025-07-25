@@ -97,6 +97,22 @@ export const fetchSurveyQuestionById = createAsyncThunk(
   }
 )
 
+export const forceRedoSurveyQuestion = createAsyncThunk(
+  'adminSurvey/forceRedoSurveyQuestion',
+  async (_, { rejectWithValue }) => {
+    try {
+      await adminSurveyService.forceRedoSurveyQuestion()
+      toast.success('Yêu cầu làm lại khảo sát thành công')
+    } catch (error) {
+      const errorMessage =
+        (error as unknown as { response?: { data?: { detail?: string } } }).response?.data?.detail ||
+        'Không thể yêu cầu làm lại khảo sát'
+      toast.error(errorMessage)
+      return rejectWithValue(errorMessage)
+    }
+  }
+)
+
 const adminSurveySlice = createSlice({
   name: 'adminSurvey',
   initialState,

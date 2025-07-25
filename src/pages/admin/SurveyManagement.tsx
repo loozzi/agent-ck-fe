@@ -11,7 +11,8 @@ import {
   createSurveyQuestion,
   deleteSurveyQuestion,
   fetchSurveyQuestions,
-  updateSurveyQuestion
+  updateSurveyQuestion,
+  forceRedoSurveyQuestion
 } from '@/slices/adminSurvey.slice'
 import type { CreateSurveyQuestionPayload, SurveyQuestion } from '@/types/adminSurvey.types'
 import React, { useEffect, useState } from 'react'
@@ -48,6 +49,20 @@ const SurveyManagement = () => {
   const [editMode, setEditMode] = useState(false)
   const [form, setForm] = useState<CreateSurveyQuestionPayload>(defaultForm)
   const [editId, setEditId] = useState<number | null>(null)
+
+  // Force Redo dialog state
+  const [openForceRedoDialog, setOpenForceRedoDialog] = useState(false)
+  // Force Redo handler
+  const handleForceRedo = () => {
+    setOpenForceRedoDialog(true)
+  }
+  const handleConfirmForceRedo = () => {
+    dispatch(forceRedoSurveyQuestion())
+    setOpenForceRedoDialog(false)
+  }
+  const handleCancelForceRedo = () => {
+    setOpenForceRedoDialog(false)
+  }
 
   useEffect(() => {
     dispatch(fetchSurveyQuestions({}))
@@ -131,8 +146,33 @@ const SurveyManagement = () => {
     <div className='p-4'>
       <div className='flex justify-between items-center mb-4'>
         <h2 className='text-xl font-bold'>Quản lý câu hỏi khảo sát</h2>
-        <Button onClick={handleOpenAdd}>Thêm câu hỏi</Button>
+        <div className='flex gap-2'>
+          <Button onClick={handleOpenAdd}>Thêm câu hỏi</Button>
+          <Button variant='secondary' onClick={handleForceRedo}>
+            Yêu cầu làm lại khảo sát
+          </Button>
+        </div>
       </div>
+
+      {/* Dialog xác nhận Force Redo */}
+      <Dialog open={openForceRedoDialog} onOpenChange={setOpenForceRedoDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Xác nhận yêu cầu làm lại khảo sát</DialogTitle>
+          </DialogHeader>
+          <div className='mb-4'>Bạn có chắc chắn muốn yêu cầu tất cả người dùng làm lại khảo sát không?</div>
+          <DialogFooter>
+            <Button variant='destructive' onClick={handleConfirmForceRedo}>
+              Xác nhận
+            </Button>
+            <DialogClose asChild>
+              <Button variant='outline' onClick={handleCancelForceRedo}>
+                Hủy
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {isLoading && <div className='mb-2 text-blue-600'>Đang tải...</div>}
       {error && <div className='mb-2 text-red-600'>{error}</div>}
       <Table>

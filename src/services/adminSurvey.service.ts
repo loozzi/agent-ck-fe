@@ -20,7 +20,8 @@ const adminSurveyService = {
   deleteSurveyQuestion: async (id: number): Promise<AxiosResponse<void>> =>
     apiInstance.delete(`${ADMIN_ROUTE_SURVEY}/${id}`),
   getSurveyQuestionById: async (id: number): Promise<AxiosResponse<SurveyQuestion>> =>
-    apiInstance.get(`${ADMIN_ROUTE_SURVEY}/${id}`)
+    apiInstance.get(`${ADMIN_ROUTE_SURVEY}/${id}`),
+  forceRedoSurveyQuestion: async (): Promise<AxiosResponse<void>> => apiInstance.post(`/admin/survey/force-redo`)
 }
 
 export default adminSurveyService
