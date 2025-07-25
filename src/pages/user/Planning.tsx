@@ -183,7 +183,7 @@ const Planning = () => {
 
       {/* Bảng giá các gói */}
       <div className='w-full'>
-        <SubscriptionSection />
+        <SubscriptionSection purchaseHistory={purchaseHistory} />
       </div>
     </div>
   )

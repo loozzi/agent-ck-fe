@@ -3,7 +3,13 @@ import { fetchSubscriptionPricings } from '@/slices/subscription.slice'
 import { useEffect } from 'react'
 import { formatCurrencyVN } from '@/utils/currency'
 
-const SubscriptionSection = () => {
+import type { SubscriptionPurchaseHistoryResponse } from '@/types/subscription'
+
+interface SubscriptionSectionProps {
+  purchaseHistory?: SubscriptionPurchaseHistoryResponse[]
+}
+
+const SubscriptionSection = ({ purchaseHistory }: SubscriptionSectionProps) => {
   const dispatch = useAppDispatch()
   const { listPricings, isLoading, error } = useAppSelector((state) => state.subscription)
 
@@ -41,6 +47,9 @@ const SubscriptionSection = () => {
     priceTable[months][purchaseCount] = p.price_vnd
   })
 
+  // Tạo set các lần mua đã mua
+  const purchasedCounts = new Set((purchaseHistory || []).map((item) => item.purchase_count))
+
   return (
     <section className='max-w-[900px] w-full mx-auto my-6 bg-white rounded-xl shadow-lg px-2 sm:px-6 py-4 box-border'>
       <h2 className='text-center mb-4 text-[20px] font-bold tracking-wide'>Bảng giá thành viên</h2>
@@ -64,8 +73,13 @@ const SubscriptionSection = () => {
           <tbody>
             {purchaseCounts.map((count) => (
               <tr key={count}>
-                <td className='px-3 py-3 border border-gray-200 font-medium text-[13px] bg-gray-50 whitespace-nowrap'>
+                <td className='px-3 py-3 border border-gray-200 font-medium text-[13px] bg-gray-50 whitespace-nowrap flex items-center gap-2'>
                   Lần mua {count}
+                  {purchasedCounts.has(count) && (
+                    <span title='Đã mua' className='text-green-600 ml-1'>
+                      ✓
+                    </span>
+                  )}
                 </td>
                 {durationMonths.map((months) => (
                   <td
