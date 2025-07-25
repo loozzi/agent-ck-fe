@@ -4,10 +4,10 @@ import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
 import TrainerNavigator from '@/navigators/trainer.routes'
 import { useEffect, useState } from 'react'
-import { FaBookOpen, FaChartLine, FaList } from 'react-icons/fa'
+import { FaCodeBranch } from 'react-icons/fa'
+import { IoIosSettings } from 'react-icons/io'
 import { MdDashboard, MdOutlineMonitorHeart } from 'react-icons/md'
 import type { RouteItem } from '../UserLayout'
-import { IoIosSettings } from 'react-icons/io'
 
 const TrainerLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false)
@@ -60,21 +60,21 @@ const TrainerLayout = () => {
     {
       id: 'rules-management',
       title: 'Quản lý rules logic',
-      icon: <FaBookOpen className='w-4 h-4' />,
+      icon: <FaCodeBranch className='w-4 h-4' />,
       href: '/trainer/rules-management'
     },
-    {
-      id: 'category-management',
-      title: 'Quản lý danh mục',
-      icon: <FaList className='w-4 h-4' />,
-      href: '/trainer/category-management'
-    },
-    {
-      id: 'feedback',
-      title: 'Feedback logger',
-      icon: <FaChartLine className='w-4 h-4' />,
-      href: '/trainer/feedback'
-    },
+    // {
+    //   id: 'category-management',
+    //   title: 'Quản lý danh mục',
+    //   icon: <FaList className='w-4 h-4' />,
+    //   href: '/trainer/category-management'
+    // },
+    // {
+    //   id: 'feedback',
+    //   title: 'Feedback logger',
+    //   icon: <FaChartLine className='w-4 h-4' />,
+    //   href: '/trainer/feedback'
+    // },
     {
       id: 'settings',
       title: 'Cài đặt',

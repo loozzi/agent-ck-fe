@@ -4,9 +4,10 @@ import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
 import AdminNavigator from '@/navigators/admin.routes'
 import { useEffect, useState } from 'react'
-import { FaBookOpen, FaHome, FaList, FaMoneyBill, FaUsers } from 'react-icons/fa'
+import { FaBookOpen, FaCodeBranch, FaHistory, FaHome, FaMoneyBill, FaUsers } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
 import { MdOutlineMonitorHeart } from 'react-icons/md'
+import { RiSurveyFill } from 'react-icons/ri'
 import type { RouteItem } from '../UserLayout'
 const AdminLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false)
@@ -71,15 +72,15 @@ const AdminLayout = () => {
     {
       id: 'logic-rules',
       title: 'Quản lý quy tắc logic',
-      icon: <FaBookOpen className='w-4 h-4' />,
+      icon: <FaCodeBranch className='w-4 h-4' />,
       href: '/admin/rules-management'
     },
-    {
-      id: 'category-management',
-      title: 'Quản lý danh mục',
-      icon: <FaList className='w-4 h-4' />,
-      href: '/admin/category-management'
-    },
+    // {
+    //   id: 'category-management',
+    //   title: 'Quản lý danh mục',
+    //   icon: <FaList className='w-4 h-4' />,
+    //   href: '/admin/category-management'
+    // },
     {
       id: 'lesson-management',
       title: 'Quản lý bài học',
@@ -89,7 +90,7 @@ const AdminLayout = () => {
     {
       id: 'survey-management',
       title: 'Quản lý khảo sát',
-      icon: <FaList className='w-4 h-4' />,
+      icon: <RiSurveyFill className='w-4 h-4' />,
       href: '/admin/survey-management'
     },
     {
@@ -101,7 +102,7 @@ const AdminLayout = () => {
     {
       id: 'history-transaction',
       title: 'Quản lý lịch sử giao dịch',
-      icon: <FaMoneyBill className='w-4 h-4' />,
+      icon: <FaHistory className='w-4 h-4' />,
       href: '/admin/history-transaction'
     },
     {
