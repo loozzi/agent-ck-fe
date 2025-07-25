@@ -9,7 +9,7 @@ const SignOut = () => {
 
   useEffect(() => {
     dispatch(signOutAction())
-    navigate('/signin')
+    navigate('/')
   }, [])
 
   return <div>SignOut</div>
