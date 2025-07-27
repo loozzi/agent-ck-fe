@@ -216,6 +216,7 @@ const Portfolio = () => {
                 sent_at: item.updated_at
               }))}
               isLoading={newsLoading}
+              showImage={false}
             />
           </div>
         )}

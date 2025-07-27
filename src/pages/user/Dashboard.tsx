@@ -1,25 +1,21 @@
 import { useAppDispatch, useAppSelector } from '@/app/hook'
-import NewsList from '@/components/common/NewsList'
-import NewsSearch from '@/components/common/NewsSearch'
-import NewsTimeline from '@/components/common/NewsTimeline'
 import EmailNotificationDialog from '@/components/common/EmailNotificationDialog'
 import EmailSettingsButton from '@/components/common/EmailSettingsButton'
+import NewsList from '@/components/common/NewsList'
 import WatchlistSection from '@/components/common/WatchlistSection'
-import WatchlistCard from '@/components/common/WatchlistCard'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { getSubscriptionStatus, getMeAction } from '@/slices/auth.slice'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getMeAction, getSubscriptionStatus } from '@/slices/auth.slice'
+import { fetchEmailStatus } from '@/slices/email.slice'
 import { fetchLatestNews, fetchNews } from '@/slices/news.slice'
 import { fetchWatchlistDetail } from '@/slices/watchlist.slice'
 import type { GetNewsParams } from '@/types/news'
 import { hasDeclinedEmailNotification } from '@/utils/emailPreferences'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { BarChart3, Bell, Globe, RefreshCw, TrendingUp, TrendingDown, ListChecks } from 'lucide-react'
+import { Bell, Globe, ListChecks, RefreshCw, TrendingUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { fetchEmailStatus } from '@/slices/email.slice'
 
 const UserDashboard = () => {
   const dispatch = useAppDispatch()
@@ -249,13 +245,13 @@ const UserDashboard = () => {
         {/* Sidebar */}
         <div className='space-y-3 sm:space-y-4 order-1 xl:order-2'>
           {/* High Importance News */}
-          <NewsList
+          {/* <NewsList
             news={highImportanceNews.slice(0, 3)}
             title='Tin nóng'
             description='Tin tức quan trọng nhất'
             variant='compact'
             isLoading={isLoading}
-          />
+          /> */}
 
           {/* Watchlist Section */}
           <WatchlistSection
@@ -269,7 +265,7 @@ const UserDashboard = () => {
       </div>
 
       {/* Categorized News Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-3'>
+      {/* <Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-3'>
         <div className='w-full'>
           <div className='flex overflow-x-auto scrollbar-hide tab-scroll'>
             <TabsList className='flex bg-muted p-1 rounded-lg min-w-max'>
@@ -428,7 +424,7 @@ const UserDashboard = () => {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
+      </Tabs> */}
     </div>
   )
 }
