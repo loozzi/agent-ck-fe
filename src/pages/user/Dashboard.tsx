@@ -10,7 +10,6 @@ import { getMeAction, getSubscriptionStatus } from '@/slices/auth.slice'
 import { fetchEmailStatus } from '@/slices/email.slice'
 import { fetchLatestNews, fetchNews } from '@/slices/news.slice'
 import { fetchWatchlistDetail } from '@/slices/watchlist.slice'
-import type { GetNewsParams } from '@/types/news'
 import { hasDeclinedEmailNotification } from '@/utils/emailPreferences'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
@@ -25,7 +24,6 @@ const UserDashboard = () => {
   const { emailStatus } = useAppSelector((state) => state.email)
   const [refreshTime, setRefreshTime] = useState(new Date())
   const [showEmailDialog, setShowEmailDialog] = useState(false)
-  const [activeTab, setActiveTab] = useState('all')
 
   useEffect(() => {
     if (user) {
@@ -71,10 +69,6 @@ const UserDashboard = () => {
     )
   }
 
-  const handleSearch = (params: GetNewsParams) => {
-    dispatch(fetchNews(params))
-  }
-
   const handleEmailComplete = async (email: string) => {
     console.log('Email updated:', email)
     // Refresh user data to get updated email
@@ -98,7 +92,6 @@ const UserDashboard = () => {
 
   // Group news by importance
   const highImportanceNews = news.filter((n) => n.importance === 'high')
-  const mediumImportanceNews = news.filter((n) => n.importance === 'medium')
 
   const handleViewChart = (ticker: string) => {
     // Navigate to chart view or open chart modal
@@ -117,8 +110,6 @@ const UserDashboard = () => {
   }
 
   const handleViewMoreNews = () => {
-    // Switch to "all" tab to show more news
-    setActiveTab('all')
     // Scroll to the tabs section
     setTimeout(() => {
       const tabsSection = document.querySelector('[role="tablist"]')

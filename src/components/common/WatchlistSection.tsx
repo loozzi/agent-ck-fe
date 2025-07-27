@@ -1,10 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import WatchlistCard from './WatchlistCard'
-import type { WatchlistDetailsResponse } from '@/types/watchlist'
-import { Eye, Star, TrendingUp, TrendingDown, ListChecks } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { WatchlistDetailsResponse } from '@/types/watchlist'
+import { Eye, ListChecks, Star, TrendingDown, TrendingUp } from 'lucide-react'
+import WatchlistCard from './WatchlistCard'
 
 interface WatchlistSectionProps {
   watchlistDetail?: WatchlistDetailsResponse
@@ -97,7 +97,7 @@ export const WatchlistSection: React.FC<WatchlistSectionProps> = ({
           <div className='text-center p-2 bg-green-50 rounded-lg'>
             <div className='flex items-center justify-center gap-1 text-green-600 mb-1'>
               <TrendingUp className='h-3 w-3' />
-              <span className='font-semibold text-xs'>Top</span>
+              <span className='font-semibold text-xs'>Cao nhất</span>
             </div>
             <div className='text-xs text-muted-foreground'>
               {topPerformers.length > 0 ? topPerformers[0].ticker : 'N/A'}
@@ -133,12 +133,28 @@ export const WatchlistSection: React.FC<WatchlistSectionProps> = ({
           </div>
         )}
 
-        {/* Preview Items - Only show 2 items in compact mode */}
         <div className='space-y-2'>
           <h4 className='text-xs font-medium text-muted-foreground'>Cổ phiếu gần đây:</h4>
           <div className='grid gap-2'>
-            {previewItems.slice(0, 2).map((item) => (
-              <WatchlistCard key={item.id} item={item} onViewChart={onViewChart} onToggleFavorite={onToggleFavorite} />
+            {previewItems.map((item) => (
+              <WatchlistCard
+                key={item.id}
+                item={{
+                  ...item,
+                  price_info: {
+                    ...item.price_info,
+                    current_price: item.price_info.current_price * 1000,
+                    change_amount: item.price_info.change_amount * 1000,
+                    high_price: item.price_info.high_price * 1000,
+                    low_price: item.price_info.low_price * 1000,
+                    open_price: item.price_info.open_price * 1000
+                  },
+                  added_price: item.added_price * 1000,
+                  target_price: item.target_price * 1000
+                }}
+                onViewChart={onViewChart}
+                onToggleFavorite={onToggleFavorite}
+              />
             ))}
           </div>
         </div>
