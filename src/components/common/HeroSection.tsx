@@ -2,10 +2,9 @@ import { useAppDispatch, useAppSelector } from '@/app/hook'
 import ZaloIcon from '@/assets/zalo.png'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import apiInstance from '@/services/axios.config'
-import { fetchStockByTicker } from '@/slices/stock.slice'
 import { fetchZaloAuthUrl } from '@/slices/zalo.slice'
 import { BarChart3, Shield, TrendingUp, Users } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { FaUser } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 
@@ -14,12 +13,6 @@ const HeroSection = () => {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
   const [showLoginPopup, setShowLoginPopup] = useState(false)
   const navigate = useNavigate()
-
-  useEffect(() => {
-    // Fetch VN-Index and HNX-Index data
-    dispatch(fetchStockByTicker('VNINDEX'))
-    dispatch(fetchStockByTicker('HNXINDEX'))
-  }, [dispatch])
 
   const scrollToNews = () => {
     const newsSection = document.getElementById('news-section')
