@@ -1,50 +1,115 @@
-### Todo
+# Giới thiệu dự án Agent CK
 
-[x] Ở giao diện "Danh mục đầu tư" khi thêm mã mới vào, thêm search tên mã cổ phiếu từ API stocks
+Agent CK là hệ thống web quản lý và phân tích dữ liệu dành cho các đối tượng quản trị viên, huấn luyện viên và người dùng cuối. Dự án được xây dựng với React, Vite, TypeScript, sử dụng kiến trúc module hóa, dễ mở rộng và bảo trì.
 
-[X] Xóa trang lịch sử vì không cần thiết
+## Tính năng chính
 
-[X] Chỉnh sửa giao diện trang học tập
+- Quản lý người dùng, bài học, khảo sát, tin tức, danh mục đầu tư, khuyến nghị, chat, email, v.v.
+- Phân quyền theo vai trò: Admin, Trainer, User.
+- Giao diện hiện đại, tối ưu cho cả desktop và mobile.
+- Tích hợp xác thực, bảo mật, và các dịch vụ bên ngoài (Zalo, Email...).
 
-[X] Tạo popup chat với bot ở tất cả màn hình
+## Cấu trúc thư mục
 
-[X] Xóa code & Revork code
+- `src/app/`: Quản lý state, hooks, cấu hình.
+- `src/components/`: Các thành phần UI dùng chung.
+- `src/layouts/`: Layout cho từng vai trò.
+- `src/pages/`: Trang chức năng cho từng nhóm người dùng.
+- `src/services/`: Tầng giao tiếp API.
+- `src/slices/`: Redux slices quản lý state.
+- `src/types/`: Định nghĩa kiểu dữ liệu.
+- `src/utils/`: Hàm tiện ích dùng chung.
 
-[X] Thêm các màn hình trainer
+## Hướng dẫn thiết kế & phát triển
 
-[X] Tạo component news
+1. **Thiết kế giao diện**
+   - Sử dụng React + CSS module cho từng component.
+   - Tận dụng các layout có sẵn trong `src/layouts/`.
+   - Tối ưu responsive với các hook như `use-mobile`.
 
-[X] Quản lý prompt
+2. **Quản lý state**
+   - Sử dụng Redux Toolkit (slice trong `src/slices/`).
+   - Tích hợp các hook custom để truy xuất state.
 
-[X] Quản lý Logic rule
+3. **Kết nối API**
+   - Định nghĩa các service trong `src/services/`.
+   - Sử dụng Axios cho các request HTTP.
 
-[X] Sửa phần logic rule -> chuyển từ giờ cập nhật sang ngày cập nhật
+4. **Thêm mới chức năng**
+   - Tạo component UI trong `src/components/ui/`.
+   - Tạo page mới trong `src/pages/`.
+   - Thêm slice nếu cần quản lý state riêng.
 
-[O] GUEST: Tạo landing page trang chủ: Hiển thị news, một số mã gợi ý trong ngày, list subscription...
+5. **Phân quyền**
+   - Sử dụng các navigator trong `src/navigators/` để kiểm soát truy cập theo vai trò.
 
-[X] USER: Sửa lại dasboard user (hiển thị thông tin các mã đang theo dõi, news...)
+## Hướng dẫn cài đặt & chạy dự án
 
-[X] USER: Tự động reload portfolio sau khi người dùng thêm giao dịch mới
+1. Cài đặt Node.js (>= 16) và Yarn.
+2. Clone dự án về máy:
+   ```
+   git clone <repo-url>
+   ```
+3. Cài đặt dependencies:
+   ```
+   yarn install
+   ```
+4. Tạo file cấu hình môi trường tại `src/configs/env.config.ts` (tham khảo mẫu).
+5. Chạy dự án:
+   ```
+   yarn dev
+   ```
+6. Truy cập giao diện tại [http://localhost:5173](http://localhost:5173)
 
-[ ] ADMIN: Subscription loại bỏ, admin có thể thêm, chỉnh sửa các subscription
+## Bàn giao & mở rộng
 
-[ ] ALL: Đăng nhập bằng Zalo Oauth (đợi API mới)
+- Dễ dàng mở rộng thêm module mới bằng cách tạo service, slice, page và component tương ứng.
+- Tài liệu code được chú thích rõ ràng, tuân thủ chuẩn TypeScript.
+- Hỗ trợ tích hợp các dịch vụ bên ngoài theo yêu cầu.
 
-[ ] USER: Màn hình chiến lược đầu tư (đợi API): Ở chiến lược đầu tư sẽ hiển thị danh sách chiến lược -> người dùng bấm vào để xem tên các bài học -> bấm vào để xem chi tiết bài học
+### Hướng dẫn mở rộng thêm Component UI
 
-[ ] USER: Ở màn hình chatbot, hiển thị ra list câu hỏi gợi ý cho người dùng, khi người dùng bấm vào thì tự gửi cho chat luôn
+1. Tạo file mới trong thư mục `src/components/ui/` (ví dụ: `MyButton.tsx`).
+2. Định nghĩa component theo chuẩn React và TypeScript.
+3. Thêm style riêng nếu cần (có thể tạo file CSS cùng tên).
+4. Import và sử dụng component mới trong các page hoặc layout.
 
-[X] USER: Chỉnh sửa màn "Danh mục đầu tư" thành "Ví của tôi" => Đồng thời giảm kích thước danh mục chứng khoán
+Ví dụ:
 
-[ ] USER: Màn hình chiến lược đầu tư -> chia 2 vùng để so sánh chiến lược của AI và của người dùng -> yêu cầu vẽ history chart để người dùng theo dõi
+```tsx
+// src/components/ui/MyButton.tsx
+import React from 'react'
+export const MyButton = ({ children, ...props }) => (
+  <button {...props} className='my-btn'>
+    {children}
+  </button>
+)
+```
 
-[ ] ADMIN & TRAINER: Up tài liệu cho AI học tập (Chỉnh sửa ở promt & logic rule???)
+### Hướng dẫn thêm một trang mới
 
-[ ] ADMIN: Loại bỏ giao diện subscription code, chỉnh sửa giao diện user management hiển thị lại các thông tin như sau: Họ và tên (avatar) | Gói đăng ký | Ngày kích hoạt | Ngày hết hạn | Vai trò | Đổi vai trò. Chia các tab ra, 1 tab tất cả, 1 tab hiển thị user đang còn hạn, 1 tab hiển thị user đã hết hạn
+1. Tạo file mới trong `src/pages/` (ví dụ: `About.tsx`).
+2. Định nghĩa nội dung trang theo chuẩn React.
+3. Thêm route mới vào file navigator phù hợp (ví dụ: `src/navigators/AppNavigator.tsx`).
+4. Nếu cần quản lý state riêng, tạo slice mới trong `src/slices/`.
 
-[ ] ADMIN: Màn hình xem chi tiết người dùng: hiển thị tất cả thông tin cơ bản, thông tin các mã đang theo dõi, ví của người dùng...
+Ví dụ:
 
-[ ] ADMIN & TRAINER: Thêm màn hình feedback logger (đang đợi logic và API)
+```tsx
+// src/pages/About.tsx
+const About = () => <div>Giới thiệu về hệ thống</div>
+export default About
+```
 
-<!-- URGENT: Fix auth flow + Home Header -> Add Header to watchlist -->
-URGENT: Add watchlist detail trong màn hình Portfolio
+Sau đó thêm vào navigator:
+
+```tsx
+// src/navigators/AppNavigator.tsx
+import About from '../pages/About'
+// ...existing code...
+;<Route path='/about' element={<About />} />
+```
+
+---
+
+Nếu cần bổ sung chi tiết về API, quy trình phát triển hoặc tài liệu kỹ thuật, vui lòng liên hệ đội ngũ phát triển.
