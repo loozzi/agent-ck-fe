@@ -1,4 +1,4 @@
-export 'https://stocks-advisor-multiagent.onrender.com/api/v1/'
+export const API_BASE_URL = 'https://stocks-advisor-multiagent.onrender.com/api/v1/'
 export const API_TIMEOUT = import.meta.env.VITE_API_TIMEOUT || 100000
 
 export const AUTHORIZATION_URL_CALLBACK =
