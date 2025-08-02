@@ -2,7 +2,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hook'
 import EmailNotificationDialog from '@/components/common/EmailNotificationDialog'
 import { Button } from '@/components/ui/button'
 import { fetchEmailStatus } from '@/slices/email.slice'
-import { fetchQuestions, fetchSurveyStatus } from '@/slices/survey.slice'
+import { fetchSurveyStatus } from '@/slices/survey.slice'
 import { useEffect, useState } from 'react'
 
 const Setting = () => {
@@ -19,7 +19,7 @@ const Setting = () => {
 
   // Xử lý làm lại khảo sát
   const handleRedoSurvey = () => {
-    dispatch(fetchQuestions())
+    window.location.href = '/survey?action=reset'
   }
 
   return (
