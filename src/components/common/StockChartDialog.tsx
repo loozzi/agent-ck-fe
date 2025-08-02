@@ -1,5 +1,6 @@
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import StockChart from '@/components/common/StockChart'
+import './stock-chart-responsive.css'
 import { Loader2 } from 'lucide-react'
 import React from 'react'
 
@@ -21,23 +22,23 @@ const StockChartDialog: React.FC<StockChartDialogProps> = ({
   stopLoss
 }) => (
   <Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent className='max-w-7xl max-h-[95vh] w-[95vw] sm:w-[90vw] md:w-[85vw] p-0 m-0 rounded-xl'>
-      <div>
+    <DialogContent className='max-w-[95vw] max-h-[95vh] w-full sm:max-w-7xl p-2 sm:p-6 m-2 sm:m-4 rounded-xl overflow-hidden'>
+      <div className='w-full h-full max-h-[90vh] overflow-y-auto'>
         {selectedTicker ? (
-          <div className='w-full'>
+          <div className='w-full h-full'>
             <StockChart
               ticker={selectedTicker}
               entryPrice={entryPrice}
               takeProfit={takeProfit}
               stopLoss={stopLoss}
-              className='w-full h-[50vh] sm:h-[60vh] min-h-[300px] sm:min-h-[400px]'
+              className='w-full h-[60vh] sm:h-[65vh] md:h-[70vh] lg:h-[75vh] min-h-[250px] max-h-[85vh]'
             />
           </div>
         ) : (
-          <div className='flex items-center justify-center h-64 sm:h-96'>
+          <div className='flex items-center justify-center h-32 sm:h-64'>
             <div className='text-center'>
               <Loader2 className='w-6 h-6 sm:w-8 sm:h-8 animate-spin mx-auto mb-2' />
-              <p className='text-sm text-gray-500'>Đang tải biểu đồ...</p>
+              <p className='text-xs sm:text-sm text-gray-500'>Đang tải biểu đồ...</p>
             </div>
           </div>
         )}

@@ -1,29 +1,16 @@
 import type { RootState } from '@/app/store'
 import AIRecommendations from '@/components/common/AIRecommendations'
 import '@/components/common/mobile-fixes.css'
-import Portfolio from '@/components/common/Portfolio'
 import StockChartDialog from '@/components/common/StockChartDialog'
 import WatchlistSection from '@/components/common/Watchlist'
 import Header from '@/components/layouts/Header'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { fetchAnalysis, fetchTickerAnalysis } from '@/slices/analysis.slice'
 import { fetchWallet } from '@/slices/portfolio.slice'
 import { fetchListStocksByName } from '@/slices/stock.slice'
 import { addToWatchlist, deleteWatchlistItem, fetchWatchlistDetail } from '@/slices/watchlist.slice'
-import type { WalletItem } from '@/types/portfolio'
 import type { WatchlistItem } from '@/types/watchlist'
-import {
-  Activity,
-  BarChart3,
-  DollarSign,
-  Loader2,
-  PieChart,
-  Target,
-  TrendingDown,
-  TrendingUp,
-  Wallet
-} from 'lucide-react'
+import { Activity, BarChart3, Loader2, Wallet } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -31,7 +18,7 @@ const Watchlist = () => {
   const dispatch = useDispatch()
 
   // Lấy state từ portfolio slice
-  const { wallet, loading } = useSelector((state: RootState) => state.portfolio)
+  const { loading } = useSelector((state: RootState) => state.portfolio)
   const { stocks, loading: stockLoading } = useSelector((state: RootState) => state.stock)
   // Lấy state từ watchlist slice
   const { watchlistDetail, isLoading: watchlistLoading } = useSelector((state: RootState) => state.watchlist)
@@ -51,7 +38,6 @@ const Watchlist = () => {
   const [showChart, setShowChart] = useState(false)
   // State for which recommendation chart is open
   const [openRecChart, setOpenRecChart] = useState<string | null>(null)
-  const sortBy = 'performance'
 
   useEffect(() => {
     dispatch(fetchWallet() as any)
@@ -80,27 +66,6 @@ const Watchlist = () => {
     }, 300)
     return () => clearTimeout(timeoutId)
   }, [addToWatchlistQuery, dispatch])
-
-  // Filter và sort wallet items
-  const filteredWallet = useMemo(() => {
-    if (!wallet) return []
-    let filtered = wallet
-
-    // Filter by search
-    if (search.trim()) {
-      filtered = filtered.filter((item: WalletItem) => item.ticker.toLowerCase().includes(search.toLowerCase()))
-    }
-
-    // Sort
-    filtered = [...filtered].sort((a, b) => {
-      const aPerformance = ((a.current_price - a.avg_price) / a.avg_price) * 100
-      const bPerformance = ((b.current_price - b.avg_price) / b.avg_price) * 100
-
-      return bPerformance - aPerformance
-    })
-
-    return filtered
-  }, [wallet, search, sortBy])
 
   // Filter watchlist items based on search
   const filteredWatchlistItems = useMemo(() => {
@@ -147,36 +112,6 @@ const Watchlist = () => {
     }
   }
 
-  // Calculate portfolio summary
-  const portfolioSummary = useMemo(() => {
-    if (!wallet || wallet.length === 0) return null
-
-    const totalValue = wallet.reduce((sum, item) => sum + item.current_value, 0)
-    const totalCost = wallet.reduce((sum, item) => sum + item.avg_price * item.quantity, 0)
-    const totalGainLoss = totalValue - totalCost
-    const totalGainLossPercent = totalCost > 0 ? (totalGainLoss / totalCost) * 100 : 0
-
-    const winnersCount = wallet.filter((item) => {
-      const performance = ((item.current_price - item.avg_price) / item.avg_price) * 100
-      return performance > 0
-    }).length
-
-    const losersCount = wallet.filter((item) => {
-      const performance = ((item.current_price - item.avg_price) / item.avg_price) * 100
-      return performance < 0
-    }).length
-
-    return {
-      totalValue,
-      totalCost,
-      totalGainLoss,
-      totalGainLossPercent,
-      winnersCount,
-      losersCount,
-      totalItems: wallet.length
-    }
-  }, [wallet])
-
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -184,10 +119,6 @@ const Watchlist = () => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(value * 1000)
-  }
-
-  const formatNumber = (value: number) => {
-    return new Intl.NumberFormat('vi-VN').format(value)
   }
 
   const handleTickerClick = async (ticker: string) => {
@@ -245,17 +176,13 @@ const Watchlist = () => {
                     <Wallet className='w-5 h-5 text-white' />
                   </div>
                   <div>
-                    <h1 className='text-xl font-bold text-gray-900'>Danh mục đầu tư và theo dõi</h1>
-                    <p className='text-sm text-gray-600'>
-                      Portfolio Value: {portfolioSummary ? formatCurrency(portfolioSummary.totalValue) : '₫142,830,750'}
-                      <span className='text-green-600 ml-2'>(+15.2%)</span>
-                    </p>
+                    <h1 className='text-xl font-bold text-gray-900'>Danh mục theo dõi</h1>
                   </div>
                 </div>
               </div>
 
               {/* Portfolio Summary Cards */}
-              {portfolioSummary && (
+              {/* {portfolioSummary && (
                 <div className='grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6'>
                   <Card className='border-0 shadow-sm'>
                     <CardContent className='p-3'>
@@ -319,15 +246,15 @@ const Watchlist = () => {
                     </CardContent>
                   </Card>
                 </div>
-              )}
+              )} */}
 
               {/* Portfolio Section */}
-              <Portfolio
+              {/* <Portfolio
                 filteredWallet={filteredWallet}
                 formatCurrency={formatCurrency}
                 formatNumber={formatNumber}
                 onTickerClick={handleTickerClick}
-              />
+              /> */}
 
               {/* Watchlist Section */}
               <WatchlistSection
@@ -342,6 +269,7 @@ const Watchlist = () => {
                 setAddToWatchlistQuery={setAddToWatchlistQuery}
                 handleAddToWatchlist={handleAddToWatchlist}
                 stocks={stocks}
+                stockLoading={stockLoading}
               />
             </div>
 

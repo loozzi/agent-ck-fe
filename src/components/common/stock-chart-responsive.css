@@ -1,0 +1,77 @@
+/* Mobile-first responsive design for stock chart dialog */
+@media (max-width: 640px) {
+  /* Override dialog content max height for small screens */
+  [data-slot='dialog-content'] {
+    max-height: 95vh !important;
+    margin: 1rem !important;
+    padding: 0.75rem !important;
+  }
+
+  /* Ensure chart container doesn't overflow */
+  .recharts-responsive-container {
+    overflow: hidden !important;
+  }
+
+  /* Adjust chart margins for mobile */
+  .recharts-cartesian-grid {
+    opacity: 0.3;
+  }
+
+  /* Hide some chart labels on very small screens */
+  @media (max-width: 480px) {
+    .recharts-xAxis .recharts-cartesian-axis-tick-value {
+      font-size: 8px !important;
+    }
+
+    .recharts-yAxis .recharts-cartesian-axis-tick-value {
+      font-size: 8px !important;
+    }
+
+    /* Hide some reference line labels on very small screens */
+    .recharts-reference-line-label {
+      font-size: 8px !important;
+    }
+  }
+}
+
+/* Landscape orientation adjustments for mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  [data-slot='dialog-content'] {
+    max-height: 90vh !important;
+    max-width: 95vw !important;
+  }
+
+  .recharts-responsive-container {
+    height: 250px !important;
+    min-height: 250px !important;
+  }
+}
+
+/* Ensure dialog is always within viewport */
+[data-slot='dialog-content'] {
+  max-width: min(95vw, 1200px) !important;
+  max-height: min(95vh, 800px) !important;
+}
+
+/* Smooth scrolling for dialog content */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.7);
+}

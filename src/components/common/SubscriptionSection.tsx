@@ -18,11 +18,11 @@ const SubscriptionSection = ({ purchaseHistory }: SubscriptionSectionProps) => {
   }, [dispatch])
 
   if (isLoading) {
-    return <div>Đang tải dữ liệu gói...</div>
+    return <div className='max-w-[900px] w-full mx-auto my-6'>Đang tải dữ liệu gói...</div>
   }
 
   if (error) {
-    return <div>Lỗi: {error}</div>
+    return <div className='max-w-[900px] w-full mx-auto my-6'>Lỗi: {error}</div>
   }
 
   // Xử lý dữ liệu để tạo bảng: cột là thời hạn (tháng), hàng là lần mua

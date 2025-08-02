@@ -170,94 +170,107 @@ const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss, entry
   }, [ticker, selectedRange, fetchStockHistory])
 
   return (
-    <Card className={cn('w-full', className)}>
-      <CardHeader className='pb-2'>
-        <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
-          <div>
-            <CardTitle className='text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2'>
-              <TrendingUp className='w-5 h-5' />
-              {ticker} - Biểu đồ giá
-            </CardTitle>
-            {stockInfo && <p className='text-sm text-gray-600 dark:text-gray-400 mt-1'>{stockInfo.name}</p>}
-          </div>
+    <Card className={cn('w-full h-full', className)}>
+      <CardHeader className='pb-2 px-3 sm:px-6'>
+        <div className='flex flex-col gap-2 sm:gap-4'>
+          <div className='flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4'>
+            <div className='min-w-0 flex-1'>
+              <CardTitle className='text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2 truncate'>
+                <TrendingUp className='w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0' />
+                <span className='truncate'>{ticker} - Biểu đồ giá</span>
+              </CardTitle>
+              {stockInfo && (
+                <p className='text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1 truncate'>{stockInfo.name}</p>
+              )}
+            </div>
 
-          {/* Price Change Info */}
-          {chartData.length > 0 && (
-            <div className='flex items-center gap-3'>
-              <div className='text-right'>
-                <p className='text-2xl font-bold text-gray-900 dark:text-gray-100'>
-                  {formatCurrency(chartData[chartData.length - 1]?.close || 0)}
-                </p>
-                <div className='flex items-center gap-2'>
-                  {isPositive && <TrendingUp className='w-4 h-4 text-green-600' />}
-                  {isNegative && <TrendingDown className='w-4 h-4 text-red-600' />}
-                  {!isPositive && !isNegative && <Minus className='w-4 h-4 text-gray-400' />}
-                  <Badge
-                    variant={isPositive ? 'default' : isNegative ? 'destructive' : 'secondary'}
-                    className={cn(
-                      isPositive && 'bg-green-100 text-green-800 hover:bg-green-100',
-                      isNegative && 'bg-red-100 text-red-800 hover:bg-red-100'
-                    )}
-                  >
-                    {isPositive ? '+' : ''}
-                    {formatCurrency(change)} ({isPositive ? '+' : ''}
-                    {changePercent.toFixed(2)}%)
-                  </Badge>
+            {/* Price Change Info */}
+            {chartData.length > 0 && (
+              <div className='flex items-center gap-2 sm:gap-3 flex-shrink-0'>
+                <div className='text-right'>
+                  <p className='text-lg sm:text-2xl font-bold text-gray-900 dark:text-gray-100'>
+                    {formatCurrency(chartData[chartData.length - 1]?.close || 0)}
+                  </p>
+                  <div className='flex items-center gap-1 sm:gap-2 justify-end'>
+                    {isPositive && <TrendingUp className='w-3 h-3 sm:w-4 sm:h-4 text-green-600' />}
+                    {isNegative && <TrendingDown className='w-3 h-3 sm:w-4 sm:h-4 text-red-600' />}
+                    {!isPositive && !isNegative && <Minus className='w-3 h-3 sm:w-4 sm:h-4 text-gray-400' />}
+                    <Badge
+                      variant={isPositive ? 'default' : isNegative ? 'destructive' : 'secondary'}
+                      className={cn(
+                        'text-xs',
+                        isPositive && 'bg-green-100 text-green-800 hover:bg-green-100',
+                        isNegative && 'bg-red-100 text-red-800 hover:bg-red-100'
+                      )}
+                    >
+                      {isPositive ? '+' : ''}
+                      {formatCurrency(change)} ({isPositive ? '+' : ''}
+                      {changePercent.toFixed(2)}%)
+                    </Badge>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Time Range Buttons */}
-        <div className='flex flex-wrap gap-2 mt-4'>
-          {timeRanges.map((range) => (
-            <Button
-              key={range.label}
-              variant={selectedRange.label === range.label ? 'default' : 'outline'}
-              size='sm'
-              onClick={() => setSelectedRange(range)}
-              disabled={loading}
-              className='text-xs'
-            >
-              {range.label}
-            </Button>
-          ))}
+          {/* Time Range Buttons */}
+          <div className='flex flex-wrap gap-1 sm:gap-2 mt-2 sm:mt-4'>
+            {timeRanges.map((range) => (
+              <Button
+                key={range.label}
+                variant={selectedRange.label === range.label ? 'default' : 'outline'}
+                size='sm'
+                onClick={() => setSelectedRange(range)}
+                disabled={loading}
+                className='text-xs px-2 py-1 sm:px-3 sm:py-2 h-7 sm:h-8'
+              >
+                {range.label}
+              </Button>
+            ))}
+          </div>
         </div>
       </CardHeader>
 
-      <CardContent className='pt-2'>
+      <CardContent className='pt-2 px-3 sm:px-6'>
         {loading && (
-          <div className='flex items-center justify-center h-64'>
+          <div className='flex items-center justify-center h-32 sm:h-64'>
             <div className='text-center'>
-              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2'></div>
-              <p className='text-sm text-gray-600 dark:text-gray-400'>Đang tải dữ liệu...</p>
+              <div className='animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-blue-600 mx-auto mb-2'></div>
+              <p className='text-xs sm:text-sm text-gray-600 dark:text-gray-400'>Đang tải dữ liệu...</p>
             </div>
           </div>
         )}
 
         {error && (
-          <div className='flex items-center justify-center h-64'>
+          <div className='flex items-center justify-center h-32 sm:h-64'>
             <div className='text-center text-red-600 dark:text-red-400'>
-              <Calendar className='w-8 h-8 mx-auto mb-2' />
-              <p className='text-sm'>{error}</p>
+              <Calendar className='w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2' />
+              <p className='text-xs sm:text-sm'>{error}</p>
             </div>
           </div>
         )}
 
         {!loading && !error && chartData.length === 0 && (
-          <div className='flex items-center justify-center h-64'>
+          <div className='flex items-center justify-center h-32 sm:h-64'>
             <div className='text-center text-gray-600 dark:text-gray-400'>
-              <Calendar className='w-8 h-8 mx-auto mb-2' />
-              <p className='text-sm'>Không có dữ liệu biểu đồ</p>
+              <Calendar className='w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2' />
+              <p className='text-xs sm:text-sm'>Không có dữ liệu biểu đồ</p>
             </div>
           </div>
         )}
 
         {!loading && !error && chartData.length > 0 && (
-          <div className='h-80 w-full'>
+          <div className='h-64 sm:h-80 md:h-96 w-full'>
             <ResponsiveContainer width='100%' height='100%'>
-              <AreaChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <AreaChart
+                data={chartData}
+                margin={{
+                  top: 5,
+                  right: 15,
+                  left: 10,
+                  bottom: 5
+                }}
+              >
                 {/* ...removed entry time line and dot... */}
                 <defs>
                   <linearGradient id='colorPrice' x1='0' y1='0' x2='0' y2='1'>
@@ -278,7 +291,8 @@ const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss, entry
                   dataKey='time'
                   tickFormatter={formatDate}
                   className='text-xs text-gray-600 dark:text-gray-400'
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 10 }}
+                  interval={'preserveStartEnd'}
                 />
                 <YAxis
                   domain={([dataMin, dataMax]) => {
@@ -296,7 +310,8 @@ const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss, entry
                   }}
                   tickFormatter={(value) => formatCurrency(value)}
                   className='text-xs text-gray-600 dark:text-gray-400'
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 10 }}
+                  width={60}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 {/* Đường kẻ ngang cho Entry, TP, SL */}
@@ -306,7 +321,7 @@ const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss, entry
                     stroke='#2563eb'
                     strokeDasharray='4 2'
                     strokeWidth={2}
-                    label={{ value: 'Entry', position: 'right', fill: '#2563eb', fontSize: 12, fontWeight: 'bold' }}
+                    label={{ value: 'Entry', position: 'right', fill: '#2563eb', fontSize: 10, fontWeight: 'bold' }}
                   />
                 )}
                 {/* Đường kẻ dọc cho thời điểm vào lệnh (entryTime) - line liền, màu giống entry price */}
@@ -334,7 +349,7 @@ const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss, entry
                     stroke='#22c55e'
                     strokeDasharray='4 2'
                     strokeWidth={2}
-                    label={{ value: 'TP', position: 'right', fill: '#22c55e', fontSize: 12, fontWeight: 'bold' }}
+                    label={{ value: 'TP', position: 'right', fill: '#22c55e', fontSize: 10, fontWeight: 'bold' }}
                   />
                 )}
                 {stopLoss && (
@@ -343,7 +358,7 @@ const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss, entry
                     stroke='#ef4444'
                     strokeDasharray='4 2'
                     strokeWidth={2}
-                    label={{ value: 'SL', position: 'right', fill: '#ef4444', fontSize: 12, fontWeight: 'bold' }}
+                    label={{ value: 'SL', position: 'right', fill: '#ef4444', fontSize: 10, fontWeight: 'bold' }}
                   />
                 )}
                 <Area
