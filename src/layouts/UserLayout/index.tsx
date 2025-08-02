@@ -1,9 +1,13 @@
 import ChatAssistantButton from '@/components/common/ChatAssistantButton'
+import ZaloFollowDialog from '@/components/common/ZaloFollowDialog'
 import MobileHeader from '@/components/layouts/MobileHeader'
 import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
 import UserNavigator from '@/navigators/user.routes'
+import { checkZaloFollowStatus } from '@/slices/zalo.slice'
+import type { RootState } from '@/app/store'
 import { useEffect, useState, type JSX } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { FaBookOpen, FaHome, FaRobot, FaWallet } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
 
@@ -15,9 +19,32 @@ export interface RouteItem {
 }
 
 const UserLayout = () => {
+  const dispatch = useDispatch()
+  const { followStatus } = useSelector((state: RootState) => state.zalo)
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false)
   const [isMobile, setIsMobile] = useState<boolean>(false)
+  const [showZaloDialog, setShowZaloDialog] = useState<boolean>(false)
+
+  // Check Zalo follow status on component mount
+  useEffect(() => {
+    dispatch(checkZaloFollowStatus() as any)
+  }, [dispatch])
+
+  // Monitor follow status and show dialog if not following
+  useEffect(() => {
+    if (followStatus) {
+      // If user is not following, show the dialog
+      if (!followStatus.is_follower) {
+        setShowZaloDialog(true)
+      } else {
+        setShowZaloDialog(false)
+      }
+    }
+    // Also check if there's an error in checking follow status
+    // In case of error, we might want to show the dialog to be safe
+  }, [followStatus])
 
   // Detect mobile screen size
   useEffect(() => {
@@ -143,6 +170,10 @@ const UserLayout = () => {
 
       {/* Chat Assistant Button - Fixed floating button */}
       <ChatAssistantButton />
+
+      {/* Zalo Follow Dialog - Show when user hasn't followed */}
+      <ZaloFollowDialog open={showZaloDialog} onOpenChange={setShowZaloDialog} />
+
       <div
         className='fixed bottom-20 right-4 z-50'
         dangerouslySetInnerHTML={{

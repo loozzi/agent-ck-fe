@@ -1,4 +1,5 @@
 import type {
+  FollowStatus,
   GetZaloDataParams,
   ZaloAuthUrlResponse,
   ZaloDataResponse,
@@ -21,7 +22,8 @@ const zaloService = {
       params: {
         fields: 'id,name,picture'
       }
-    })
+    }),
+  getZaloFollowStatus: (): Promise<AxiosResponse<FollowStatus>> => apiInstance.get('/auth/zalo/check-follower-status')
 }
 
 export default zaloService

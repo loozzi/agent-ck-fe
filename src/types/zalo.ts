@@ -58,6 +58,7 @@ export interface ZaloState {
   authorization_url: string
   zaloResponse?: ZaloSendCodeResponse
   userData?: ZaloDataResponse
+  followStatus?: FollowStatus
   error?: string
 }
 
@@ -66,4 +67,10 @@ export interface Window {
     reload: () => void
     // Có thể bổ sung các method khác nếu cần
   }
+}
+
+export interface FollowStatus {
+  zalo_id: string | number
+  is_follower: boolean
+  message: string
 }

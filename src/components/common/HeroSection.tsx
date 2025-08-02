@@ -4,13 +4,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import apiInstance from '@/services/axios.config'
 import { fetchZaloAuthUrl } from '@/slices/zalo.slice'
 import { BarChart3, Shield, TrendingUp, Users } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FaUser } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 
 const HeroSection = () => {
   const dispatch = useAppDispatch()
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  const authorization_url = useAppSelector((state) => state.zalo.authorization_url)
   const [showLoginPopup, setShowLoginPopup] = useState(false)
   const navigate = useNavigate()
 
@@ -31,6 +32,12 @@ const HeroSection = () => {
       setShowLoginPopup(false)
     }
   }
+
+  useEffect(() => {
+    if (authorization_url) {
+      window.location.href = authorization_url
+    }
+  }, [authorization_url])
 
   return (
     <section className='relative bg-white text-gray-900 overflow-hidden'>

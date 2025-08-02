@@ -9,7 +9,8 @@ const initialState: ZaloState = {
   code: '',
   authorization_url: '',
   zaloResponse: undefined,
-  userData: undefined
+  userData: undefined,
+  followStatus: undefined
 }
 
 export const fetchZaloAuthUrl = createAsyncThunk('zalo/fetchZaloAuthUrl', async (_, { rejectWithValue }) => {
@@ -66,6 +67,19 @@ export const getZaloData = createAsyncThunk(
   }
 )
 
+export const checkZaloFollowStatus = createAsyncThunk('zalo/checkZaloFollowStatus', async (_, { rejectWithValue }) => {
+  try {
+    const response = await zaloService.getZaloFollowStatus()
+    if (response.status !== 200) {
+      toast.error((response as any).response.data.detail || 'Không thể kiểm tra trạng thái theo dõi Zalo')
+      return rejectWithValue('Không thể kiểm tra trạng thái theo dõi Zalo')
+    }
+    return response.data
+  } catch (error) {
+    return rejectWithValue(error instanceof Error ? error.message : 'Không thể kiểm tra trạng thái theo dõi Zalo')
+  }
+})
+
 const zaloSlice = createSlice({
   name: 'zalo',
   initialState,
@@ -100,6 +114,15 @@ const zaloSlice = createSlice({
         state.userData = action.payload
       })
       .addCase(getZaloData.rejected, (state, action) => {
+        state.error = action.payload as string
+      })
+      .addCase(checkZaloFollowStatus.pending, (state) => {
+        state.followStatus = undefined
+      })
+      .addCase(checkZaloFollowStatus.fulfilled, (state, action) => {
+        state.followStatus = action.payload
+      })
+      .addCase(checkZaloFollowStatus.rejected, (state, action) => {
         state.error = action.payload as string
       })
   }
