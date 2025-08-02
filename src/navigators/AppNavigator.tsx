@@ -8,7 +8,6 @@ import UserAuth from '@/pages/auth/UserAuth'
 import ZaloCallback from '@/pages/auth/ZaloCallback'
 import Home from '@/pages/Home'
 import Survey from '@/pages/user/Survey'
-import Watchlist from '@/pages/user/Watchlist'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 const AppNavigator = () => {
@@ -45,14 +44,14 @@ const AppNavigator = () => {
             />
           }
         />
-        <Route
+        {/* <Route
           path='/watchlist'
           element={
             <ProtectedRoute requiredRoles={['user']}>
               <Watchlist />
             </ProtectedRoute>
           }
-        />
+        /> */}
 
         {/* Redirect root to user dashboard */}
         {/* Protected user routes */}

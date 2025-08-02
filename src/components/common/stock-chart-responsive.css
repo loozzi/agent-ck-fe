@@ -1,38 +1,4 @@
 /* Mobile-first responsive design for stock chart dialog */
-@media (max-width: 640px) {
-  /* Override dialog content max height for small screens */
-  [data-slot='dialog-content'] {
-    max-height: 95vh !important;
-    margin: 1rem !important;
-    padding: 0.75rem !important;
-  }
-
-  /* Ensure chart container doesn't overflow */
-  .recharts-responsive-container {
-    overflow: hidden !important;
-  }
-
-  /* Adjust chart margins for mobile */
-  .recharts-cartesian-grid {
-    opacity: 0.3;
-  }
-
-  /* Hide some chart labels on very small screens */
-  @media (max-width: 480px) {
-    .recharts-xAxis .recharts-cartesian-axis-tick-value {
-      font-size: 8px !important;
-    }
-
-    .recharts-yAxis .recharts-cartesian-axis-tick-value {
-      font-size: 8px !important;
-    }
-
-    /* Hide some reference line labels on very small screens */
-    .recharts-reference-line-label {
-      font-size: 8px !important;
-    }
-  }
-}
 
 /* Landscape orientation adjustments for mobile */
 @media (max-height: 500px) and (orientation: landscape) {

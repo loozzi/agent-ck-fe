@@ -1,3 +1,4 @@
+import type { RootState } from '@/app/store'
 import ChatAssistantButton from '@/components/common/ChatAssistantButton'
 import ZaloFollowDialog from '@/components/common/ZaloFollowDialog'
 import MobileHeader from '@/components/layouts/MobileHeader'
@@ -5,11 +6,10 @@ import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
 import UserNavigator from '@/navigators/user.routes'
 import { checkZaloFollowStatus } from '@/slices/zalo.slice'
-import type { RootState } from '@/app/store'
 import { useEffect, useState, type JSX } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { FaBookOpen, FaHome, FaRobot, FaWallet } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
+import { useDispatch, useSelector } from 'react-redux'
 
 export interface RouteItem {
   id: string
@@ -84,11 +84,17 @@ const UserLayout = () => {
       href: '/dashboard'
     },
     {
-      id: 'portfolio',
-      title: 'Ví của tôi',
+      id: 'watchlist',
+      title: 'Danh sách theo dõi',
       icon: <FaWallet className='w-4 h-4' />,
-      href: '/portfolio'
+      href: '/watchlist'
     },
+    // {
+    //   id: 'portfolio',
+    //   title: 'Ví của tôi',
+    //   icon: <FaWallet className='w-4 h-4' />,
+    //   href: '/portfolio'
+    // },
     // {
     //   id: 'strategy',
     //   title: 'Chiến lược',

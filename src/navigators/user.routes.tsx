@@ -10,6 +10,7 @@ import type { RouteBrowser } from '@/types/routes'
 import { Route, Routes } from 'react-router'
 import Strategy from '@/pages/user/Strategy'
 import ChatPage from '@/pages/user/ChatPage'
+import Watchlist from '@/pages/user/Watchlist'
 
 export const userRoutesConfig: RouteBrowser[] = [
   {
@@ -70,6 +71,11 @@ export const userRoutesConfig: RouteBrowser[] = [
     name: 'chat',
     route: 'chat',
     element: <ChatPage />
+  },
+  {
+    name: 'watchlist',
+    route: 'watchlist',
+    element: <Watchlist />
   }
 ]
 

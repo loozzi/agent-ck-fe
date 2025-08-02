@@ -3,7 +3,6 @@ import AIRecommendations from '@/components/common/AIRecommendations'
 import '@/components/common/mobile-fixes.css'
 import StockChartDialog from '@/components/common/StockChartDialog'
 import WatchlistSection from '@/components/common/Watchlist'
-import Header from '@/components/layouts/Header'
 import { Input } from '@/components/ui/input'
 import { fetchAnalysis, fetchTickerAnalysis } from '@/slices/analysis.slice'
 import { fetchWallet } from '@/slices/portfolio.slice'
@@ -154,15 +153,14 @@ const Watchlist = () => {
   }, [showChart])
 
   return (
-    <div className='h-screen w-screen bg-gray-50 overflow-hidden'>
-      <Header />
+    <div className='h-screen -m-4 overflow-hidden'>
       {loading && (
         <div className='flex items-center justify-center h-64'>
           <Loader2 className='animate-spin w-8 h-8' />
         </div>
       )}
       {!loading && (
-        <div className='h-full w-full mt-14'>
+        <div className='h-full'>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-0 h-full'>
             {/* Left Panel - Portfolio & Watchlist (White Background) */}
             <div

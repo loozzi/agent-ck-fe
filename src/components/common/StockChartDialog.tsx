@@ -22,7 +22,7 @@ const StockChartDialog: React.FC<StockChartDialogProps> = ({
   stopLoss
 }) => (
   <Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent className='max-w-[95vw] max-h-[95vh] w-full sm:max-w-7xl p-2 sm:p-6 m-2 sm:m-4 rounded-xl overflow-hidden'>
+    <DialogContent className='max-w-[100vw] max-h-[95vh] w-full sm:max-w-7xl p-2 sm:p-6 rounded-xl overflow-hidden'>
       <div className='w-full h-full max-h-[90vh] overflow-y-auto'>
         {selectedTicker ? (
           <div className='w-full h-full'>

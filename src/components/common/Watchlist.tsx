@@ -89,7 +89,7 @@ const Watchlist: React.FC<WatchlistProps> = ({
                 disabled={!selectedStock}
               >
                 <Plus className='w-3 h-3 mr-1' />
-                Thêm vào danh mục theo dõi
+                Thêm
               </Button>
             </div>
           </div>
