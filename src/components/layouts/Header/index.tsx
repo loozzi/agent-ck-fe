@@ -1,17 +1,18 @@
 import { useAppSelector } from '@/app/hook'
 import ZaloIcon from '@/assets/zalo.png'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { APP_NAME } from '@/configs/env.config'
 import apiInstance from '@/services/axios.config'
-import { BookOpen, Info, Menu, TrendingUp, User, X } from 'lucide-react'
+import { BookOpen, Info, LogOut, Menu, TrendingUp, User, X } from 'lucide-react'
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import './Header.css'
-import { APP_NAME } from '@/configs/env.config'
 
 const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const isLoggedIn = useAppSelector((state) => state.auth.isAuthenticated)
+  const user = useAppSelector((state) => state.auth.user)
   const [showLoginPopup, setShowLoginPopup] = useState(false)
   const handleZaloLogin = async () => {
     setShowLoginPopup(true)
@@ -112,18 +113,33 @@ const Header = () => {
               {/* User/Profile Button */}
               {isLoggedIn ? (
                 <>
+                  {/* User Info với Avatar và Tên */}
                   <NavLink
                     to='/dashboard'
-                    className='flex items-center space-x-1 text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm px-3 py-2 rounded-md'
+                    className='flex items-center space-x-2 text-white hover:text-yellow-300 transition-colors duration-200 font-medium text-sm px-3 py-2 rounded-md'
+                    title='Đến dashboard'
                   >
-                    <User size={16} />
-                    <span>Bảng điều khiển</span>
+                    {user?.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.full_name || 'User'}
+                        className='h-6 w-6 rounded-full object-cover'
+                      />
+                    ) : (
+                      <div className='h-6 w-6 rounded-full bg-gray-400 flex items-center justify-center'>
+                        <User size={14} className='text-white' />
+                      </div>
+                    )}
+                    <span className='max-w-24 truncate'>{user?.full_name || user?.zalo_name || 'User'}</span>
                   </NavLink>
+
+                  {/* Logout Icon */}
                   <NavLink
                     to='/signout'
-                    className='flex items-center space-x-1 text-white hover:text-red-400 transition-colors duration-200 font-medium text-sm px-3 py-2 rounded-md'
+                    className='flex items-center text-red-400 hover:text-red-300 transition-colors duration-200 p-2 rounded-md'
+                    title='Đăng xuất'
                   >
-                    <span>Đăng xuất</span>
+                    <LogOut size={16} />
                   </NavLink>
                 </>
               ) : (
@@ -164,19 +180,32 @@ const Header = () => {
               {/* User/Profile Button for mobile */}
               {isLoggedIn ? (
                 <>
+                  {/* User Info for Mobile - Clickable */}
                   <NavLink
                     to='/dashboard'
-                    className='flex items-center justify-between w-full text-left px-3 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors duration-200'
+                    className='flex items-center justify-between w-full text-left px-3 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-600 bg-blue-50 rounded-md transition-colors duration-200'
                     onClick={() => {
                       setActiveDropdown(null)
                       setIsMobileMenuOpen(false)
                     }}
                   >
                     <div className='flex items-center space-x-2'>
-                      <User size={16} />
-                      <span className='text-sm'>Bảng điều khiển</span>
+                      {user?.avatar ? (
+                        <img
+                          src={user.avatar}
+                          alt={user.full_name || 'User'}
+                          className='h-6 w-6 rounded-full object-cover'
+                        />
+                      ) : (
+                        <div className='h-6 w-6 rounded-full bg-gray-400 flex items-center justify-center'>
+                          <User size={14} className='text-white' />
+                        </div>
+                      )}
+                      <span className='text-sm font-medium'>{user?.full_name || user?.zalo_name || 'User'}</span>
                     </div>
                   </NavLink>
+
+                  {/* Logout Button for Mobile */}
                   <NavLink
                     to='/signout'
                     className='flex items-center justify-between w-full text-left px-3 py-2 text-red-500 hover:bg-red-50 hover:text-red-700 rounded-md transition-colors duration-200'
@@ -186,6 +215,7 @@ const Header = () => {
                     }}
                   >
                     <div className='flex items-center space-x-2'>
+                      <LogOut size={16} />
                       <span className='text-sm'>Đăng xuất</span>
                     </div>
                   </NavLink>
