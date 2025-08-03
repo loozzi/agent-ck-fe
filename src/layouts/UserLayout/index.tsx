@@ -7,7 +7,7 @@ import SidebarProvider from '@/components/layouts/SidebarProvider'
 import UserNavigator from '@/navigators/user.routes'
 import { checkZaloFollowStatus } from '@/slices/zalo.slice'
 import { useEffect, useState, type JSX } from 'react'
-import { FaBookOpen, FaHome, FaRobot, FaWallet } from 'react-icons/fa'
+import { FaBookOpen, FaHome, FaMoneyBillWave, FaRobot, FaWallet } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -85,7 +85,7 @@ const UserLayout = () => {
     },
     {
       id: 'watchlist',
-      title: 'Danh sách theo dõi',
+      title: 'Danh mục theo dõi',
       icon: <FaWallet className='w-4 h-4' />,
       href: '/watchlist'
     },
@@ -116,7 +116,7 @@ const UserLayout = () => {
     {
       id: 'subscription',
       title: 'Gói dịch vụ',
-      icon: <FaWallet className='w-4 h-4' />,
+      icon: <FaMoneyBillWave className='w-4 h-4' />,
       href: '/subscription'
     },
     // {

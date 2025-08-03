@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { fetchEmailStatus } from '@/slices/email.slice'
 import { fetchSurveyStatus } from '@/slices/survey.slice'
 import { useEffect, useState } from 'react'
+import { NavLink } from 'react-router-dom'
 
 const Setting = () => {
   const dispatch = useAppDispatch()
@@ -17,11 +18,6 @@ const Setting = () => {
     dispatch(fetchSurveyStatus())
   }, [dispatch])
 
-  // Xử lý làm lại khảo sát
-  const handleRedoSurvey = () => {
-    window.location.href = '/survey?action=reset'
-  }
-
   return (
     <div className='mx-auto py-8'>
       <h2 className='text-2xl font-bold mb-6'>Cài đặt người dùng</h2>
@@ -34,14 +30,14 @@ const Setting = () => {
           <div className='text-sm text-gray-700'>
             Email: <span className='font-medium'>{user?.email || 'Chưa có'}</span>
           </div>
-          <div className='text-sm text-gray-700'>
+          {/* <div className='text-sm text-gray-700'>
             Vai trò: <span className='font-medium'>{user?.role || 'user'}</span>
           </div>
           {user?.zalo_id && (
             <div className='text-sm text-gray-700'>
               Zalo: <span className='font-medium'>{user.zalo_name || user.zalo_id}</span>
             </div>
-          )}
+          )} */}
           <div className='text-sm text-gray-700'>
             Trạng thái Zalo:{' '}
             <span className='font-medium'>
@@ -96,9 +92,12 @@ const Setting = () => {
             <span className='text-red-600'>Bạn chưa làm khảo sát</span>
           )}
         </div>
-        <Button variant='outline' size='sm' onClick={handleRedoSurvey}>
+        <NavLink
+          to='/survey?action=reset'
+          className='inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3'
+        >
           {status?.is_completed ? 'Làm lại khảo sát' : 'Làm khảo sát'}
-        </Button>
+        </NavLink>
       </div>
     </div>
   )

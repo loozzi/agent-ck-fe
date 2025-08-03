@@ -218,6 +218,9 @@ const Survey = () => {
               </div>
 
               <div className='flex gap-3'>
+                <Button onClick={() => navigate('/')} variant='outline' className='flex-1'>
+                  Quay lại trang chủ
+                </Button>
                 <Button
                   onClick={() => {
                     window.location.href = '/survey?action=reset'
@@ -364,6 +367,13 @@ const Survey = () => {
             {/* Navigation buttons */}
             <div className='pt-6 border-t border-gray-200'>
               <div className='flex gap-3'>
+                <Button
+                  onClick={() => navigate('/')}
+                  variant='outline'
+                  className='border-red-200 text-red-600 hover:bg-red-50'
+                >
+                  Hủy bỏ
+                </Button>
                 {(currentPart > 0 || currentQuestionIndex > 0) && (
                   <Button onClick={handlePrevious} variant='outline' className='flex items-center gap-2'>
                     <ChevronLeft className='h-4 w-4' />
