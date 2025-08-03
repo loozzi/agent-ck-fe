@@ -125,7 +125,7 @@ const UserAuth = () => {
     if (isAuthenticated) {
       dispatch(getMeAction())
       setFormData({ email: '', password: '', full_name: '' })
-      navigate('/')
+      navigate('/dashboard')
     }
   }, [isAuthenticated, navigate])
 
@@ -133,7 +133,7 @@ const UserAuth = () => {
     if (isAuthenticated && user && user.role === 'user' && user.onboarding_completed === false) {
       navigate('/survey')
     } else if (isAuthenticated) {
-      navigate('/')
+      navigate('/dashboard')
     }
   }, [user, isAuthenticated])
 

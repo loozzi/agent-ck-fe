@@ -12,11 +12,16 @@ const Home = () => {
 
   useEffect(() => {
     const role = user?.role
+    const onboarding_completed = user?.onboarding_completed
 
     if (role === 'admin') {
       navigate('/admin/dashboard')
     } else if (role === 'trainer') {
       navigate('/trainer/dashboard')
+    } else if (role === 'user' && onboarding_completed === false) {
+      navigate('/survey')
+    } else if (role === 'user' && onboarding_completed === true) {
+      navigate('/dashboard')
     }
   }, [user, navigate])
 
