@@ -58,7 +58,7 @@ export const fetchSurveyStatus = createAsyncThunk('survey/fetchSurveyStatus', as
     }
     return response.data
   } catch (error: any) {
-    return rejectWithValue(error.response?.data || 'Lỗi khi lấy trạng thái khảo sát')
+    return rejectWithValue(error.response?.data?.detail || 'Lỗi khi lấy trạng thái khảo sát')
   }
 })
 
@@ -130,17 +130,9 @@ const surveySlice = createSlice({
         state.isSubmitting = false
         state.error = action.payload as string
       })
-      .addCase(fetchSurveyStatus.pending, (state) => {
-        state.isLoading = true
-        state.error = null
-      })
       .addCase(fetchSurveyStatus.fulfilled, (state, action) => {
         state.status = action.payload
         state.isLoading = false
-      })
-      .addCase(fetchSurveyStatus.rejected, (state, action) => {
-        state.isLoading = false
-        state.error = action.payload as string
       })
       .addCase(fetchMySurvey.pending, (state) => {
         state.isLoading = true

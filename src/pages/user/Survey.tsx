@@ -30,14 +30,16 @@ const Survey = () => {
   }, [])
 
   useEffect(() => {
-    if (window.location.href.includes('action=reset')) {
-      dispatch(fetchQuestions())
-    } else {
-      if (status?.is_completed) {
-        setIsCompleted(true)
-        toast.info('Bạn đã hoàn thành khảo sát này trước đó.')
-      } else {
+    if (!questions) {
+      if (window.location.href.includes('action=reset')) {
         dispatch(fetchQuestions())
+      } else {
+        if (status?.is_completed) {
+          setIsCompleted(true)
+          toast.info('Bạn đã hoàn thành khảo sát này trước đó.')
+        } else {
+          dispatch(fetchQuestions())
+        }
       }
     }
   }, [status])
@@ -367,13 +369,15 @@ const Survey = () => {
             {/* Navigation buttons */}
             <div className='pt-6 border-t border-gray-200'>
               <div className='flex gap-3'>
-                <Button
-                  onClick={() => navigate('/')}
-                  variant='outline'
-                  className='border-red-200 text-red-600 hover:bg-red-50'
-                >
-                  Hủy bỏ
-                </Button>
+                {status?.is_completed && (
+                  <Button
+                    onClick={() => navigate('/')}
+                    variant='outline'
+                    className='border-red-200 text-red-600 hover:bg-red-50'
+                  >
+                    Hủy bỏ
+                  </Button>
+                )}
                 {(currentPart > 0 || currentQuestionIndex > 0) && (
                   <Button onClick={handlePrevious} variant='outline' className='flex items-center gap-2'>
                     <ChevronLeft className='h-4 w-4' />

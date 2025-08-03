@@ -30,7 +30,7 @@ const processQueue = (error: Error | null, token: string | null = null) => {
 
 // Check if the endpoint is in whitelist (doesn't need auth)
 const isWhitelistedEndpoint = (url: string): boolean => {
-  const whiteList = ['/auth/login', '/auth/register', '/auth/token/refresh']
+  const whiteList = ['/auth/login', '/auth/register', '/auth/token/refresh', '/survey/questions']
   return whiteList.some((endpoint) => url.includes(endpoint))
 }
 
@@ -70,8 +70,10 @@ apiInstance.interceptors.response.use(
 
     // Handle onboarding required
     if (status == 403 && responseData?.onboarding_required) {
-      console.log('Onboarding required, redirecting to survey...')
-      window.location.href = '/survey'
+      if (window.location.pathname !== '/survey') {
+        console.log('Onboarding required, redirecting to survey...')
+        window.location.href = '/survey'
+      }
       return Promise.reject(error)
     }
 
