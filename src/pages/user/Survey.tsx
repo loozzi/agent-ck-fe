@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { getMeAction } from '@/slices/auth.slice'
 import { fetchQuestions, fetchSurveyStatus, submitSurvey } from '@/slices/survey.slice'
 import type { SurveyPayload } from '@/types/survey'
-import { CheckCircle2, ChevronLeft, ChevronRight, Clock, FileText, History, Target } from 'lucide-react'
+import { CheckCircle2, ChevronLeft, ChevronRight, Clock, FileText, History, LogOut, Target } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { toast } from 'react-toastify'
@@ -269,12 +269,23 @@ const Survey = () => {
                 </p>
               </div>
             </div>
-            <Badge
-              variant='secondary'
-              className='px-3 py-1 text-sm font-semibold bg-white border-2 border-blue-200 text-blue-700'
-            >
-              Câu {currentQuestionIndex + 1}/{currentPartData?.questions?.length || 0}
-            </Badge>
+            <div className='flex items-center gap-3'>
+              <Badge
+                variant='secondary'
+                className='px-3 py-1 text-sm font-semibold bg-white border-2 border-blue-200 text-blue-700'
+              >
+                Câu {currentQuestionIndex + 1}/{currentPartData?.questions?.length || 0}
+              </Badge>
+              <Button
+                onClick={() => navigate('/signout')}
+                variant='outline'
+                size='sm'
+                className='flex items-center gap-2 border-red-200 text-red-600 hover:bg-red-50'
+              >
+                <LogOut className='h-4 w-4' />
+                Đăng xuất
+              </Button>
+            </div>
           </div>
 
           <div className='space-y-2'>
