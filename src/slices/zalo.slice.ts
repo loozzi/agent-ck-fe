@@ -2,7 +2,7 @@ import type { ZaloState } from '@/types/zalo'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import zaloService from '@/services/zalo.service'
 import { toast } from 'react-toastify'
-import { AUTHORIZATION_URL_CALLBACK } from '@/configs/env.config'
+import { API_BASE_URL } from '@/configs/env.config'
 
 const initialState: ZaloState = {
   state: '',
@@ -15,19 +15,19 @@ const initialState: ZaloState = {
 
 export const fetchZaloAuthUrl = createAsyncThunk('zalo/fetchZaloAuthUrl', async (_, { rejectWithValue }) => {
   try {
-    const response = await zaloService.getZaloAuthUrl()
-    if (response.status !== 200) {
-      toast.error((response as any).response.data.detail || 'Không thể lấy URL xác thực zalo')
-      return rejectWithValue('Không thể lấy URL xác thực zalo')
-    }
+    window.location.href = API_BASE_URL + 'auth/zalo/login'
+    // if (response.status !== 200) {
+    //   toast.error((response as any).response.data.detail || 'Không thể lấy URL xác thực zalo')
+    //   return rejectWithValue('Không thể lấy URL xác thực zalo')
+    // }
 
-    const { authorization_url, state } = response.data
+    // const { authorization_url, state } = response.data
 
-    // Modify the redirect_uri in the authorization_url
-    const url = new URL(authorization_url)
-    url.searchParams.set('redirect_uri', AUTHORIZATION_URL_CALLBACK)
+    // // Modify the redirect_uri in the authorization_url
+    // const url = new URL(authorization_url)
+    // url.searchParams.set('redirect_uri', AUTHORIZATION_URL_CALLBACK)
 
-    return { authorization_url: url.toString(), state }
+    // return { authorization_url: url.toString(), state }
   } catch (error) {
     return rejectWithValue(error instanceof Error ? error.message : 'Không thể lấy URL xác thực Zalo')
   }
@@ -86,16 +86,6 @@ const zaloSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchZaloAuthUrl.pending, (state) => {
-        state.authorization_url = ''
-      })
-      .addCase(fetchZaloAuthUrl.fulfilled, (state, action) => {
-        state.authorization_url = action.payload.authorization_url
-        state.state = action.payload.state
-      })
-      .addCase(fetchZaloAuthUrl.rejected, (state, action) => {
-        state.error = action.payload as string
-      })
       .addCase(sendZaloCode.pending, (state) => {
         state.code = ''
       })
