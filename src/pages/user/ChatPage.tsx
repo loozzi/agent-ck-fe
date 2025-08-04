@@ -44,7 +44,7 @@ const ChatPage = () => {
   const getDisplayMessages = (histories: ChatHistory[]): ChatHistory[] => {
     let messages: ChatHistory[] = []
 
-    if (histories.length === 0) {
+    if (histories.length === 0 && !loadingHistories) {
       // Return welcome message if no history
       messages = [
         {

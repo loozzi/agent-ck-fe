@@ -5,7 +5,6 @@ import StockChartDialog from '@/components/common/StockChartDialog'
 import WatchlistSection from '@/components/common/Watchlist'
 import { Input } from '@/components/ui/input'
 import { fetchAnalysis, fetchTickerAnalysis } from '@/slices/analysis.slice'
-import { fetchWallet } from '@/slices/portfolio.slice'
 import { fetchListStocksByName } from '@/slices/stock.slice'
 import { addToWatchlist, deleteWatchlistItem, fetchWatchlistDetail } from '@/slices/watchlist.slice'
 import type { WatchlistItem } from '@/types/watchlist'
@@ -39,7 +38,7 @@ const Watchlist = () => {
   const [openRecChart, setOpenRecChart] = useState<string | null>(null)
 
   useEffect(() => {
-    dispatch(fetchWallet() as any)
+    // dispatch(fetchWallet() as any)
     dispatch(fetchWatchlistDetail() as any)
   }, [dispatch])
 
