@@ -7,7 +7,7 @@ import ZaloIcon from '@/assets/zalo.png'
 const ZaloCallback = () => {
   const searchParams = new URLSearchParams(window.location.search)
   const { zaloResponse, userData } = useAppSelector((state) => state.zalo)
-  const { isAuthenticated } = useAppSelector((state) => state.auth)
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth)
   const dispatch = useAppDispatch()
   const code = searchParams.get('code')
   const state = searchParams.get('state')
@@ -51,10 +51,12 @@ const ZaloCallback = () => {
   }, [userData])
 
   useEffect(() => {
-    if (isAuthenticated) {
-      window.location.href = '/'
+    if (isAuthenticated && user?.onboarding_completed) {
+      window.location.href = '/dashboard'
+    } else if (isAuthenticated && !user?.onboarding_completed && user?.role === 'user') {
+      window.location.href = '/survey'
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, user])
 
   return (
     <div className='flex flex-col items-center justify-center min-h-[300px] py-12'>

@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const Home = () => {
-  const { user } = useAppSelector((state) => state.auth)
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -24,6 +24,8 @@ const Home = () => {
       navigate('/dashboard')
     }
   }, [user, navigate])
+
+  if (isAuthenticated) return null // Prevent rendering Home if user is authenticated and redirected
 
   return (
     <div className='min-h-screen bg-gray-50'>

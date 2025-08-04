@@ -125,7 +125,6 @@ const UserAuth = () => {
     if (isAuthenticated) {
       dispatch(getMeAction())
       setFormData({ email: '', password: '', full_name: '' })
-      navigate('/dashboard')
     }
   }, [isAuthenticated, navigate])
 
