@@ -6,9 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import apiInstance from '@/services/axios.config'
 import { getMeAction, signInAction, signUpAction } from '@/slices/auth.slice'
-import { fetchZaloAuthUrl } from '@/slices/zalo.slice'
 import type { SignUpPayload } from '@/types/payload'
 import { Eye, EyeOff, Lock, Mail, Shield, TrendingUp, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -29,7 +27,7 @@ const UserAuth = () => {
   const isLoading = useAppSelector((state) => state.auth.loading)
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
   const user = useAppSelector((state) => state.auth.user)
-  const { authorization_url } = useAppSelector((state) => state.zalo)
+  // const { authorization_url } = useAppSelector((state) => state.zalo)
 
   // Determine sign in/up state based on current URL
   const [isSignIn, setIsSignIn] = useState<boolean>(() => {
@@ -111,8 +109,9 @@ const UserAuth = () => {
   }
 
   const handleZaloLogin = async () => {
-    dispatch(fetchZaloAuthUrl())
-    await apiInstance.get('/auth/zalo/login')
+    // dispatch(fetchZaloAuthUrl())
+    // await apiInstance.get('/auth/zalo/login')
+    window.location.href = '/api/v1/auth/zalo/login'
   }
 
   useEffect(() => {
@@ -136,11 +135,11 @@ const UserAuth = () => {
     }
   }, [user, isAuthenticated])
 
-  useEffect(() => {
-    if (authorization_url) {
-      window.location.href = authorization_url
-    }
-  }, [authorization_url])
+  // useEffect(() => {
+  //   if (authorization_url) {
+  //     window.location.href = authorization_url
+  //   }
+  // }, [authorization_url])
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4'>

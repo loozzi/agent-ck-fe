@@ -2,7 +2,6 @@ import { useAppSelector } from '@/app/hook'
 import ZaloIcon from '@/assets/zalo.png'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { APP_NAME } from '@/configs/env.config'
-import apiInstance from '@/services/axios.config'
 import { BookOpen, Info, LogOut, Menu, TrendingUp, User, X } from 'lucide-react'
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
@@ -14,6 +13,7 @@ const Header = () => {
   const isLoggedIn = useAppSelector((state) => state.auth.isAuthenticated)
   const user = useAppSelector((state) => state.auth.user)
   const [showLoginPopup, setShowLoginPopup] = useState(false)
+
   const handleZaloLogin = async () => {
     setShowLoginPopup(true)
     try {
@@ -21,7 +21,8 @@ const Header = () => {
       // Nếu dùng redux, cần dispatch
       // Nếu không, chỉ gọi API
       // dispatch(fetchZaloAuthUrl())
-      await apiInstance.get('/auth/zalo/login')
+      // await apiInstance.get('/auth/zalo/login')
+      window.location.href = '/api/v1/auth/zalo/login'
     } finally {
       setShowLoginPopup(false)
     }

@@ -1,17 +1,15 @@
-import { useAppDispatch, useAppSelector } from '@/app/hook'
+import { useAppSelector } from '@/app/hook'
 import ZaloIcon from '@/assets/zalo.png'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import apiInstance from '@/services/axios.config'
-import { fetchZaloAuthUrl } from '@/slices/zalo.slice'
 import { BarChart3, Shield, TrendingUp, Users } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { FaUser } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 
 const HeroSection = () => {
-  const dispatch = useAppDispatch()
+  // const dispatch = useAppDispatch()
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
-  const authorization_url = useAppSelector((state) => state.zalo.authorization_url)
+  // const authorization_url = useAppSelector((state) => state.zalo.authorization_url)
   const [showLoginPopup, setShowLoginPopup] = useState(false)
   const navigate = useNavigate()
 
@@ -26,18 +24,13 @@ const HeroSection = () => {
   const handleZaloLogin = async () => {
     setShowLoginPopup(true)
     try {
-      dispatch(fetchZaloAuthUrl())
-      await apiInstance.get('/auth/zalo/login')
+      // dispatch(fetchZaloAuthUrl())
+      // await apiInstance.get('/auth/zalo/login')
+      window.location.href = '/api/v1/auth/zalo/login'
     } finally {
       setShowLoginPopup(false)
     }
   }
-
-  useEffect(() => {
-    if (authorization_url) {
-      window.location.href = authorization_url
-    }
-  }, [authorization_url])
 
   return (
     <section className='relative bg-white text-gray-900 overflow-hidden'>
