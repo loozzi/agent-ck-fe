@@ -10,6 +10,7 @@ import { useEffect, useState, type JSX } from 'react'
 import { FaBookOpen, FaHome, FaMoneyBillWave, FaRobot, FaWallet } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
 import { useDispatch, useSelector } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 
 export interface RouteItem {
   id: string
@@ -20,6 +21,7 @@ export interface RouteItem {
 
 const UserLayout = () => {
   const dispatch = useDispatch()
+  const location = useLocation()
   const { followStatus } = useSelector((state: RootState) => state.zalo)
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false)
@@ -175,7 +177,7 @@ const UserLayout = () => {
       </main>
 
       {/* Chat Assistant Button - Fixed floating button */}
-      <ChatAssistantButton />
+      {location.pathname !== '/chat' && <ChatAssistantButton />}
 
       {/* Zalo Follow Dialog - Show when user hasn't followed */}
       <ZaloFollowDialog open={showZaloDialog} onOpenChange={setShowZaloDialog} />

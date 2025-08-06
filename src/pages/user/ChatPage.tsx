@@ -73,9 +73,6 @@ const ChatPage = () => {
   const handleSuggestedQuestionClick = (question: string) => {
     if (!loadingSend) {
       setInputMessage(question)
-      setTimeout(() => {
-        handleSendMessage()
-      }, 0)
     }
   }
 

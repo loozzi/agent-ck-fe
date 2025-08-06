@@ -1,9 +1,8 @@
-export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'https://stocks-advisor-multiagent.onrender.com/api/v1/'
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://www.dautuchungkhoanai.vn/api/v1/'
 export const API_TIMEOUT = import.meta.env.VITE_API_TIMEOUT || 100000
 
 export const AUTHORIZATION_URL_CALLBACK =
-  import.meta.env.VITE_AUTHORIZATION_URL_CALLBACK || 'https://stocks-advisor-multiagent.onrender.com/auth/zalo/callback'
+  import.meta.env.VITE_AUTHORIZATION_URL_CALLBACK || 'https://www.dautuchungkhoanai.vn/auth/zalo/callback'
 
 export const APP_NAME = import.meta.env.VITE_APP_NAME || 'Agent CK'
 export const APP_VERSION = import.meta.env.VITE_APP_VERSION || '1.0.0'

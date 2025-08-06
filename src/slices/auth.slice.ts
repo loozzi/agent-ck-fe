@@ -236,10 +236,7 @@ const userSlice = createSlice({
       .addCase(signOutAction.pending, (state) => {
         state.isAuthenticated = false
         state.user = null
-        state.token = null
-        state.refreshToken = null
         state.loading = false
-        state.signUpSuccess = false
       })
       .addCase(signOutAction.fulfilled, (state) => {
         state.isAuthenticated = false
