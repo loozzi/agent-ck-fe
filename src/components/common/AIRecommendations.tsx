@@ -57,7 +57,7 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({
                     <span
                       className={`px-2 py-0.5 rounded text-xs font-semibold ${rec.signal === 'BUY' ? 'bg-green-600' : rec.signal === 'SELL' ? 'bg-red-600' : 'bg-yellow-400 text-gray-900'}`}
                     >
-                      {rec.signal}
+                      {rec.signal === 'BUY' ? 'MUA' : rec.signal === 'SELL' ? 'BÁN' : 'GIỮ'}
                     </span>
                     <span className='ml-2 text-xs text-white/80'>Độ tin cậy: {rec.confidence ?? '-'}</span>
                   </div>
