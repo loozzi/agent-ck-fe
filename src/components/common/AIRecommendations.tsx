@@ -122,9 +122,9 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({
                     <StockChart
                       ticker={rec.ticker}
                       className='w-full h-full'
-                      entryPrice={rec.entry_price ? rec.entry_price / 1000 : undefined}
-                      takeProfit={rec.take_profit ? rec.take_profit / 1000 : undefined}
-                      stopLoss={rec.stop_loss ? rec.stop_loss / 1000 : undefined}
+                      entryPrice={rec.entry_price ? rec.entry_price : undefined}
+                      takeProfit={rec.take_profit ? rec.take_profit : undefined}
+                      stopLoss={rec.stop_loss ? rec.stop_loss : undefined}
                       entryTime={rec.created_at}
                     />
                   </div>
