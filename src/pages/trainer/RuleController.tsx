@@ -161,6 +161,11 @@ const RuleController = () => {
       await dispatch(deleteLogicRule(selectedRule.id)).unwrap()
       setShowDeleteDialog(false)
       setSelectedRule(null)
+      if (user?.role === 'admin') {
+        dispatch(fetchAdminLogicRules({}))
+      } else {
+        dispatch(getLogicRules({}))
+      }
     } catch (error) {
     } finally {
       setIsDeleting(false)
