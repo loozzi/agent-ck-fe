@@ -321,7 +321,7 @@ const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss, entry
                     stroke='#2563eb'
                     strokeDasharray='4 2'
                     strokeWidth={2}
-                    label={{ value: 'Entry', position: 'right', fill: '#2563eb', fontSize: 10, fontWeight: 'bold' }}
+                    label={{ value: 'Giá vào', position: 'left', fill: '#2563eb', fontSize: 10, fontWeight: 'bold' }}
                   />
                 )}
                 {/* Đường kẻ dọc cho thời điểm vào lệnh (entryTime) - line liền, màu giống entry price */}
@@ -349,7 +349,7 @@ const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss, entry
                     stroke='#22c55e'
                     strokeDasharray='4 2'
                     strokeWidth={2}
-                    label={{ value: 'TP', position: 'right', fill: '#22c55e', fontSize: 10, fontWeight: 'bold' }}
+                    label={{ value: 'Chốt lời', position: 'left', fill: '#22c55e', fontSize: 10, fontWeight: 'bold' }}
                   />
                 )}
                 {stopLoss && (
@@ -358,7 +358,7 @@ const StockChart = ({ ticker, className, entryPrice, takeProfit, stopLoss, entry
                     stroke='#ef4444'
                     strokeDasharray='4 2'
                     strokeWidth={2}
-                    label={{ value: 'SL', position: 'right', fill: '#ef4444', fontSize: 10, fontWeight: 'bold' }}
+                    label={{ value: 'Cắt lỗ', position: 'left', fill: '#ef4444', fontSize: 10, fontWeight: 'bold' }}
                   />
                 )}
                 <Area
