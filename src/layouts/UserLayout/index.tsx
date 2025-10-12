@@ -181,6 +181,12 @@ const UserLayout = () => {
 
       {/* Zalo Follow Dialog - Show when user hasn't followed */}
       <ZaloFollowDialog open={showZaloDialog} onOpenChange={setShowZaloDialog} />
+      <div
+        className='flex justify-center'
+        dangerouslySetInnerHTML={{
+          __html: `<div class="zalo-follow-only-button" data-oaid="4412053929170802954"></div>`
+        }}
+      />
 
       <div
         className='fixed bottom-20 right-4 z-50'
