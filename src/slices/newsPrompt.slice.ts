@@ -9,6 +9,7 @@ import type {
   TestNewsPromptPayload,
   TestNewsPromptResponse
 } from '@/types/news_prompt'
+import { toast } from 'react-toastify'
 
 const initialState: NewsPromptState = {
   prompts: [],
@@ -60,10 +61,11 @@ export const createNewsPrompt = createAsyncThunk(
   async (payload: CreateNewsPromptPayload, { rejectWithValue }) => {
     try {
       const response = await newsPromptService.createNewsPrompt(payload)
-      if (response.status !== 201) {
+      if (response.status !== 200) {
         const errorMessage = (response as any).response?.data?.detail || 'Không thể tạo prompt'
         return rejectWithValue(errorMessage)
       }
+      toast.success('Tạo prompt thành công')
       return response.data as NewsPrompt
     } catch (error) {
       return rejectWithValue((error as any).response?.data?.message || 'Không thể tạo prompt')
@@ -96,9 +98,26 @@ export const updateNewsPrompt = createAsyncThunk(
         const errorMessage = (response as any).response?.data?.detail || 'Không thể cập nhật prompt'
         return rejectWithValue(errorMessage)
       }
+      toast.success('Cập nhật prompt thành công')
       return response.data as NewsPrompt
     } catch (error) {
       return rejectWithValue((error as any).response?.data?.message || 'Không thể cập nhật prompt')
+    }
+  }
+)
+
+export const toggleNewsPromptActive = createAsyncThunk(
+  'newsPrompt/toggleNewsPromptActive',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await newsPromptService.toggleNewsPromptActive(id)
+      if (response.status !== 200) {
+        const errorMessage = (response as any).response?.data?.detail || 'Không thể thay đổi trạng thái prompt'
+        return rejectWithValue(errorMessage)
+      }
+      return response.data as NewsPrompt
+    } catch (error) {
+      return rejectWithValue((error as any).response?.data?.message || 'Không thể thay đổi trạng thái prompt')
     }
   }
 )
@@ -108,10 +127,11 @@ export const deleteNewsPrompt = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       const response = await newsPromptService.deleteNewsPrompt(id)
-      if (response.status !== 204) {
+      if (response.status !== 200) {
         const errorMessage = (response as any).response?.data?.detail || 'Không thể xóa prompt'
         return rejectWithValue(errorMessage)
       }
+      toast.success('Xóa prompt thành công')
       return id
     } catch (error) {
       return rejectWithValue((error as any).response?.data?.message || 'Không thể xóa prompt')
@@ -138,7 +158,7 @@ const newsPromptSlice = createSlice({
       })
       .addCase(fetchNewsPrompts.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload as string
+        toast.error(action.payload as string)
       })
       .addCase(createNewsPrompt.pending, (state) => {
         state.isLoading = true
@@ -150,7 +170,7 @@ const newsPromptSlice = createSlice({
       })
       .addCase(createNewsPrompt.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload as string
+        toast.error(action.payload as string)
       })
       .addCase(updateNewsPrompt.pending, (state) => {
         state.isLoading = true
@@ -165,7 +185,7 @@ const newsPromptSlice = createSlice({
       })
       .addCase(updateNewsPrompt.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload as string
+        toast.error(action.payload as string)
       })
       .addCase(deleteNewsPrompt.pending, (state) => {
         state.isLoading = true
@@ -177,7 +197,7 @@ const newsPromptSlice = createSlice({
       })
       .addCase(deleteNewsPrompt.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload as string
+        toast.error(action.payload as string)
       })
       .addCase(testNewsPrompt.pending, (state) => {
         state.isLoading = true
@@ -188,7 +208,7 @@ const newsPromptSlice = createSlice({
       })
       .addCase(testNewsPrompt.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload as string
+        toast.error(action.payload as string)
       })
       .addCase(fetchNewsPromptsById.pending, (state) => {
         state.isLoading = true
@@ -199,7 +219,22 @@ const newsPromptSlice = createSlice({
       })
       .addCase(fetchNewsPromptsById.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload as string
+        toast.error(action.payload as string)
+      })
+      .addCase(toggleNewsPromptActive.pending, (state) => {
+        state.isLoading = true
+        state.error = undefined
+      })
+      .addCase(toggleNewsPromptActive.fulfilled, (state, action) => {
+        const index = state.prompts.findIndex((prompt) => prompt.id === action.payload.id)
+        if (index !== -1) {
+          state.prompts[index] = action.payload
+        }
+        state.isLoading = false
+      })
+      .addCase(toggleNewsPromptActive.rejected, (state, action) => {
+        state.isLoading = false
+        toast.error(action.payload as string)
       })
   }
 })

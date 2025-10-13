@@ -30,7 +30,7 @@ const newsPromptService = {
     return apiInstance.put(`/news-prompts/${id}`, payload)
   },
   toggleNewsPromptActive: (id: string): Promise<AxiosResponse<NewsPrompt>> => {
-    return apiInstance.patch(`/news-prompts/${id}/activate`)
+    return apiInstance.post(`/news-prompts/${id}/activate`)
   }
 }
 
