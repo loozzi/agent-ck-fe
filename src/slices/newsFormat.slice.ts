@@ -135,6 +135,10 @@ const newsFormatSlice = createSlice({
       })
       .addCase(fetchNewsFormats.fulfilled, (state, action) => {
         state.loadingFetchFormats = false
+        state.formats = action.payload.formats
+        state.total = action.payload.total
+        state.page = action.payload.page
+        state.per_page = action.payload.per_page
       })
       .addCase(fetchNewsFormats.rejected, (state) => {
         state.loadingFetchFormats = false
@@ -183,14 +187,14 @@ const newsFormatSlice = createSlice({
       .addCase(testNewsFormat.rejected, (state) => {
         state.loadingTestFormat = false
       })
-      .addCase(checkNewsFormatConflict.pending, (state) => {
+      .addCase(checkNewsFormatConflict.pending, (_state) => {
         // No loading state for conflict check
       })
       .addCase(checkNewsFormatConflict.fulfilled, (state, action) => {
         // No loading state for conflict check
         state.conflictFormat = action.payload.conflicting_format
       })
-      .addCase(checkNewsFormatConflict.rejected, (state) => {
+      .addCase(checkNewsFormatConflict.rejected, (_state) => {
         // No loading state for conflict check
       })
   }

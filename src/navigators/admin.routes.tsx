@@ -3,6 +3,7 @@ import HistoryTransaction from '@/pages/admin/HistoryTransaction'
 import LessonManagement from '@/pages/admin/Lesson'
 import LessonCreate from '@/pages/admin/LessonCreate'
 import LessonDetail from '@/pages/admin/LessonDetail'
+import NewsFormatManagement from '@/pages/admin/NewsFormatManagement'
 import NewsPromptManagement from '@/pages/admin/NewsPromptManagement'
 import PricingManagement from '@/pages/admin/PricingManagement'
 import AdminSetting from '@/pages/admin/Setting'
@@ -105,6 +106,12 @@ export const adminRoutesConfig: RouteBrowser[] = [
     name: 'News Prompt Management',
     route: 'news-prompt-management',
     element: <NewsPromptManagement />,
+    exact: true
+  },
+  {
+    name: 'News Format Management',
+    route: 'news-format-management',
+    element: <NewsFormatManagement />,
     exact: true
   }
 ]

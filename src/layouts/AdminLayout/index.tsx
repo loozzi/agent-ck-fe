@@ -4,7 +4,7 @@ import Sidebar from '@/components/layouts/Sidebar'
 import SidebarProvider from '@/components/layouts/SidebarProvider'
 import AdminNavigator from '@/navigators/admin.routes'
 import { useEffect, useState } from 'react'
-import { FaBookOpen, FaCodeBranch, FaDotCircle, FaHistory, FaHome, FaMoneyBill, FaUsers } from 'react-icons/fa'
+import { FaBone, FaBookOpen, FaCodeBranch, FaDotCircle, FaHistory, FaHome, FaMoneyBill, FaUsers } from 'react-icons/fa'
 import { IoIosSettings } from 'react-icons/io'
 import { MdOutlineMonitorHeart } from 'react-icons/md'
 import { RiSurveyFill } from 'react-icons/ri'
@@ -62,6 +62,12 @@ const AdminLayout = () => {
       title: 'Quản lý news prompt',
       icon: <FaDotCircle className='w-4 h-4' />,
       href: '/admin/news-prompt-management'
+    },
+    {
+      id: 'news-format-management',
+      title: 'Quản lý news format',
+      icon: <FaBone className='w-4 h-4' />,
+      href: '/admin/news-format-management'
     },
     // {
     //   id: 'subscription',
