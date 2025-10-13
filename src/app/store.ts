@@ -22,6 +22,7 @@ import lessonReducer from '@/slices/lesson.slice'
 import adminSurveyReducer from '@/slices/adminSurvey.slice'
 import emailReducer from '@/slices/email.slice'
 import analysisReducer from '@/slices/analysis.slice'
+import newsFormatReducer from '@/slices/newsFormat.slice'
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -33,6 +34,7 @@ const rootReducer = combineReducers({
   stock: stockReducer,
   news: newsReducer,
   newsPrompt: newsPromptReducer,
+  newsFormat: newsFormatReducer,
   prompt: promptReducer,
   logicRule: logicRuleReducer,
   zalo: zaloReducer,
