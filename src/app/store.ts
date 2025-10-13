@@ -3,6 +3,7 @@ import chatReducer from '@/slices/chat.slice'
 import logicRuleReducer from '@/slices/logicRule.slice'
 import mbtiReducer from '@/slices/mbti.slice'
 import newsReducer from '@/slices/news.slice'
+import newsPromptReducer from '@/slices/newsPrompt.slice'
 import portfolioReducer from '@/slices/portfolio.slice'
 import promptReducer from '@/slices/prompt.slice'
 import stockReducer from '@/slices/stock.slice'
@@ -31,6 +32,7 @@ const rootReducer = combineReducers({
   chat: chatReducer,
   stock: stockReducer,
   news: newsReducer,
+  newsPrompt: newsPromptReducer,
   prompt: promptReducer,
   logicRule: logicRuleReducer,
   zalo: zaloReducer,
@@ -56,6 +58,7 @@ const persistConfig = {
     'subscription',
     'stock',
     'news',
+    'newsPrompt',
     'prompt',
     'logicRule',
     'zalo',

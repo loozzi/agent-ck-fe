@@ -130,7 +130,7 @@ const newsPromptSlice = createSlice({
         state.error = undefined
       })
       .addCase(fetchNewsPrompts.fulfilled, (state, action) => {
-        state.prompts = action.payload.items
+        state.prompts = action.payload.prompts
         state.total = action.payload.total
         state.page = action.payload.page
         state.per_page = action.payload.per_page
