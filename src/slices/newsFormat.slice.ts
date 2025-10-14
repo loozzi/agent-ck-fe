@@ -1,12 +1,12 @@
+import newsFormatService from '@/services/newsFormat.service'
 import type {
   GetNewsFormatsParams,
-  NewsFormatCreatePayload,
   NewsFormatCheckConflictPayload,
+  NewsFormatCreatePayload,
   NewsFormatState,
   TestNewsFormatPayload
 } from '@/types/news_format'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import newsFormatService from '@/services/newsFormat.service'
 import { toast } from 'react-toastify'
 
 const initialState: NewsFormatState = {
@@ -24,7 +24,7 @@ const initialState: NewsFormatState = {
 
 export const fetchNewsFormats = createAsyncThunk(
   'newsFormat/fetchNewsFormats',
-  async (params?: GetNewsFormatsParams, { rejectWithValue }) => {
+  async (params: GetNewsFormatsParams, { rejectWithValue }) => {
     try {
       const response = await newsFormatService.getFormats(params)
       if (response.status !== 200) {
@@ -34,7 +34,7 @@ export const fetchNewsFormats = createAsyncThunk(
       return response.data
     } catch (error) {
       toast.error('Failed to fetch news formats')
-      return rejectWithValue(error.response.data)
+      return rejectWithValue(error)
     }
   }
 )
@@ -51,7 +51,7 @@ export const createNewsFormat = createAsyncThunk(
       return response.data
     } catch (error) {
       toast.error('Failed to create news format')
-      return rejectWithValue(error.response.data)
+      return rejectWithValue(error)
     }
   }
 )
@@ -68,7 +68,7 @@ export const updateNewsFormat = createAsyncThunk(
       return response.data
     } catch (error) {
       toast.error('Failed to update news format')
-      return rejectWithValue(error.response.data)
+      return rejectWithValue(error)
     }
   }
 )
@@ -85,7 +85,7 @@ export const deleteNewsFormat = createAsyncThunk(
       return response.data
     } catch (error) {
       toast.error('Failed to delete news format')
-      return rejectWithValue(error.response.data)
+      return rejectWithValue(error)
     }
   }
 )
@@ -102,7 +102,7 @@ export const testNewsFormat = createAsyncThunk(
       return response.data
     } catch (error) {
       toast.error('Failed to test news format')
-      return rejectWithValue(error.response.data)
+      return rejectWithValue(error)
     }
   }
 )
@@ -119,7 +119,7 @@ export const checkNewsFormatConflict = createAsyncThunk(
       return response.data
     } catch (error) {
       toast.error('Failed to check news format conflict')
-      return rejectWithValue(error.response.data)
+      return rejectWithValue(error)
     }
   }
 )
