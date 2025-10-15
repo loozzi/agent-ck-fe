@@ -34,6 +34,7 @@ import {
 } from '@/slices/newsFormat.slice'
 import type { NewsFormatResponse } from '@/types/news_format'
 import { AlertTriangle, Clock, Eye, MoreHorizontal, Plus, Settings, Trash2 } from 'lucide-react'
+import { toast } from 'react-toastify'
 
 const NewsFormatManagement = () => {
   const dispatch = useAppDispatch()
@@ -55,7 +56,7 @@ const NewsFormatManagement = () => {
   const [editedContent, setEditedContent] = useState('')
   const [editedName, setEditedName] = useState('')
   const [editedActiveDays, setEditedActiveDays] = useState<number[]>([])
-  const [editedActiveHour, setEditedActiveHour] = useState<number>(9)
+  const [editedActiveHour, setEditedActiveHour] = useState<number>(7)
   const [activeTab, setActiveTab] = useState('settings')
   const [isPreviewLoading, setIsPreviewLoading] = useState(false)
   const [testResult, setTestResult] = useState<string>('')
@@ -63,21 +64,60 @@ const NewsFormatManagement = () => {
   const [newFormatName, setNewFormatName] = useState('')
   const [newFormatContent, setNewFormatContent] = useState('')
   const [newActiveDays, setNewActiveDays] = useState<number[]>([])
-  const [newActiveHour, setNewActiveHour] = useState<number>(9)
+  const [newActiveHour, setNewActiveHour] = useState<number>(7)
   const [createActiveTab, setCreateActiveTab] = useState('settings')
   const [isCreatePreviewLoading, setIsCreatePreviewLoading] = useState(false)
   const [createTestResult, setCreateTestResult] = useState<string>('')
   const [showConflictWarning, setShowConflictWarning] = useState(false)
 
+  // API validation: active_days phải là số từ 1-7 (1=T2, 2=T3, ..., 7=CN)
   const daysOfWeek = [
-    { value: 0, label: 'Chủ nhật' },
     { value: 1, label: 'Thứ 2' },
     { value: 2, label: 'Thứ 3' },
     { value: 3, label: 'Thứ 4' },
     { value: 4, label: 'Thứ 5' },
     { value: 5, label: 'Thứ 6' },
-    { value: 6, label: 'Thứ 7' }
+    { value: 6, label: 'Thứ 7' },
+    { value: 7, label: 'Chủ nhật' }
   ]
+
+  // API validation: active_hour phải là 7, 10 hoặc 14
+  const allowedHours = [
+    { value: 7, label: '07:00' },
+    { value: 10, label: '10:00' },
+    { value: 14, label: '14:00' }
+  ]
+
+  // Helper functions to convert old format to new format
+  const convertDaysToNewFormat = (days: number[]): number[] => {
+    return days
+      .map((day) => {
+        // If already in new format (1-7), return as is
+        if (day >= 1 && day <= 7) return day
+        // Convert old format (0-6) to new format (1-7)
+        // 0=Sunday -> 7, 1=Monday -> 1, 2=Tuesday -> 2, etc.
+        return day === 0 ? 7 : day
+      })
+      .filter((day) => day >= 1 && day <= 7)
+      .sort()
+  }
+
+  const convertHourToValidFormat = (hour: number): number => {
+    // If already valid, return as is
+    if ([7, 10, 14].includes(hour)) return hour
+    // Convert to nearest valid hour
+    if (hour < 8.5) return 7
+    if (hour < 12) return 10
+    return 14
+  }
+
+  const validateFormatData = (days: number[], hour: number): boolean => {
+    // Check if all days are in valid range 1-7
+    const validDays = days.every((day) => day >= 1 && day <= 7)
+    // Check if hour is one of allowed values
+    const validHour = [7, 10, 14].includes(hour)
+    return validDays && validHour && days.length > 0
+  }
 
   useEffect(() => {
     dispatch(fetchNewsFormats({ page: 1, per_page: 10 }))
@@ -98,14 +138,38 @@ const NewsFormatManagement = () => {
     setManageFormat(format)
     setEditedContent(format.content)
     setEditedName(format.name)
-    setEditedActiveDays(format.active_days)
-    setEditedActiveHour(format.active_hour)
+
+    // Convert to new format before setting state
+    const convertedDays = convertDaysToNewFormat(format.active_days)
+    const convertedHour = convertHourToValidFormat(format.active_hour)
+
+    // Show notification if data was converted
+    const daysChanged = JSON.stringify(convertedDays) !== JSON.stringify(format.active_days)
+    const hourChanged = convertedHour !== format.active_hour
+
+    if (daysChanged || hourChanged) {
+      console.log('Format data converted to new API format:', {
+        oldDays: format.active_days,
+        newDays: convertedDays,
+        oldHour: format.active_hour,
+        newHour: convertedHour
+      })
+    }
+
+    setEditedActiveDays(convertedDays)
+    setEditedActiveHour(convertedHour)
     setActiveTab('settings')
     setTestResult('')
   }
 
   const handleSaveChanges = async () => {
     if (!manageFormat) return
+
+    // Validate data before sending
+    if (!validateFormatData(editedActiveDays, editedActiveHour)) {
+      toast.error('Dữ liệu không hợp lệ. Vui lòng kiểm tra lại ngày và giờ hoạt động.')
+      return
+    }
 
     // Check for conflicts before saving
     try {
@@ -183,7 +247,7 @@ const NewsFormatManagement = () => {
     setNewFormatName('')
     setNewFormatContent('')
     setNewActiveDays([])
-    setNewActiveHour(9)
+    setNewActiveHour(7)
     setCreateActiveTab('settings')
     setCreateTestResult('')
     setShowConflictWarning(false)
@@ -191,7 +255,13 @@ const NewsFormatManagement = () => {
 
   const handleCreateFormat = async () => {
     if (!newFormatName.trim() || !newFormatContent.trim() || newActiveDays.length === 0) {
-      alert('Vui lòng nhập đầy đủ thông tin')
+      toast.warn('Vui lòng nhập đầy đủ thông tin')
+      return
+    }
+
+    // Validate data before sending
+    if (!validateFormatData(newActiveDays, newActiveHour)) {
+      toast.error('Dữ liệu không hợp lệ. Vui lòng kiểm tra lại ngày và giờ hoạt động.')
       return
     }
 
@@ -224,13 +294,13 @@ const NewsFormatManagement = () => {
       setShowCreateModal(false)
     } catch (error) {
       console.error('Error creating format:', error)
-      alert('Có lỗi xảy ra khi tạo format')
+      toast.error('Có lỗi xảy ra khi tạo format')
     }
   }
 
   const handleCreatePreviewResult = async () => {
     if (!newFormatContent.trim()) {
-      alert('Vui lòng nhập nội dung format trước khi test')
+      toast.warn('Vui lòng nhập nội dung format trước khi test')
       return
     }
 
@@ -287,7 +357,12 @@ const NewsFormatManagement = () => {
   }
 
   const formatActiveDays = (days: number[]) => {
-    return days.map((day) => daysOfWeek.find((d) => d.value === day)?.label).join(', ')
+    // Convert to new format first to ensure consistent display
+    const convertedDays = convertDaysToNewFormat(days)
+    return convertedDays
+      .map((day) => daysOfWeek.find((d) => d.value === day)?.label)
+      .filter(Boolean)
+      .join(', ')
   }
 
   const formatActiveHour = (hour: number) => {
@@ -461,6 +536,7 @@ const NewsFormatManagement = () => {
                     </div>
                   ))}
                 </div>
+                <p className='text-xs text-gray-500 mt-2'>Chọn ít nhất một ngày trong tuần</p>
               </div>
 
               <div>
@@ -473,13 +549,14 @@ const NewsFormatManagement = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {Array.from({ length: 24 }, (_, i) => (
-                      <SelectItem key={i} value={i.toString()}>
-                        {i.toString().padStart(2, '0')}:00
+                    {allowedHours.map((hour) => (
+                      <SelectItem key={hour.value} value={hour.value.toString()}>
+                        {hour.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                <p className='text-xs text-gray-500 mt-1'>Chỉ cho phép: 7h, 10h, 14h</p>
               </div>
 
               <div className='flex items-center justify-between pt-4'>
@@ -595,6 +672,7 @@ const NewsFormatManagement = () => {
                     </div>
                   ))}
                 </div>
+                <p className='text-xs text-gray-500 mt-2'>Chọn ít nhất một ngày trong tuần</p>
               </div>
 
               <div>
@@ -604,13 +682,14 @@ const NewsFormatManagement = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {Array.from({ length: 24 }, (_, i) => (
-                      <SelectItem key={i} value={i.toString()}>
-                        {i.toString().padStart(2, '0')}:00
+                    {allowedHours.map((hour) => (
+                      <SelectItem key={hour.value} value={hour.value.toString()}>
+                        {hour.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                <p className='text-xs text-gray-500 mt-1'>Chỉ cho phép: 7h, 10h, 14h</p>
               </div>
 
               <div className='flex items-center justify-between pt-4'>

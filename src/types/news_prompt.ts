@@ -37,6 +37,14 @@ export interface TestNewsPromptResponse {
   error?: string
 }
 
+export interface TestNewsPromptSSEEvent {
+  type: 'progress' | 'complete' | 'error'
+  progress?: number
+  message?: string
+  result?: string
+  error?: string
+}
+
 export interface NewsPromptState {
   prompts: NewsPrompt[]
   isLoading: boolean
@@ -44,4 +52,7 @@ export interface NewsPromptState {
   total: number
   page: number
   per_page: number
+  testProgress?: number
+  testMessage?: string
+  isTestInProgress?: boolean
 }

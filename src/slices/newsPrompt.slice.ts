@@ -6,8 +6,7 @@ import type {
   GetNewsPromptsResponse,
   NewsPrompt,
   NewsPromptState,
-  TestNewsPromptPayload,
-  TestNewsPromptResponse
+  TestNewsPromptPayload
 } from '@/types/news_prompt'
 import { toast } from 'react-toastify'
 
@@ -17,7 +16,10 @@ const initialState: NewsPromptState = {
   error: undefined,
   total: 0,
   page: 1,
-  per_page: 10
+  per_page: 10,
+  testProgress: 0,
+  testMessage: '',
+  isTestInProgress: false
 }
 
 export const fetchNewsPrompts = createAsyncThunk(
@@ -75,16 +77,21 @@ export const createNewsPrompt = createAsyncThunk(
 
 export const testNewsPrompt = createAsyncThunk(
   'newsPrompt/testNewsPrompt',
-  async (payload: TestNewsPromptPayload, { rejectWithValue }) => {
+  async (payload: TestNewsPromptPayload, { rejectWithValue, dispatch }) => {
     try {
-      const response = await newsPromptService.testNewsPrompt(payload)
-      if (response.status !== 200) {
-        const errorMessage = (response as any).response?.data?.detail || 'Không thể kiểm tra prompt'
-        return rejectWithValue(errorMessage)
-      }
-      return response.data as TestNewsPromptResponse
+      const response = await newsPromptService.testNewsPromptSSE(payload, (event) => {
+        if (event.type === 'progress') {
+          dispatch(
+            newsPromptSlice.actions.updateTestProgress({
+              progress: event.progress || 0,
+              message: event.message || ''
+            })
+          )
+        }
+      })
+      return response
     } catch (error) {
-      return rejectWithValue((error as any).response?.data?.message || 'Không thể kiểm tra prompt')
+      return rejectWithValue((error as Error).message || 'Không thể kiểm tra prompt')
     }
   }
 )
@@ -142,7 +149,17 @@ export const deleteNewsPrompt = createAsyncThunk(
 const newsPromptSlice = createSlice({
   name: 'newsPrompt',
   initialState,
-  reducers: {},
+  reducers: {
+    updateTestProgress: (state, action) => {
+      state.testProgress = action.payload.progress
+      state.testMessage = action.payload.message
+    },
+    resetTestProgress: (state) => {
+      state.testProgress = 0
+      state.testMessage = ''
+      state.isTestInProgress = false
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchNewsPrompts.pending, (state) => {
@@ -202,12 +219,22 @@ const newsPromptSlice = createSlice({
       .addCase(testNewsPrompt.pending, (state) => {
         state.isLoading = true
         state.error = undefined
+        state.isTestInProgress = true
+        state.testProgress = 0
+        state.testMessage = 'Bắt đầu kiểm tra prompt...'
       })
       .addCase(testNewsPrompt.fulfilled, (state) => {
         state.isLoading = false
+        state.isTestInProgress = false
+        state.testProgress = 100
+        state.testMessage = 'Kiểm tra prompt hoàn thành'
+        toast.success('Kiểm tra prompt thành công')
       })
       .addCase(testNewsPrompt.rejected, (state, action) => {
         state.isLoading = false
+        state.isTestInProgress = false
+        state.testProgress = 0
+        state.testMessage = ''
         toast.error(action.payload as string)
       })
       .addCase(fetchNewsPromptsById.pending, (state) => {
@@ -239,5 +266,6 @@ const newsPromptSlice = createSlice({
   }
 })
 
+export const { updateTestProgress, resetTestProgress } = newsPromptSlice.actions
 const newsPromptReducer = newsPromptSlice.reducer
 export default newsPromptReducer
