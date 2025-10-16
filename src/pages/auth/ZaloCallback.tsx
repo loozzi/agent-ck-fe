@@ -1,12 +1,10 @@
 import { useAppDispatch, useAppSelector } from '@/app/hook'
-import { zaloCompleteLogin } from '@/slices/auth.slice'
-import { getZaloData, sendZaloCode } from '@/slices/zalo.slice'
-import { useEffect } from 'react'
 import ZaloIcon from '@/assets/zalo.png'
+import { zaloSignInAction } from '@/slices/auth.slice'
+import { useEffect } from 'react'
 
 const ZaloCallback = () => {
   const searchParams = new URLSearchParams(window.location.search)
-  const { zaloResponse, userData } = useAppSelector((state) => state.zalo)
   const { isAuthenticated, user } = useAppSelector((state) => state.auth)
   const dispatch = useAppDispatch()
   const code = searchParams.get('code')
@@ -23,32 +21,9 @@ const ZaloCallback = () => {
       console.log('Zalo code:', code)
       console.log('Zalo state:', state)
 
-      dispatch(sendZaloCode({ code, state }))
+      dispatch(zaloSignInAction({ code, state }))
     }
   }, [code, state, error])
-
-  useEffect(() => {
-    if (zaloResponse) {
-      const { client_api_info } = zaloResponse
-      const { access_token } = client_api_info
-
-      dispatch(getZaloData({ access_token }))
-    }
-  }, [zaloResponse])
-
-  useEffect(() => {
-    if (userData && state && code) {
-      dispatch(
-        zaloCompleteLogin({
-          oauth_data: {
-            authorization_code: code,
-            state: state
-          },
-          user_info: userData
-        })
-      )
-    }
-  }, [userData])
 
   useEffect(() => {
     if (isAuthenticated && user?.onboarding_completed) {

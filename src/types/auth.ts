@@ -82,3 +82,8 @@ export interface ChangePasswordResponse {
   password_changed: boolean
   sessions_invalidated: boolean
 }
+
+export interface ZaloCallbackParams {
+  code: string
+  state: string
+}

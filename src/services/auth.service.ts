@@ -5,7 +5,8 @@ import type {
   SignInResponse,
   SignUpResponse,
   ZaloCompleteLoginPayload,
-  ZaloCompleteLoginResponse
+  ZaloCompleteLoginResponse,
+  ZaloCallbackParams
 } from '@/types/auth'
 import type { RefreshTokenPayload, SignInPayload, SignUpPayload } from '@/types/payload'
 import type { AxiosResponse } from 'axios'
@@ -25,6 +26,8 @@ const authService = {
   signOut: (): Promise<AxiosResponse<void>> => apiInstance.post('/auth/logout'),
   completeLogin: (data: ZaloCompleteLoginPayload): Promise<AxiosResponse<ZaloCompleteLoginResponse>> =>
     apiInstance.post('/auth/zalo/complete-login', data),
+  signInZalo: (params: ZaloCallbackParams): Promise<AxiosResponse<ZaloCompleteLoginResponse>> =>
+    apiInstance.get('/auth/zalo/callback', { params }),
   changePassword: (data: ChangePasswordPayload): Promise<AxiosResponse<ChangePasswordResponse>> =>
     apiInstance.post('/auth/change-password', data)
 }

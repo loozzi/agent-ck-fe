@@ -1,7 +1,7 @@
 import authService from '@/services/auth.service'
 import subscriptionService from '@/services/subscription.service'
 import userService from '@/services/user.service'
-import type { AuthState, ZaloCompleteLoginPayload } from '@/types/auth'
+import type { AuthState, ZaloCallbackParams, ZaloCompleteLoginPayload } from '@/types/auth'
 import type { SignInPayload, SignUpPayload } from '@/types/payload'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
@@ -114,6 +114,25 @@ export const zaloCompleteLogin = createAsyncThunk(
   async (payload: ZaloCompleteLoginPayload, { rejectWithValue }) => {
     try {
       const response = await authService.completeLogin(payload)
+      if (response.status === 200) {
+        toast.success('Đăng nhập Zalo thành công')
+        return response.data
+      } else {
+        toast.error((response as any).response.data.detail || 'Đăng nhập Zalo không thành công')
+        return rejectWithValue('Đăng nhập Zalo không thành công')
+      }
+    } catch (error) {
+      toast.error('Đã xảy ra lỗi khi đăng nhập Zalo')
+      return rejectWithValue(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi đăng nhập Zalo')
+    }
+  }
+)
+
+export const zaloSignInAction = createAsyncThunk(
+  'auth/zaloSignIn',
+  async (params: ZaloCallbackParams, { rejectWithValue }) => {
+    try {
+      const response = await authService.signInZalo(params)
       if (response.status === 200) {
         toast.success('Đăng nhập Zalo thành công')
         return response.data
@@ -283,6 +302,28 @@ const userSlice = createSlice({
       })
       .addCase(changePasswordAction.rejected, (state) => {
         state.loading = false
+      })
+      .addCase(zaloSignInAction.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(zaloSignInAction.fulfilled, (state, action) => {
+        state.isAuthenticated = true
+        state.user = action.payload.user
+        state.token = action.payload.access_token
+        state.refreshToken = action.payload.refresh_token
+        state.loading = false
+        if (action.payload.user.onboarding_completed) {
+          window.location.href = '/dashboard'
+        } else {
+          window.location.href = '/survey'
+        }
+      })
+      .addCase(zaloSignInAction.rejected, (state) => {
+        state.loading = false
+        state.isAuthenticated = false
+        state.user = null
+        state.token = null
+        state.refreshToken = null
       })
   }
 })
